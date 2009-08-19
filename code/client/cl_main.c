@@ -99,6 +99,9 @@ cvar_t	*cl_guidServerUniq;
 
 cvar_t	*cl_consoleKeys;
 
+cvar_t	*cl_useFilterWords;
+cvar_t	*cl_filterWords;
+
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
@@ -3124,6 +3127,9 @@ void CL_Init( void ) {
 	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
 
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
+
+	cl_useFilterWords = Cvar_Get ("cl_useFilterWords", "0", CVAR_ARCHIVE);
+	cl_filterWords = Cvar_Get ("cl_filterWords", "", CVAR_ARCHIVE);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
 #ifdef USE_CURL

@@ -34,10 +34,6 @@ extern qboolean loadCamera(const char *name);
 extern void startCamera(int time);
 extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
-#ifdef SMOKINGUNS
-char **badWords = NULL;
-int numWords;
-#endif
 /*
 ====================
 CL_GetGameState
@@ -416,37 +412,40 @@ Bad Word Filter
 
 ====================
 */
-#ifdef SMOKINGUNS
 char* fixBadWords(char *str)
 {
-	char *at;
-	char wordBuf[4096];
-	int cIndex;
+	char *pos;
+	char *wordStart;
+	char *wordEnd;
+	int wordLen;
 	int i;
 
-	for( i=0;i<numWords;++i )
-	{
-		at = str;
+	wordStart = cl_filterWords->string;
 
-		while( ( at = (char *)Q_stristr( at, badWords[i] ) ) )
-		{
-#ifndef min
-#define min(a, b)	(a) < (b) ? a : b
-#endif
-			cIndex = min( strspn( at, "ABCDEFGHIIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ), sizeof( wordBuf ) - 1 );
-			memcpy( wordBuf, at, cIndex );
-			wordBuf[cIndex] = '\0';
-
-			if( ( Q_stricmp(badWords[i], wordBuf) == 0 ) && ( at == str || ( at[-1] == ' ' ) || ( at > ( str + 1 ) && at[-2] == '^' ) ) )
-				Com_Memset( at, ' ', cIndex );
-
-			++at;
-		}	
+	while (*wordStart) {
+		wordLen = 0;
+		wordEnd = wordStart;
+		//Word length
+		while (*wordEnd) {
+			if (*wordEnd++ == ',')
+				break;
+			wordLen++;
+		}
+		pos = str;
+		while (*pos) {
+			if (Q_stricmpn(wordStart,pos,wordLen)==0){
+				//Replace word with *
+				for (i=0;i<wordLen;i++){
+					*pos = '*';
+					pos++;
+				}
+			}
+			pos++;
+		}
+		wordStart = wordEnd;
 	}
-
 	return str;
 }
-#endif
 
 /*
 ====================
@@ -458,11 +457,11 @@ The cgame module is making a system call
 intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	switch( args[0] ) {
 	case CG_PRINT:
-#ifndef SMOKINGUNS
-		Com_Printf( "%s", (const char*)VMA(1) );
-#else
-		Com_Printf( "%s", (const char*)fixBadWords( VMA(1) ) );
-#endif
+		if(cl_useFilterWords->integer) {
+			Com_Printf( "%s", (const char*)fixBadWords( VMA(1) ) );
+		} else {
+			Com_Printf( "%s", (const char*)VMA(1) );
+		}
 		return 0;
 	case CG_ERROR:
 		Com_Error( ERR_DROP, "%s", (const char*)VMA(1) );
@@ -773,60 +772,8 @@ void CL_InitCGame( void ) {
 	const char			*mapname;
 	int					t1, t2;
 	vmInterpret_t		interpret;
-#ifdef SMOKINGUNS
-	int					l;
-	char				*at;
-	char				blockThis[255];
-	char				*buf;
-	char				**tempBuf;
-	int					capacity = 40;
-#endif
 
 	t1 = Sys_Milliseconds();
-
-	// Load language filter
-#ifdef SMOKINGUNS
-	if( !badWords )
-	{
-		numWords = 0;
-
-		buf = Cvar_VariableString( "cg_filterWords" );
-
-		if( strlen( buf ) > 0 )
-		{
-			l = 0;
-
-			badWords = Z_Malloc( capacity * sizeof( char* ) );
-
-			at = buf;
-			while( ( at = strchr( buf, ',' ) ) )
-			{
-				if( ( l-1 ) > capacity )					// ( l-1 ) because we want to leave room for the last word
-				{
-					tempBuf = Z_Malloc( ( capacity + 40 ) * sizeof( char** ) );
-					Com_Memcpy( tempBuf, badWords, capacity * sizeof( char** ) );
-					Z_Free( badWords );
-					badWords = tempBuf;
-
-					capacity += 40;
-				}
-
-				strncpy( blockThis, buf, ( strchr( buf, ',' ) - buf ) );
-				blockThis[( strchr( buf, ',' ) - buf )] = '\0';
-				badWords[l] = strdup( blockThis );
-				buf = at + 1;
-				++l;
-			}
-
-			badWords[l] = strdup( buf );
-			++l;
-
-			numWords = l;
-		}
-		else
-			Com_Printf( "No filter loaded.\n" );
-	}
-#endif
 
 	// put away the console
 	Con_Close();
