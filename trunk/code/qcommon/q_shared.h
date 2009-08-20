@@ -28,81 +28,53 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#ifndef SMOKINGUNS
-// That sources are broken for legacy ioQ3 build
-#error "Howdy, don't do that cowboy !! "
-
-#ifdef STANDALONE
-  #define PRODUCT_NAME			"iofoo3"
-  #define BASEGAME			"foobar"
-  #define CLIENT_WINDOW_TITLE     	"changeme"
-  #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-  #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
-#else
-  #define PRODUCT_NAME			"ioq3"
-  #define BASEGAME			"baseq3"
-  #define CLIENT_WINDOW_TITLE     	"ioquake3"
-  #define CLIENT_WINDOW_MIN_TITLE 	"ioq3"
-  #define GAMENAME_FOR_MASTER		"Quake3Arena"
+// Tequila: Smokin' Guns defines update
+// MISSIONPACK must be kept out, we are STANDALONE now
+#ifdef MISSIONPACK
+#undef MISSIONPACK
 #endif
 
-#ifdef _MSC_VER
-  #define PRODUCT_VERSION "1.36"
+#define PRODUCT_NAME				"Smokin' Guns"
+#define BASEGAME					"smokinguns"
+// Tequila comment: SDK_BASEGAME is used for compatibility reason
+// If we don't use it, 1.0 client won't accept to connect to servers
+// with 1.1 game mod. It permit also to read the baseq3/pak0.pk3
+// as expected in 1.0 client until we don't need it anymore
+#define SDK_BASEGAME				"baseq3"
+#define CLIENT_WINDOW_TITLE     	"SmokinGuns"
+#define CLIENT_WINDOW_MIN_TITLE 	"SG"
+#define GAMENAME_FOR_MASTER		"smokinguns"
+
+// PRODUCT_VERSION will be used for sg_version cvar
+#ifndef PRODUCT_VERSION
+#define PRODUCT_VERSION	1.1
+#endif
+#ifndef SG_RELEASE
+#define SG_RELEASE	20090730
 #endif
 
-#define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
-
-#else
-  // Tequila: Smokin' Guns defines update
-  // MISSIONPACK must be kept out, we are STANDALONE now
-  #ifdef MISSIONPACK
-  #undef MISSIONPACK
-  #endif
-  #ifndef STANDALONE
-  #define STANDALONE
-  #endif
-
-  #define PRODUCT_NAME				"Smokin' Guns"
-  #define BASEGAME					"smokinguns"
-  // Tequila comment: SDK_BASEGAME is used for compatibility reason
-  // If we don't use it, 1.0 client won't accept to connect to servers
-  // with 1.1 game mod. It permit also to read the baseq3/pak0.pk3
-  // as expected in 1.0 client until we don't need it anymore
-  #define SDK_BASEGAME				"baseq3"
-  #define CLIENT_WINDOW_TITLE     	"SmokinGuns"
-  #define CLIENT_WINDOW_MIN_TITLE 	"SG"
-  #define GAMENAME_FOR_MASTER		"smokinguns"
-
-  // PRODUCT_VERSION will be used for sg_version cvar
-  #ifndef PRODUCT_VERSION
-    #define PRODUCT_VERSION	1.1
-  #endif
-  #ifndef SG_RELEASE
-    #define SG_RELEASE	20090730
-  #endif
-
-  #ifndef XSTRING
-  #define XSTRING(x)				STRING(x)
-  #define STRING(x)					#x
-  #endif
-
-  #define Q3_VERSION PRODUCT_NAME " " XSTRING(PRODUCT_VERSION)
-  // We should undefine it as it is redefined later by ioQ3 sources
-  #undef XSTRING
-  #undef STRING
-
-  //unlagged - lag simulation #2
-  #define MAX_LATENT_CMDS 64
-  //unlagged - lag simulation #2
-
-  //#define NEW_ANIMS
-  #define AKIMBO
-
-  #if defined Q3_VM || defined QAGAME || defined CGAME || defined UI
-  // Tequila comment: activate Smokin' Guns MOD only features
-  #define SMOKINGUNS_MOD
-  #endif
+#ifndef XSTRING
+#define XSTRING(x)				STRING(x)
+#define STRING(x)					#x
 #endif
+
+#define Q3_VERSION PRODUCT_NAME " " XSTRING(PRODUCT_VERSION)
+// We should undefine it as it is redefined later by ioQ3 sources
+#undef XSTRING
+#undef STRING
+
+//unlagged - lag simulation #2
+#define MAX_LATENT_CMDS 64
+//unlagged - lag simulation #2
+
+//#define NEW_ANIMS
+#define AKIMBO
+
+#if defined Q3_VM || defined QAGAME || defined CGAME || defined UI
+// Tequila comment: activate Smokin' Guns MOD only features
+#define SMOKINGUNS_MOD
+#endif
+
 
 #define MAX_TEAMNAME 32
 

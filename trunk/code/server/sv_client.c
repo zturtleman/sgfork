@@ -91,14 +91,9 @@ void SV_GetChallenge(netadr_t from)
 		challenge->connected = qfalse;
 	}
 
-#if ! defined STANDALONE || defined SMOKINGUNS
 	// Drop the authorize stuff if this client is coming in via v6 as the auth server does not support ipv6.
 	// Drop also for addresses coming in on local LAN and for stand-alone games independent from id's assets.
-#ifndef SMOKINGUNS
-	if(challenge->adr.type == NA_IP && !Cvar_VariableIntegerValue("com_standalone") && !Sys_IsLANAddress(from))
-#else
 	if(challenge->adr.type == NA_IP && !Sys_IsLANAddress(from))
-#endif
 	{
 		// look up the authorize server's IP
 		if (svs.authorizeAddress.type == NA_BAD)
@@ -151,7 +146,6 @@ void SV_GetChallenge(netadr_t from)
 			return;
 		}
 	}
-#endif
 
 	challenge->pingTime = svs.time;
 	NET_OutOfBandPrint( NS_SERVER, challenge->adr, "challengeResponse %i %s", challenge->challenge, clientChallenge);
@@ -200,7 +194,6 @@ static qboolean SV_TrustedClient( char* ip, char *info ) {
 }
 #endif
 
-#if ! defined STANDALONE || defined SMOKINGUNS
 /*
 ====================
 SV_AuthorizeIpPacket
@@ -276,7 +269,6 @@ void SV_AuthorizeIpPacket( netadr_t from ) {
 	// clear the challenge record so it won't timeout and let them through
 	Com_Memset( challengeptr, 0, sizeof(*challengeptr) );
 }
-#endif
 
 /*
 ==================
