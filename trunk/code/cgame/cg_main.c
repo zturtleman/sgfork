@@ -150,9 +150,10 @@ vmCvar_t	cg_autoswitch;
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
 vmCvar_t	cg_fov;
-#ifndef SMOKINGUNS
 vmCvar_t	cg_zoomFov;
-#endif
+
+vmCvar_t	cg_drawAINodes;
+
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
 vmCvar_t	cg_thirdPersonAngle;
@@ -279,8 +280,6 @@ vec3_t			ai_nodes[MAX_AINODES];
 vec3_t			ai_angles[MAX_AINODES];
 int				ai_nodepointer;
 
-qboolean		cg_cheats;
-
 vmCvar_t		hit_origin_x;
 vmCvar_t		hit_origin_y;
 vmCvar_t		hit_origin_z;
@@ -327,7 +326,11 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_fov, "cg_fov", "90", CVAR_ARCHIVE },
 #else
 	{ &cg_fov, "cg_fov", "90", CVAR_CHEAT },
+	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_CHEAT },
 #endif
+
+	{ &cg_drawAINodes, "cg_drawAINodes", "0", CVAR_CHEAT },
+
 	{ &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE },
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 	{ &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE  },
@@ -645,11 +648,6 @@ void CG_UpdateCvars( void ) {
 #endif
 		trap_Cvar_Update( cv->vmCvar );
 	}
-
-#ifdef SMOKINGUNS
-	if(!cg_cheats)
-		cg_fov.integer = 90;
-#endif
 
 	// check for modications here
 

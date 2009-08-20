@@ -690,11 +690,7 @@ static int CG_CalcFov( void ) {
 		fov_x = 90;
 	} else {
 		// user selectable
-#ifndef SMOKINGUNS
 		if ( cgs.dmflags & DF_FIXED_FOV ) {
-#else
-		if ( (cgs.dmflags & DF_FIXED_FOV) || !cg_cheats) {
-#endif
 			// dmflag to prevent wide fov for all clients
 			fov_x = 90;
 		} else {
@@ -707,11 +703,8 @@ static int CG_CalcFov( void ) {
 		}
 
 		// account for zooms
-#ifndef SMOKINGUNS
 		zoomFov = cg_zoomFov.value;
-#else
-		zoomFov = 22.5f;
-#endif
+
 		if ( zoomFov < 1 ) {
 			zoomFov = 1;
 		} else if ( zoomFov > 160 ) {

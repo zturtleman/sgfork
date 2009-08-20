@@ -4397,7 +4397,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	CG_PlayMusic();
 
-	if(cg_cheats)
+	if(cg_drawAINodes.integer)
 		CG_DrawNodes();
 #endif
 

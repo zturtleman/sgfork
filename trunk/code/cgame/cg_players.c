@@ -780,14 +780,14 @@ static qboolean	CG_RegisterClientSkin( clientInfo_t *ci, const char *modelName, 
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/lower_%s.skin", modelName, skinName );
 	ci->legsSkin = trap_R_RegisterSkin( filename );
-	if (!ci->legsSkin && cg_cheats) {
+	if (!ci->legsSkin) {
 		Com_Printf( "Leg skin load failure: %s\n", filename );
 	}
 
 
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/upper_%s.skin", modelName, skinName );
 	ci->torsoSkin = trap_R_RegisterSkin( filename );
-	if (!ci->torsoSkin && cg_cheats) {
+	if (!ci->torsoSkin) {
 		Com_Printf( "Torso skin load failure: %s\n", filename );
 	}
 
@@ -798,36 +798,36 @@ static qboolean	CG_RegisterClientSkin( clientInfo_t *ci, const char *modelName, 
 	//head
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/head_%s_damage_1.skin", modelName, skinName );
 	ci->headSkin_damage_1 = trap_R_RegisterSkin( filename );
-	if (!ci->headSkin_damage_1 && cg_cheats) {
+	if (!ci->headSkin_damage_1) {
 		Com_Printf( "Head skin load failure: %s\n", filename );
 	}
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/head_%s_damage_2.skin", modelName, skinName );
 	ci->headSkin_damage_2 = trap_R_RegisterSkin( filename );
-	if (!ci->headSkin_damage_2 && cg_cheats) {
+	if (!ci->headSkin_damage_2) {
 		Com_Printf( "Head skin load failure: %s\n", filename );
 	}
 
 	//upper
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/upper_%s_damage_1.skin", modelName, skinName );
 	ci->torsoSkin_damage_1 = trap_R_RegisterSkin( filename );
-	if (!ci->torsoSkin_damage_1 && cg_cheats) {
+	if (!ci->torsoSkin_damage_1) {
 		Com_Printf( "Torso skin load failure: %s\n", filename );
 	}
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/upper_%s_damage_2.skin", modelName, skinName );
 	ci->torsoSkin_damage_2 = trap_R_RegisterSkin( filename );
-	if (!ci->torsoSkin_damage_2 && cg_cheats) {
+	if (!ci->torsoSkin_damage_2) {
 		Com_Printf( "Torso skin load failure: %s\n", filename );
 	}
 
 	//lower
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/lower_%s_damage_1.skin", modelName, skinName );
 	ci->legsSkin_damage_1 = trap_R_RegisterSkin( filename );
-	if (!ci->legsSkin_damage_1 && cg_cheats) {
+	if (!ci->legsSkin_damage_1) {
 		Com_Printf( "Torso skin load failure: %s\n", filename );
 	}
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/lower_%s_damage_2.skin", modelName, skinName );
 	ci->legsSkin_damage_2 = trap_R_RegisterSkin( filename );
-	if (!ci->legsSkin_damage_2 && cg_cheats) {
+	if (!ci->legsSkin_damage_2) {
 		Com_Printf( "Torso skin load failure: %s\n", filename );
 	}
 
@@ -843,7 +843,7 @@ static qboolean	CG_RegisterClientSkin( clientInfo_t *ci, const char *modelName, 
 		Com_sprintf( filename, sizeof( filename ), "models/wq3_players/heads/%s/head_%s.skin", headModelName, headSkinName );
 		ci->headSkin = trap_R_RegisterSkin( filename );
 	}*/
-	if (!ci->headSkin && cg_cheats) {
+	if (!ci->headSkin) {
 		Com_Printf( "Head skin load failure: %s\n", filename );
 	}
 	if ( !ci->legsSkin || !ci->torsoSkin || !ci->headSkin || !ci->legsSkin_damage_1 ||
@@ -885,10 +885,8 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	if ( !ci->legsModel ) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/lower.md3", modelName );
 		ci->legsModel = trap_R_RegisterModel( filename );
-		if ( !ci->legsModel ) {
-#else
-	if ( !ci->legsModel && cg_cheats) {
 #endif
+		if ( !ci->legsModel ) {
 			Com_Printf( "Failed to load model file %s\n", filename );
 			return qfalse;
 		}
@@ -904,10 +902,8 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	if ( !ci->torsoModel ) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/upper.md3", modelName );
 		ci->torsoModel = trap_R_RegisterModel( filename );
-		if ( !ci->torsoModel ) {
-#else
-	if ( !ci->torsoModel && cg_cheats) {
 #endif
+		if ( !ci->torsoModel ) {
 			Com_Printf( "Failed to load model file %s\n", filename );
 			return qfalse;
 		}
@@ -930,10 +926,8 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", headModelName, headModelName );
 		ci->headModel = trap_R_RegisterModel( filename );
 	}
-	if ( !ci->headModel ) {
-#else
-	if ( !ci->headModel && cg_cheats) {
 #endif
+	if ( !ci->headModel ) {
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
@@ -953,7 +947,6 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 				Com_Printf( "Failed to load skin file: %s : %s : %s, %s : %s\n", newTeamName, modelName, skinName, headName, headSkinName );
 #else
 	if ( !CG_RegisterClientSkin( ci, modelName, skinName ) ) {
-		if(cg_cheats)
 			Com_Printf( "Failed to load skin file: %s : %s\n", modelName, skinName );
 #endif
 				return qfalse;
@@ -979,8 +972,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/animation.cfg", modelName );
 	if ( !CG_ParseAnimationFile( filename, ci ) ) {
-		if(cg_cheats)
-			Com_Printf( "Failed to load animation file %s\n", filename );
+		Com_Printf( "Failed to load animation file %s\n", filename );
 		return qfalse;
 	}
 #endif
@@ -998,7 +990,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/icon_%s.tga", modelName, skinName );
 	ci->modelIcon = trap_R_RegisterShaderNoMip( filename );
 
-	if ( !ci->modelIcon && cg_cheats) {
+	if ( !ci->modelIcon ) {
 		Com_Printf( "Failed to load icon file: %s\n", filename );
 #endif
 		return qfalse;
@@ -3884,19 +3876,10 @@ void CG_Player( centity_t *cent ) {
 		VectorSubtract(legs.origin, cg.legOffset, legs.origin);
 	}
 
-	// A temporary solution to disable shadow projection bug
-	// in the Quake 3 engine, as it is a form of cheating.
-	if (cg_shadows.integer == 2 && !cg_cheats
-	&& CG_Cvar_VariableInteger("r_stencilbits") >= 4) {
-		CG_Printf("cg_shadows: 2 -> 1\n");
-		cg_shadows.integer = 1;
-		trap_Cvar_Set("cg_shadows", "1");
-	}
-
 	// add the shadow
 	shadow = CG_PlayerShadow( cent, &shadowPlane, legs.origin );
 
-	if ( cg_shadows.integer == 3 && shadow && cg_cheats) {
+	if ( cg_shadows.integer == 3 && shadow) {
 		renderfx |= RF_SHADOW_PLANE;
 	}
 	renderfx |= RF_LIGHTING_ORIGIN;

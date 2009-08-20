@@ -1689,9 +1689,10 @@ extern	vmCvar_t		cg_autoswitch;
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
-#ifndef SMOKINGUNS
 extern	vmCvar_t		cg_zoomFov;
-#endif
+
+extern	vmCvar_t		cg_drawAINodes;
+
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;
 extern	vmCvar_t		cg_thirdPerson;
@@ -1822,8 +1823,6 @@ extern	vmCvar_t		cg_button_turnright[2];*/
 extern	vec3_t			ai_nodes[MAX_AINODES];
 extern	vec3_t			ai_angles[MAX_AINODES];
 extern	int				ai_nodepointer;
-
-extern	qboolean		cg_cheats;
 
 extern	vmCvar_t		hit_origin_x;
 extern	vmCvar_t		hit_origin_y;

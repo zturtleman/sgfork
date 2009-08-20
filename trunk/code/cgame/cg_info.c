@@ -378,14 +378,7 @@ void CG_DrawInformation( void ) {
 		UI_DrawProportionalString( 320, y, "CHEATS ARE ENABLED",
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
-#ifndef SMOKINGUNS
 	}
-#else
-		cg_cheats = qtrue;
-	} else
-		cg_cheats = qfalse;
-#endif
-
 	// game type
 	switch ( cgs.gametype ) {
 	case GT_FFA:

@@ -616,7 +616,7 @@ static void CG_SaveFileAiNode_f(void){
 	const char	*map;
 	char	header[] = "AI-NODES";
 
-	if(!cg_cheats)
+	if(!cg_drawAINodes.integer)
 		return;
 
 	// get mapname
@@ -655,7 +655,7 @@ static void CG_OpenFileAiNode_f(void){
 
 	int				pos = 0;
 
-	if(!cg_cheats)
+	if(!cg_drawAINodes.integer)
 		return;
 
 	// get mapname
@@ -703,7 +703,7 @@ static void CG_OpenFileAiNode_f(void){
 }
 static void CG_SetAiNode_f(void){
 
-	if(!cg_cheats)
+	if(!cg_drawAINodes.integer)
 		return;
 
 	if(ai_nodepointer > MAX_AINODES){
@@ -720,7 +720,7 @@ static void CG_SetAiNode_f(void){
 
 static void CG_ResetAiNode_f(void){
 
-	if(!cg_cheats)
+	if(!cg_drawAINodes.integer)
 		return;
 
 	// just reset the pointer
@@ -730,7 +730,7 @@ static void CG_ResetAiNode_f(void){
 static void  CG_DeleteAiNode_f(void){
 	int node, i;
 
-	if(!cg_cheats)
+	if(!cg_drawAINodes.integer)
 		return;
 
 
@@ -751,7 +751,7 @@ static void  CG_DeleteAiNode_f(void){
 static void CG_PrintAiNode_f(void){
 	int i;
 
-	if(!cg_cheats)
+	if(!cg_drawAINodes.integer)
 		return;
 
 	CG_Printf("-------------------\n");
