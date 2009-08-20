@@ -398,7 +398,6 @@ static void SV_Kick_f( void ) {
 	cl->lastPacketTime = svs.time;	// in case there is a funny zombie
 }
 
-#if ! defined STANDALONE || defined SMOKINGUNS
 // these functions require the auth server which of course is not available anymore for stand-alone games.
 
 /*
@@ -526,7 +525,6 @@ static void SV_BanNum_f( void ) {
 		Com_Printf("%s was banned from coming back\n", cl->name);
 	}
 }
-#endif
 
 /*
 ==================
@@ -1265,14 +1263,8 @@ void SV_AddOperatorCommands( void ) {
 
 	Cmd_AddCommand ("heartbeat", SV_Heartbeat_f);
 	Cmd_AddCommand ("kick", SV_Kick_f);
-#ifndef STANDALONE
-	if(!Cvar_VariableIntegerValue("com_standalone"))
-#elif defined SMOKINGUNS
-	{
-		Cmd_AddCommand ("banUser", SV_Ban_f);
-		Cmd_AddCommand ("banClient", SV_BanNum_f);
-	}
-#endif
+	Cmd_AddCommand ("banUser", SV_Ban_f);
+	Cmd_AddCommand ("banClient", SV_BanNum_f);
 	Cmd_AddCommand ("clientkick", SV_KickNum_f);
 	Cmd_AddCommand ("status", SV_Status_f);
 	Cmd_AddCommand ("serverinfo", SV_Serverinfo_f);

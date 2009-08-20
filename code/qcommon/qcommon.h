@@ -259,22 +259,11 @@ extern int demo_protocols[];
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
 #endif
 
-#ifndef STANDALONE
-  #ifndef AUTHORIZE_SERVER_NAME
-    #define	AUTHORIZE_SERVER_NAME	"authorize.quake3arena.com"
-  #endif
-  #ifndef PORT_AUTHORIZE
+#ifndef AUTHORIZE_SERVER_NAME
+  #define	AUTHORIZE_SERVER_NAME	"authorize.smokin-guns.org"
+#endif
+#ifndef PORT_AUTHORIZE
   #define	PORT_AUTHORIZE		27952
-  #endif
-#else
-  #ifdef SMOKINGUNS
-    #ifndef AUTHORIZE_SERVER_NAME
-      #define	AUTHORIZE_SERVER_NAME	"authorize.smokin-guns.org"
-    #endif
-    #ifndef PORT_AUTHORIZE
-      #define	PORT_AUTHORIZE		27952
-    #endif
-  #endif
 #endif
 
 #define	PORT_MASTER			27950
