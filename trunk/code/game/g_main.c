@@ -248,8 +248,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_allowVoteKick, "g_allowVoteKick", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
-	{ &g_redteam, "g_redteamname", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteamname", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
+	{ &g_redteam, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
+	{ &g_blueteam, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},

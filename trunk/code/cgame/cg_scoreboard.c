@@ -285,36 +285,17 @@ static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, in
 	float	color[4];
 	int		count;
 	clientInfo_t	*ci;
-#ifdef SMOKINGUNS
-	char	string[64];
-	char	*teamscore;
-	const char *info;
-#endif
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = fade;
 
 #ifdef SMOKINGUNS
-	info = CG_ConfigString( CS_SERVERINFO );
-
 	if(cgs.gametype >= GT_TEAM){
-		if(team == TEAM_RED){
-			/*trap_Cvar_VariableStringBuffer("g_teamnamered", string, sizeof(string));
-			Q_strupr(string);*/
-			Q_strncpyz( string, Info_ValueForKey( info,"g_teamnamered"), sizeof(string) );
-		} else if (team == TEAM_BLUE) {
-			/*trap_Cvar_VariableStringBuffer("g_teamnameblue", string, sizeof(string));
-			Q_strupr(string);*/
-			Q_strncpyz( string, Info_ValueForKey( info,"g_teamnameblue"), sizeof(string) );
+		if((team == TEAM_RED || team == TEAM_BLUE)){
+			(team == TEAM_RED )? CG_DrawBigStringColor(SB_HEAD_X, y, "Red", color) : CG_DrawBigStringColor(SB_HEAD_X, y, "Blue", color);
+			CG_DrawBigStringColor(SB_BOTICON_X, y, va("%i", cg.teamScores[team-1] ), color);
+			y += BIGCHAR_HEIGHT;
 		}
-		//CG_Printf("%s\n", string);
-	}
-
-	if((team == TEAM_RED || team == TEAM_BLUE) && cgs.gametype >= GT_TEAM){
-		teamscore = va("%i", cg.teamScores[team-1] );
-		CG_DrawBigStringColor(SB_HEAD_X, y, string, color);
-		CG_DrawBigStringColor(SB_BOTICON_X, y, teamscore, color);
-		y += BIGCHAR_HEIGHT;
 	}
 #endif
 
