@@ -73,17 +73,8 @@ static const char *netSources[] = {
 static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
-#ifndef SMOKINGUNS
-	{"All", "" },
-	{"Quake 3 Arena", "" },
-	{"Team Arena", "missionpack" },
-	{"Rocket Arena", "arena" },
-	{"Alliance", "alliance20" },
-	{"Weapons Factory Arena", "wfa" },
-	{"OSP", "osp" },
-#else
-	{"Smokin' Guns", BASEGAME}
-#endif
+	{"All", ""},
+	{"Smokin' Guns", "smokinguns"}	
 };
 
 static const char *teamArenaGameTypes[] = {
@@ -4472,21 +4463,7 @@ static void UI_BuildServerDisplayList(qboolean force) {
 		// set list box index to zero
 		Menu_SetFeederSelection(NULL, FEEDER_SERVERS, 0, NULL);
 		// mark all servers as visible so we store ping updates for them
-#ifndef SMOKINGUNS
 		trap_LAN_MarkServerVisible(ui_netSource.integer, -1, qtrue);
-#else
-		// Nope, in SG we only mark current SG servers visible.
-		count = trap_LAN_GetServerCount(ui_netSource.integer);
-		for (i=0; i<count; i++) {
-			trap_LAN_GetServerInfo(ui_netSource.integer, i, info, MAX_STRING_CHARS);
-			// The second string of the comparison should translate in BASEGAME - and it does for normal SG
-			if (!Q_stricmp(Info_ValueForKey(info, "game"), serverFilters[ui_serverFilterType.integer].basedir)) {
-				trap_LAN_MarkServerVisible(ui_netSource.integer, i, qtrue);
-			} else {
-				trap_LAN_MarkServerVisible(ui_netSource.integer, i, qfalse);
-			}
-		}
-#endif
 	}
 
 	// get the server count (comes from the master)
@@ -4538,19 +4515,13 @@ static void UI_BuildServerDisplayList(qboolean force) {
 				}
 			}
 
-#ifndef SMOKINGUNS
 			if (ui_serverFilterType.integer > 0) {
 				if (Q_stricmp(Info_ValueForKey(info, "game"), serverFilters[ui_serverFilterType.integer].basedir) != 0) {
 					trap_LAN_MarkServerVisible(ui_netSource.integer, i, qfalse);
 					continue;
 				}
 			}
-#else
-			if (Q_stricmp(Info_ValueForKey(info, "game"), serverFilters[ui_serverFilterType.integer].basedir) != 0) {
-				trap_LAN_MarkServerVisible(ui_netSource.integer, i, qfalse);
-				continue;
-			}
-#endif
+
 			// make sure we never add a favorite server twice
 			if (ui_netSource.integer == AS_FAVORITES) {
 				UI_RemoveServerFromDisplayList(i);

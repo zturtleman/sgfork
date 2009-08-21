@@ -2630,11 +2630,7 @@ void Com_WriteConfiguration( void ) {
 
 	// not needed for dedicated
 #ifndef DEDICATED
-#ifdef SMOKINGUNS
-	fs = Cvar_Get ("fs_game", BASEGAME, CVAR_INIT|CVAR_SYSTEMINFO );
-#else
 	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-#endif
 #endif
 }
 

@@ -2536,25 +2536,6 @@ void FS_AddGameDirectory( const char *path, const char *dir ) {
 
 /*
 ================
-FS_idPak
-================
-*/
-qboolean FS_idPak( char *pak, char *base ) {
-	int i;
-
-	for (i = 0; i < NUM_ID_PAKS; i++) {
-		if ( !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
-			break;
-		}
-	}
-	if (i < NUM_ID_PAKS) {
-		return qtrue;
-	}
-	return qfalse;
-}
-
-/*
-================
 FS_CheckDirTraversal
 
 Check whether the string contains stuff like "../" to prevent directory traversal bugs
@@ -2612,11 +2593,6 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 		// Ok, see if we have this pak file
 		badchecksum = qfalse;
 		havepak = qfalse;
-
-		// never autodownload any of the id paks
-		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEGAME) || FS_idPak(fs_serverReferencedPakNames[i], "missionpack") ) {
-			continue;
-		}
 
 		// Make sure the server cannot make us write to non-quake3 directories.
 		if(FS_CheckDirTraversal(fs_serverReferencedPakNames[i]))
@@ -2789,43 +2765,23 @@ FS_Startup
 static void FS_Startup( const char *gameName )
 {
     const char *homePath;
-#ifdef SDK_BASEGAME
-    cvar_t *fs_sdk_basegame;
-#endif
 
 	Com_Printf( "----- FS_Startup -----\n" );
 
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT );
-#ifndef SMOKINGUNS
 	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
-#else
-	fs_basegame = Cvar_Get ("fs_basegame", BASEGAME, CVAR_INIT );
 #ifdef FS_MISSING
 	fs_missingfiles = Cvar_Get ("fs_missingfiles", "0", CVAR_INIT );
-#endif
 #endif
 	homePath = Sys_DefaultHomePath();
 	if (!homePath || !homePath[0]) {
 		homePath = fs_basepath->string;
 	}
 	fs_homepath = Cvar_Get ("fs_homepath", homePath, CVAR_INIT );
-#ifndef SMOKINGUNS
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-#else
-	fs_gamedirvar = Cvar_Get ("fs_game", fs_basegame->string, CVAR_INIT|CVAR_SYSTEMINFO );
-#endif
 
 	// add search path elements in reverse priority order
-#ifdef SDK_BASEGAME
-	// Tequila comment: Added a trick to read the legacy game folder too
-	// So the baseq3/pak0.pk3 can still be read if still in use
-	fs_sdk_basegame = Cvar_Get ("fs_sdk_basegame", SDK_BASEGAME, CVAR_INIT );
-	if (fs_sdk_basegame->string[0]) {
-		FS_AddGameDirectory( fs_basepath->string, fs_sdk_basegame->string );
-	}
-#endif
-
 	if (fs_basepath->string[0]) {
 		FS_AddGameDirectory( fs_basepath->string, gameName );
 	}
