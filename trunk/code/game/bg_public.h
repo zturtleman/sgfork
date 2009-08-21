@@ -26,12 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
-
-#ifndef SDK_BASEGAME
-#define	GAME_VERSION		BASEGAME "-1"
-#else
-#define	GAME_VERSION		SDK_BASEGAME "-1"
-#endif
+#define	GAME_VERSION		"smokinguns-fork"
 
 #define ACTIVATE_RANGE 45
 
