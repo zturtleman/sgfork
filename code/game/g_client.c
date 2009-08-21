@@ -1163,7 +1163,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	teamLeader = client->sess.teamLeader;
 
 	// colors
-//FIXME: Not protected from buffer overflow
 	strcpy(c1, Info_ValueForKey( userinfo, "color" ));
 	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
 	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));

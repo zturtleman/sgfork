@@ -65,9 +65,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WINDOW_POPUP				0x00200000	// popup
 #define WINDOW_BACKCOLORSET			0x00400000	// backcolor was explicitly set
 #define WINDOW_TIMEDVISIBLE			0x00800000	// visibility timing ( NOT implemented )
-#ifdef SMOKINGUNS
 #define WINDOW_NOFOCUS				0x01000000
-#endif
 
 
 // CGAME cursor type bits
@@ -85,28 +83,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_SCRIPT_ARGS 12
 #define MAX_EDITFIELD 256
 
-#ifndef SMOKINGUNS
-#define ART_FX_BASE			"menu/art/fx_base"
-#define ART_FX_BLUE			"menu/art/fx_blue"
-#define ART_FX_CYAN			"menu/art/fx_cyan"
-#define ART_FX_GREEN		"menu/art/fx_grn"
-#define ART_FX_RED			"menu/art/fx_red"
-#define ART_FX_TEAL			"menu/art/fx_teal"
-#define ART_FX_WHITE		"menu/art/fx_white"
-#define ART_FX_YELLOW		"menu/art/fx_yel"
-#endif
-
 #define ASSET_GRADIENTBAR "ui/assets/gradientbar2.tga"
-#ifndef SMOKINGUNS
-#define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
-#define ASSET_SCROLLBAR_ARROWDOWN   "ui/assets/scrollbar_arrow_dwn_a.tga"
-#define ASSET_SCROLLBAR_ARROWUP     "ui/assets/scrollbar_arrow_up_a.tga"
-#define ASSET_SCROLLBAR_ARROWLEFT   "ui/assets/scrollbar_arrow_left.tga"
-#define ASSET_SCROLLBAR_ARROWRIGHT  "ui/assets/scrollbar_arrow_right.tga"
-#define ASSET_SCROLL_THUMB          "ui/assets/scrollbar_thumb.tga"
-#define ASSET_SLIDER_BAR						"ui/assets/slider2.tga"
-#define ASSET_SLIDER_THUMB					"ui/assets/sliderbutt_1.tga"
-#else
 #define ASSET_SCROLLBAR             "ui/wq3_assets/scrollbar.tga"
 #define ASSET_SCROLLBAR_HORZ		"ui/wq3_assets/scrollbar_horz.tga"
 #define ASSET_SCROLLBAR_ARROWDOWN   "ui/wq3_assets/scrollbar_arrow_dwn_a.tga"
@@ -118,18 +95,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ASSET_SLIDER_THUMB			"ui/wq3_assets/slider_thumb.tga"
 #define ASSET_MENU_WIDTH			"ui/wq3_assets/menu_width.tga"
 #define ASSET_MENU_HEIGHT			"ui/wq3_assets/menu_height.tga"
-#endif
 #define SCROLLBAR_SIZE 16.0
 #define SLIDER_WIDTH 96.0
-#ifndef SMOKINGUNS
-#define SLIDER_HEIGHT 16.0
-#define SLIDER_THUMB_WIDTH 12.0
-#define SLIDER_THUMB_HEIGHT 20.0
-#else
 #define SLIDER_HEIGHT 12.0
 #define SLIDER_THUMB_WIDTH 14.0
 #define SLIDER_THUMB_HEIGHT 14.0
-#endif
 #define	NUM_CROSSHAIRS			10
 
 typedef struct {
@@ -311,19 +281,15 @@ typedef struct {
   qhandle_t scrollBarArrowLeft;
   qhandle_t scrollBarArrowRight;
   qhandle_t scrollBar;
-#ifdef SMOKINGUNS
   qhandle_t	scrollBar_horz;
-#endif
   qhandle_t scrollBarThumb;
   qhandle_t buttonMiddle;
   qhandle_t buttonInside;
   qhandle_t solidBox;
   qhandle_t sliderBar;
   qhandle_t sliderThumb;
-#ifdef SMOKINGUNS
   qhandle_t	menu_width;
   qhandle_t menu_height;
-#endif
   sfxHandle_t menuEnterSound;
   sfxHandle_t menuExitSound;
   sfxHandle_t menuBuzzSound;
@@ -340,11 +306,7 @@ typedef struct {
   // player settings
 	qhandle_t fxBasePic;
   qhandle_t fxPic[7];
-#ifndef SMOKINGUNS
-	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
-#else
 	qhandle_t	crosshairShader;
-#endif
 
 } cachedAssets_t;
 
@@ -371,13 +333,8 @@ typedef struct {
   void (*addRefEntityToScene) (const refEntity_t *re );
   void (*renderScene) ( const refdef_t *fd );
   void (*registerFont) (const char *pFontname, int pointSize, fontInfo_t *font);
-#ifndef SMOKINGUNS
-  void (*ownerDrawItem) (float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
-	float (*getValue) (int ownerDraw);
-#else
   void (*ownerDrawItem) (itemDef_t *item, float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
 	float (*getValue) (int ownerDraw);
-#endif
 	qboolean (*ownerDrawVisible) (int flags);
   void (*runScript)(char **p);
   void (*getTeamColor)(vec4_t *color);

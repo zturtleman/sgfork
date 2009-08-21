@@ -96,73 +96,24 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	iconx = SB_BOTICON_X + (SB_RATING_WIDTH / 2);
 	headx = SB_HEAD_X + (SB_RATING_WIDTH / 2);
 
-	// draw the handicap or bot skill marker (unless player has flag)
-#ifndef SMOKINGUNS
-	if ( ci->powerups & ( 1 << PW_NEUTRALFLAG ) ) {
-		if( largeFormat ) {
-			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, TEAM_FREE, qfalse );
-		}
-		else {
-			CG_DrawFlagModel( iconx, y, 16, 16, TEAM_FREE, qfalse );
-		}
-	} else if ( ci->powerups & ( 1 << PW_REDFLAG ) ) {
-		if( largeFormat ) {
-			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, TEAM_RED, qfalse );
-		}
-		else {
-			CG_DrawFlagModel( iconx, y, 16, 16, TEAM_RED, qfalse );
-		}
-	} else if ( ci->powerups & ( 1 << PW_BLUEFLAG ) ) {
-		if( largeFormat ) {
-			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, TEAM_BLUE, qfalse );
-		}
-		else {
-			CG_DrawFlagModel( iconx, y, 16, 16, TEAM_BLUE, qfalse );
-		}
-	} else {
-#endif
 		if ( ci->botSkill > 0 && ci->botSkill <= 5 ) {
 			if ( cg_drawIcons.integer ) {
 				if( largeFormat ) {
-#ifndef SMOKINGUNS
-					CG_DrawPic( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
-#else
 					CG_DrawPic( iconx+32, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
-#endif
 				}
 				else {
-#ifndef SMOKINGUNS
-					CG_DrawPic( iconx, y, 16, 16, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
-#else
 					CG_DrawPic( iconx+16, y, 16, 16, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
-#endif
 				}
 			}
 		} else if ( ci->handicap < 100 ) {
 			Com_sprintf( string, sizeof( string ), "%i", ci->handicap );
-#ifndef SMOKINGUNS
-			if ( cgs.gametype == GT_TOURNAMENT )
-#else
 			if ( cgs.gametype == GT_DUEL )
-#endif
 				CG_DrawSmallStringColor( iconx, y - SMALLCHAR_HEIGHT/2, string, color );
 			else
 				CG_DrawSmallStringColor( iconx, y, string, color );
 		}
 
 		// draw the wins (/ losses)
-#ifndef SMOKINGUNS
-		if ( cgs.gametype == GT_TOURNAMENT ) {
-			Com_sprintf( string, sizeof( string ), "%i/%i", ci->wins, ci->losses );
-			if( ci->handicap < 100 && !ci->botSkill ) {
-				CG_DrawSmallStringColor( iconx, y + SMALLCHAR_HEIGHT/2, string, color );
-			}
-			else {
-				CG_DrawSmallStringColor( iconx, y, string, color );
-			}
-		}
-	}
-#else
 		if(cgs.gametype == GT_DUEL){
 			Com_sprintf( string, sizeof( string ), "%i", ci->losses );
 			CG_DrawBigString( headx - 2*ICON_SIZE, y, string, fade );
@@ -174,7 +125,6 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 			CG_DrawSmallStringColor( iconx + largeFormat*6+6, y, string, color );
 		}
-#endif
 
 	// draw the face
 	VectorClear( headAngles );
@@ -183,46 +133,27 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		CG_DrawHead( headx, y - ( ICON_SIZE - BIGCHAR_HEIGHT ) / 2, ICON_SIZE, ICON_SIZE,
 			score->client, headAngles );
 
-#ifdef SMOKINGUNS
 		if( score->won && cgs.gametype == GT_DUEL) {
 			//CG_DrawPic( headx + ICON_SIZE, y - ( 32 - BIGCHAR_HEIGHT ) /2, 32, 32, cgs.media.won);
 		} else if( ci->team == TEAM_RED_SPECTATOR || ci->team == TEAM_BLUE_SPECTATOR ||
 			(cgs.gametype == GT_DUEL && !score->realspec && ci->team == TEAM_SPECTATOR))
 			CG_DrawPic( headx + ICON_SIZE, y - ( 32 - BIGCHAR_HEIGHT ) /2, 32, 32, cgs.media.dead);
-#endif
 	}
 	else {
 		CG_DrawHead( headx, y, 16, 16, score->client, headAngles );
 
-#ifdef SMOKINGUNS
 		if(score->won && cgs.gametype == GT_DUEL) {
 			//CG_DrawPic( headx+16, y, 16, 16, cgs.media.won);
 		} else if( ci->team == TEAM_RED_SPECTATOR || ci->team == TEAM_BLUE_SPECTATOR ||
 			(cgs.gametype == GT_DUEL && !score->realspec && ci->team == TEAM_SPECTATOR))
 			CG_DrawPic( headx+16, y, 16, 16, cgs.media.dead);
-#endif
 	}
 
-#ifndef SMOKINGUNS
-	// draw the team task
-	if ( ci->teamTask != TEAMTASK_NONE ) {
-		if ( ci->teamTask == TEAMTASK_OFFENSE ) {
-			CG_DrawPic( headx + 48, y, 16, 16, cgs.media.assaultShader );
-		}
-		else if ( ci->teamTask == TEAMTASK_DEFENSE ) {
-			CG_DrawPic( headx + 48, y, 16, 16, cgs.media.defendShader );
-		}
-	}
-#endif
 	// draw the score line
 	if ( score->ping == -1 ) {
 		Com_sprintf(string, sizeof(string),
 			" connecting    %s", ci->name);
-#ifndef SMOKINGUNS
-	} else if ( ci->team == TEAM_SPECTATOR ) {
-#else
 	} else if ( ci->team == TEAM_SPECTATOR && (cgs.gametype != GT_DUEL || score->realspec)){
-#endif
 		Com_sprintf(string, sizeof(string),
 			" SPECT %3i %4i %s", score->ping, score->time, ci->name);
 	} else {
@@ -289,7 +220,6 @@ static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, in
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = fade;
 
-#ifdef SMOKINGUNS
 	if(cgs.gametype >= GT_TEAM){
 		if((team == TEAM_RED || team == TEAM_BLUE)){
 			(team == TEAM_RED )? CG_DrawBigStringColor(SB_HEAD_X, y, "Red", color) : CG_DrawBigStringColor(SB_HEAD_X, y, "Blue", color);
@@ -297,18 +227,13 @@ static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, in
 			y += BIGCHAR_HEIGHT;
 		}
 	}
-#endif
 
 	count = 0;
 	for ( i = 0 ; i < cg.numScores && count < maxClients ; i++ ) {
 		score = &cg.scores[i];
 		ci = &cgs.clientinfo[ score->client ];
 
-#ifndef SMOKINGUNS
-		if ( team != ci->team ) {
-#else
 		if ( team != ci->team && cgs.gametype != GT_DUEL) {
-#endif
 			continue;
 		}
 
@@ -325,7 +250,6 @@ static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, in
 CG_DrawTimer
 =================
 */
-#ifdef SMOKINGUNS
 static float CG_DrawRoundTimer( float y ) {
 	char		*s;
 	//int			w;
@@ -353,7 +277,6 @@ static float CG_DrawRoundTimer( float y ) {
 
 	return y;
 }
-#endif
 
 /*
 =================
@@ -363,11 +286,7 @@ Draw the normal in-game scoreboard
 =================
 */
 qboolean CG_DrawOldScoreboard( void ) {
-#ifndef SMOKINGUNS
-	int		x, y, w, i, n1, n2;
-#else
 	int		x, y, w, i, n1, n2, n1b, n2b;
-#endif
 	float	fade;
 	float	*fadeColor;
 	char	*s;
@@ -410,11 +329,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// fragged by ... line
 	if ( cg.killerName[0] ) {
-#ifndef SMOKINGUNS
-		s = va("Fragged by %s", cg.killerName );
-#else
 		s = va("Killed by %s", cg.killerName );
-#endif
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		x = ( SCREEN_WIDTH - w ) / 2;
 		y = 40;
@@ -423,11 +338,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// current rank
 	if ( cgs.gametype < GT_TEAM) {
-#ifndef SMOKINGUNS
-		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
-#else
 		if (cg.snap->ps.persistant[PERS_TEAM] < TEAM_SPECTATOR ) {
-#endif
 			s = va("%s place with %i",
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 				cg.snap->ps.persistant[PERS_SCORE] );
@@ -436,39 +347,17 @@ qboolean CG_DrawOldScoreboard( void ) {
 			y = 60;
 			CG_DrawBigString( x, y, s, fade );
 		}
-#ifndef SMOKINGUNS
-	} else {
-		if ( cg.teamScores[0] == cg.teamScores[1] ) {
-			s = va("Teams are tied at %i", cg.teamScores[0] );
-		} else if ( cg.teamScores[0] >= cg.teamScores[1] ) {
-			s = va("Red leads %i to %i",cg.teamScores[0], cg.teamScores[1] );
-		} else {
-			s = va("Blue leads %i to %i",cg.teamScores[1], cg.teamScores[0] );
-		}
-
-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		x = ( SCREEN_WIDTH - w ) / 2;
-		y = 60;
-		CG_DrawBigString( x, y, s, fade );
-#endif
 	}
 
 	// scoreboard
 	y = SB_HEADER;
 
-#ifndef SMOKINGUNS
-	CG_DrawPic( SB_SCORE_X + (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardScore );
-	CG_DrawPic( SB_PING_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardPing );
-	CG_DrawPic( SB_TIME_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardTime );
-	CG_DrawPic( SB_NAME_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardName );
-#else
 	CG_DrawRoundTimer (y);
 
 	CG_DrawPic( SB_SCORE_X, y, 64, 32, cgs.media.scoreboardScore );
 	CG_DrawPic( SB_PING_X, y, 64, 32, cgs.media.scoreboardPing );
 	CG_DrawPic( SB_TIME_X, y, 64, 32, cgs.media.scoreboardTime );
 	CG_DrawPic( SB_NAME_X, y, 64, 32, cgs.media.scoreboardName );
-#endif
 
 	y = SB_TOP;
 
@@ -495,30 +384,19 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 		if ( cg.teamScores[0] >= cg.teamScores[1] ) {
 			n1 = CG_TeamScoreboard( y, TEAM_RED, fade, maxClients, lineHeight );
-#ifndef SMOKINGUNS
-			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize, 0.33f, TEAM_RED );
-#else
 			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize+10, 0.33f, TEAM_RED );
-#endif
 			y += (n1 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n1;
-#ifdef SMOKINGUNS
 			if(cgs.gametype >= GT_RTP) {
 				n1b = CG_TeamScoreboard( y, TEAM_RED_SPECTATOR, fade, maxClients, lineHeight );
 				CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1b * lineHeight + bottomBorderSize, 0.33f, TEAM_RED );
 				y += (n1b * lineHeight) + BIGCHAR_HEIGHT;
 				maxClients -= n1b;
 			}
-#endif
 			n2 = CG_TeamScoreboard( y, TEAM_BLUE, fade, maxClients, lineHeight );
-#ifndef SMOKINGUNS
-			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize, 0.33f, TEAM_BLUE );
-#else
 			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize+10, 0.33f, TEAM_BLUE );
-#endif
 			y += (n2 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n2;
-#ifdef SMOKINGUNS
 			if ( cgs.gametype >= GT_RTP ) {
 				n2b = CG_TeamScoreboard( y, TEAM_BLUE_SPECTATOR, fade, maxClients, lineHeight );
 				CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2b * lineHeight + bottomBorderSize, 0.33f, TEAM_BLUE );
@@ -530,25 +408,21 @@ qboolean CG_DrawOldScoreboard( void ) {
 			} else {
 				CG_DrawTeamBackground(0, SB_TOP+lineHeight/2, 640, (n1+n2)*(lineHeight + bottomBorderSize+10),0.33, TEAM_RED);
 			}*/
-#endif
 		} else {
 			n1 = CG_TeamScoreboard( y, TEAM_BLUE, fade, maxClients, lineHeight );
 			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize, 0.33f, TEAM_BLUE );
 			y += (n1 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n1;
-#ifdef SMOKINGUNS
 			if(cgs.gametype >= GT_RTP) {
 				n1b = CG_TeamScoreboard( y, TEAM_BLUE_SPECTATOR, fade, maxClients, lineHeight );
 				CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1b * lineHeight + bottomBorderSize, 0.33f, TEAM_BLUE );
 				y += (n1b * lineHeight) + BIGCHAR_HEIGHT;
 				maxClients -= n1b;
 			}
-#endif
 			n2 = CG_TeamScoreboard( y, TEAM_RED, fade, maxClients, lineHeight );
 			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize, 0.33f, TEAM_RED );
 			y += (n2 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n2;
-#ifdef SMOKINGUNS
 			if ( cgs.gametype >= GT_RTP ) {
 				n2b = CG_TeamScoreboard( y, TEAM_RED_SPECTATOR, fade, maxClients, lineHeight );
 				CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2b * lineHeight + bottomBorderSize, 0.33f, TEAM_RED );
@@ -560,7 +434,6 @@ qboolean CG_DrawOldScoreboard( void ) {
 			} else {
 				CG_DrawTeamBackground(0, SB_TOP+lineHeight/2, 640, (n1+n2)*(lineHeight + bottomBorderSize+10),0.33, TEAM_RED);
 			}*/
-#endif
 		}
 		n1 = CG_TeamScoreboard( y, TEAM_SPECTATOR, fade, maxClients, lineHeight );
 		y += (n1 * lineHeight) + BIGCHAR_HEIGHT;
@@ -569,15 +442,11 @@ qboolean CG_DrawOldScoreboard( void ) {
 		// free for all scoreboard
 		//
 		n1 = CG_TeamScoreboard( y, TEAM_FREE, fade, maxClients, lineHeight );
-#ifdef SMOKINGUNS
 		if(cgs.gametype != GT_DUEL){
-#endif
 			y += (n1 * lineHeight) + BIGCHAR_HEIGHT;
 			n2 = CG_TeamScoreboard( y, TEAM_SPECTATOR, fade, maxClients - n1, lineHeight );
 			y += (n2 * lineHeight) + BIGCHAR_HEIGHT;
-#ifdef SMOKINGUNS
 		}
-#endif
 	}
 
 	if (!localClient) {
