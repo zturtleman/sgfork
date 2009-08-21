@@ -75,7 +75,7 @@ char *Sys_DefaultHomePath( void )
 			return NULL;
 		}
 		Q_strncpyz( homePath, szPath, sizeof( homePath ) );
-		Q_strcat( homePath, sizeof( homePath ), "\\Quake3" );
+		Q_strcat( homePath, sizeof( homePath ), "\\SmokinGuns" );
 		FreeLibrary(shfolder);
 		if( !CreateDirectory( homePath, NULL ) )
 		{
