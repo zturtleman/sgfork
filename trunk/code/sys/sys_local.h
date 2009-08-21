@@ -55,7 +55,6 @@ void Sys_ErrorDialog( const char *error );
 void Sys_AnsiColorPrint( const char *msg );
 
 #ifdef SMOKINGUNS
-const char *Sys_GetSystemInstallPath(const char *path);
 void Sys_PlatformPostInit( char *progname );
 void Sys_PlatformExit( void );
 #ifdef DEDICATED

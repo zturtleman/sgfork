@@ -91,18 +91,6 @@ char *Sys_DefaultHomePath( void )
 }
 
 /*
-==================
-Sys_GetSystemInstallPath
-==================
-*/
-#ifdef SMOKINGUNS
-const char *Sys_GetSystemInstallPath(const char *path)
-{
-	return path;
-}
-#endif
-
-/*
 ================
 Sys_Milliseconds
 ================
