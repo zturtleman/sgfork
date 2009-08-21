@@ -34,43 +34,6 @@ typedef struct {
 
 #define MAX_SHADER_REMAPS 128
 
-#ifndef SMOKINGUNS
-int remapCount = 0;
-shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
-
-void AddRemap(const char *oldShader, const char *newShader, float timeOffset) {
-	int i;
-
-	for (i = 0; i < remapCount; i++) {
-		if (Q_stricmp(oldShader, remappedShaders[i].oldShader) == 0) {
-			// found it, just update this one
-			strcpy(remappedShaders[i].newShader,newShader);
-			remappedShaders[i].timeOffset = timeOffset;
-			return;
-		}
-	}
-	if (remapCount < MAX_SHADER_REMAPS) {
-		strcpy(remappedShaders[remapCount].newShader,newShader);
-		strcpy(remappedShaders[remapCount].oldShader,oldShader);
-		remappedShaders[remapCount].timeOffset = timeOffset;
-		remapCount++;
-	}
-}
-
-const char *BuildShaderStateConfig(void) {
-	static char	buff[MAX_STRING_CHARS*4];
-	char out[(MAX_QPATH * 2) + 5];
-	int i;
-
-	memset(buff, 0, MAX_STRING_CHARS);
-	for (i = 0; i < remapCount; i++) {
-		Com_sprintf(out, (MAX_QPATH * 2) + 5, "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, remappedShaders[i].timeOffset);
-		Q_strcat( buff, sizeof( buff ), out);
-	}
-	return buff;
-}
-#endif
-
 /*
 =========================================================================
 
@@ -243,14 +206,6 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 		return;
 	}
 
-#ifndef SMOKINGUNS
-	if (ent->targetShaderName && ent->targetShaderNewName) {
-		float f = level.time * 0.001;
-		AddRemap(ent->targetShaderName, ent->targetShaderNewName, f);
-		trap_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
-	}
-#endif
-
 	if ( !ent->target ) {
 		return;
 	}
@@ -262,10 +217,8 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 		} else {
 			if ( t->use ) {
 				// disable triggering when using activatable doors
-#ifdef SMOKINGUNS
 				if(t->s.eType == ET_MOVER && t->s.angles2[0] == -1000){
 				} else
-#endif
 					t->use (t, ent, activator);
 			}
 		}
@@ -349,9 +302,7 @@ void G_SetMovedir( vec3_t angles, vec3_t movedir ) {
 	} else {
 		AngleVectors (angles, movedir, NULL, NULL);
 	}
-#ifdef SMOKINGUNS
 	VectorNormalize(movedir);
-#endif
 	VectorClear( angles );
 }
 
@@ -509,9 +460,6 @@ gentity_t *G_TempEntity( vec3_t origin, int event ) {
 	e->freeAfterEvent = qtrue;
 
 	VectorCopy( origin, snapped );
-#ifndef SMOKINGUNS
-	SnapVector( snapped );		// save network bandwidth
-#endif
 	G_SetOrigin( e, snapped );
 
 	// find cluster for PVS
@@ -691,7 +639,6 @@ ignoreTeam can be TEAM_RED or TEAM_BLUE for team games that use
 spawnpoints that are spread out (unlike CTF), or -1 otherwise.
 ================
 */
-#ifdef SMOKINGUNS
 qboolean G_IsAnyClientWithinRadius( const vec3_t org, float rad, int ignoreTeam ) {
 	int length, i, j;
 	float radSqr;
@@ -718,4 +665,3 @@ qboolean G_IsAnyClientWithinRadius( const vec3_t org, float rad, int ignoreTeam 
 
 	return qfalse;
 }
-#endif

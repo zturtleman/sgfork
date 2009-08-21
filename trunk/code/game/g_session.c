@@ -93,7 +93,6 @@ void G_ReadSessionData( gclient_t *client ) {
 	client->sess.teamLeader = (qboolean)teamLeader;
 
 	//make all players spectators at start, to rechoose their weapons
-#ifdef SMOKINGUNS
 	if ( g_gametype.integer >= GT_RTP || g_gametype.integer == GT_DUEL){
 
 		client->sess.sessionTeam = TEAM_SPECTATOR;
@@ -107,7 +106,6 @@ void G_ReadSessionData( gclient_t *client ) {
 			client->realspec = qfalse;
 		//G_WriteClientSessionData( client );
 	}
-#endif
 }
 
 
@@ -118,22 +116,14 @@ G_InitSessionData
 Called on a first-time connect
 ================
 */
-#ifndef SMOKINGUNS
-void G_InitSessionData( gclient_t *client, char *userinfo ) {
-#else
 void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
-#endif
 	clientSession_t	*sess;
 	const char		*value;
 
 	sess = &client->sess;
 
 	// initial team determination
-#ifndef SMOKINGUNS
-	if ( g_gametype.integer >= GT_TEAM ) {
-#else
 	if ( g_gametype.integer == GT_TEAM ) {
-#endif
 		if ( g_teamAutoJoin.integer ) {
 			sess->sessionTeam = PickTeam( -1 );
 			BroadcastTeamChange( client, -1 );
@@ -158,15 +148,6 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 					sess->sessionTeam = TEAM_FREE;
 				}
 				break;
-#ifndef SMOKINGUNS
-			case GT_TOURNAMENT:
-				// if the game is full, go into a waiting mode
-				if ( level.numNonSpectatorClients >= 2 ) {
-					sess->sessionTeam = TEAM_SPECTATOR;
-				} else {
-					sess->sessionTeam = TEAM_FREE;
-				}
-#else
 			case GT_RTP:
 			case GT_BR:
 				if ( g_teamAutoJoin.integer ) {
@@ -187,7 +168,6 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 				}
 
 				sess->sessionTeam = TEAM_SPECTATOR;
-#endif
 				break;
 			}
 		}
@@ -209,9 +189,7 @@ G_InitWorldSession
 void G_InitWorldSession( void ) {
 	char	s[MAX_STRING_CHARS];
 	int		gt;
-#ifdef SMOKINGUNS
 	int		i;
-#endif
 
 	trap_Cvar_VariableStringBuffer( "session", s, sizeof(s) );
 	gt = atoi( s );
@@ -224,7 +202,6 @@ void G_InitWorldSession( void ) {
 	}
 
 	// init the data
-#ifdef SMOKINGUNS
 	switch ( g_gametype.integer ) {
 	case GT_RTP:
 	case GT_BR:
@@ -257,7 +234,6 @@ void G_InitWorldSession( void ) {
 		}
 		break;
 	}
-#endif
 }
 
 /*

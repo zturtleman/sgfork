@@ -145,14 +145,10 @@ void trap_GetServerinfo( char *buffer, int bufferSize ) {
 }
 
 void trap_SetBrushModel( gentity_t *ent, const char *name ) {
-#ifndef SMOKINGUNS
-	syscall( G_SET_BRUSH_MODEL, ent, name );
-#else
 	// only set it if not already set
 	if(!(ent->flags & FL_INITIALIZED))
 		syscall( G_SET_BRUSH_MODEL, ent, name );
 	ent->flags |= FL_INITIALIZED;
-#endif
 }
 
 void trap_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask ) {

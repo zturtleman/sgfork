@@ -71,16 +71,6 @@ void Use_target_remove_powerups( gentity_t *ent, gentity_t *other, gentity_t *ac
 		return;
 	}
 
-#ifndef SMOKINGUNS
-	if( activator->client->ps.powerups[PW_REDFLAG] ) {
-		Team_ReturnFlag( TEAM_RED );
-	} else if( activator->client->ps.powerups[PW_BLUEFLAG] ) {
-		Team_ReturnFlag( TEAM_BLUE );
-	} else if( activator->client->ps.powerups[PW_NEUTRALFLAG] ) {
-		Team_ReturnFlag( TEAM_FREE );
-	}
-#endif
-
 	memset( activator->client->ps.powerups, 0, sizeof( activator->client->ps.powerups ) );
 }
 
@@ -184,15 +174,10 @@ Multiple identical looping sounds will just increase volume without any speed co
 */
 void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	if (ent->spawnflags & 3) {	// looping sound toggles
-#ifndef SMOKINGUNS
-		if (ent->s.loopSound)
-			ent->s.loopSound = 0;	// turn it off
-#else
 		if (ent->s.loopSound){
 			ent->s.loopSound = 0;	// turn it off
 			ent->s.eFlags |= EF_SOUNDOFF; //make it possible to restart at round restart
 		}
-#endif
 		else
 			ent->s.loopSound = ent->noise_index;	// start it
 	}else {	// normal sound
@@ -278,11 +263,7 @@ void target_laser_think (gentity_t *self) {
 	// fire forward and see what we hit
 	VectorMA (self->s.origin, 2048, self->movedir, end);
 
-#ifndef SMOKINGUNS
-	trap_Trace( &tr, self->s.origin, NULL, NULL, end, self->s.number, CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE);
-#else
 	trap_Trace_New( &tr, self->s.origin, NULL, NULL, end, self->s.number, CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE);
-#endif
 
 	if ( tr.entityNum ) {
 		// hurt it if we can
