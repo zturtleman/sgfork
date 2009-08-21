@@ -3713,7 +3713,7 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
 			trap_Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
 #else
-			trap_Cvar_Set("g_redteam, UI_Cvar_VariableString("ui_redteam"));
+			trap_Cvar_Set("g_redteam", UI_Cvar_VariableString("ui_redteam"));
 			trap_Cvar_Set("g_blueteam", UI_Cvar_VariableString("ui_blueteam"));
 #endif
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );
