@@ -77,25 +77,6 @@ void UI_StartDemoLoop( void ) {
 	trap_Cmd_ExecuteText( EXEC_APPEND, "d1\n" );
 }
 
-
-#ifndef SMOKINGUNS
-#ifndef MISSIONPACK
-static void NeedCDAction( qboolean result ) {
-	if ( !result ) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
-	}
-}
-#endif // MISSIONPACK
-
-#ifndef MISSIONPACK
-static void NeedCDKeyAction( qboolean result ) {
-	if ( !result ) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
-	}
-}
-#endif // MISSIONPACK
-#endif
-
 char *UI_Argv( int arg ) {
 	static char	buffer[MAX_STRING_CHARS];
 
@@ -155,12 +136,10 @@ void UI_LoadBestScores(const char *map, int game) {
 	fileHandle_t f;
 	postGameInfo_t newInfo;
 
-#ifdef SMOKINGUNS
 	// Tequila: Minor fix to not try to load anything when map is not defined here
 	//          In some case that's involves not critical bad file loading tries
 	if (map==NULL)
 		return ;
-#endif
 
 	memset(&newInfo, 0, sizeof(postGameInfo_t));
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);

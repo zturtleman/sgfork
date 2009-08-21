@@ -218,7 +218,6 @@ CG_DeathCamView
 
 ===============
 */
-#ifdef SMOKINGUNS
 static void CG_DeathCamView(void) {
 	vec3_t			focusAngles;
 	static vec3_t   prevorigin, prevangles, diffangles, difforigin;
@@ -271,8 +270,6 @@ static void CG_DeathCamView(void) {
 	}
 	VectorCopy(focusAngles,cg.refdefViewAngles);
 }
-#endif
-
 
 /*
 ===============
@@ -291,7 +288,6 @@ static void CG_OffsetThirdPersonView( void ) {
 	vec3_t		focusPoint;
 	float		focusDist;
 	float		forwardScale, sideScale;
-#ifdef SMOKINGUNS
 	float		thirdPersonAngle, thirdPersonRange;
 
  	if(cgs.deathcam && (cg.snap->ps.stats[STAT_HEALTH] <= 0) && (cgs.gametype != GT_DUEL)
@@ -309,19 +305,10 @@ static void CG_OffsetThirdPersonView( void ) {
 		thirdPersonAngle = cg_thirdPersonAngle.value;
 		thirdPersonRange = cg_thirdPersonRange.value;
 	}
-#endif
 
 	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
 
 	VectorCopy( cg.refdefViewAngles, focusAngles );
-
-#ifndef SMOKINGUNS
-	// if dead, look at killer
-	if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
-		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
-		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
-	}
-#endif
 
 	if ( focusAngles[PITCH] > 45 ) {
 		focusAngles[PITCH] = 45;		// don't go too far overhead
@@ -334,30 +321,16 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	view[2] += 8;
 
-#ifndef SMOKINGUNS
-	cg.refdefViewAngles[PITCH] *= 0.5;
-#endif
-
 	AngleVectors( cg.refdefViewAngles, forward, right, up );
 
-#ifndef SMOKINGUNS
-	forwardScale = cos( cg_thirdPersonAngle.value / 180 * M_PI );
-	sideScale = sin( cg_thirdPersonAngle.value / 180 * M_PI );
-	VectorMA( view, -cg_thirdPersonRange.value * forwardScale, forward, view );
-	VectorMA( view, -cg_thirdPersonRange.value * sideScale, right, view );
-#else
 	forwardScale = cos( thirdPersonAngle / 180 * M_PI );
 	sideScale = sin( thirdPersonAngle / 180 * M_PI );
 	VectorMA( view, -thirdPersonRange * forwardScale, forward, view );
 	VectorMA( view, -thirdPersonRange * sideScale, right, view );
-#endif
 
 	// trace a ray from the origin to the viewpoint to make sure the view isn't
 	// in a solid block.  Use an 8 by 8 block to prevent the view from near clipping anything
 
-#ifndef SMOKINGUNS
-	if (!cg_cameraMode.integer) {
-#endif
 		CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 
 		if ( trace.fraction != 1.0 ) {
@@ -369,10 +342,6 @@ static void CG_OffsetThirdPersonView( void ) {
 			CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 			VectorCopy( trace.endpos, view );
 		}
-#ifndef SMOKINGUNS
-	}
-#endif
-
 
 	VectorCopy( view, cg.refdef.vieworg );
 
@@ -383,11 +352,7 @@ static void CG_OffsetThirdPersonView( void ) {
 		focusDist = 1;	// should never happen
 	}
 	cg.refdefViewAngles[PITCH] = -180 / M_PI * atan2( focusPoint[2], focusDist );
-#ifndef SMOKINGUNS
-	cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
-#else
 	cg.refdefViewAngles[YAW] -= thirdPersonAngle;
-#endif
 }
 
 
@@ -403,7 +368,6 @@ static void CG_StepOffset( void ) {
 	}
 }
 
-#ifdef SMOKINGUNS
 #define	WAIT_TIME 1000.0f
 
 /*
@@ -442,7 +406,6 @@ static void CG_DuelIntroView( void ) {
 
 	vectoangles(dist_angles, cg.refdefViewAngles);
 }
-#endif
 
 /*
 ===============
@@ -460,11 +423,9 @@ static void CG_OffsetFirstPersonView( void ) {
 	float			f;
 	vec3_t			predictedVelocity;
 	int				timeDelta;
-#ifdef SMOKINGUNS
 	int	land_deflect_time = LAND_DEFLECT_TIME;
 	int land_return_time = LAND_RETURN_TIME;
 	int	shoot_deflect_time = LAND_DEFLECT_TIME - 50;
-#endif
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
 		return;
@@ -473,16 +434,6 @@ static void CG_OffsetFirstPersonView( void ) {
 	origin = cg.refdef.vieworg;
 	angles = cg.refdefViewAngles;
 
-#ifndef SMOKINGUNS
-	// if dead, fix the angle and don't add any kick
-	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) {
-		angles[ROLL] = 40;
-		angles[PITCH] = -15;
-		angles[YAW] = cg.snap->ps.stats[STAT_DEAD_YAW];
-		origin[2] += cg.predictedPlayerState.viewheight;
-		return;
-	}
-#else
 	// add view height
 	origin[2] += cg.predictedPlayerState.viewheight;
 
@@ -491,7 +442,6 @@ static void CG_OffsetFirstPersonView( void ) {
 		BG_ModifyEyeAngles( origin, angles, CG_Trace, cg.legOffset,
 			qfalse);
 	}
-#endif
 
 	// add angles based on weapon kick
 	VectorAdd (angles, cg.kick_angles, angles);
@@ -547,11 +497,6 @@ static void CG_OffsetFirstPersonView( void ) {
 
 //===================================
 
-#ifndef SMOKINGUNS
-	// add view height
-	origin[2] += cg.predictedPlayerState.viewheight;
-#endif
-
 	// smooth out duck height changes
 	timeDelta = cg.time - cg.duckTime;
 	if ( timeDelta < DUCK_TIME) {
@@ -566,7 +511,6 @@ static void CG_OffsetFirstPersonView( void ) {
 	}
 
 	origin[2] += bob;
-#ifdef SMOKINGUNS
 	cg.legOffset[2] += bob;
 
 	//check for bullethit
@@ -574,20 +518,9 @@ static void CG_OffsetFirstPersonView( void ) {
 		land_deflect_time /= 2;
 		land_return_time /= 2;
 	}
-#endif
 
 	// add fall height
 	delta = cg.time - cg.landTime;
-#ifndef SMOKINGUNS
-	if ( delta < LAND_DEFLECT_TIME ) {
-		f = delta / LAND_DEFLECT_TIME;
-		cg.refdef.vieworg[2] += cg.landChange * f;
-	} else if ( delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME ) {
-		delta -= LAND_DEFLECT_TIME;
-		f = 1.0 - ( delta / LAND_RETURN_TIME );
-		cg.refdef.vieworg[2] += cg.landChange * f;
-	}
-#else
 	if ( delta < land_deflect_time ) {
 		f = delta / land_deflect_time;
 		cg.refdef.vieworg[2] += cg.landChange * f;
@@ -615,7 +548,6 @@ static void CG_OffsetFirstPersonView( void ) {
 		//anglechange
 		cg.refdefViewAngles[PITCH] -= cg.shootAngleChange *f;
 	}
-#endif
 
 	// add step offset
 	CG_StepOffset();
@@ -645,11 +577,7 @@ void CG_ZoomDown_f( void ) {
 		return;
 	}
 	cg.zoomed = qtrue;
-#ifndef SMOKINGUNS
-	cg.zoomTime = cg.time;
-#else
 	cg.zoomTime = -1;
-#endif
 }
 
 void CG_ZoomUp_f( void ) {
@@ -657,11 +585,7 @@ void CG_ZoomUp_f( void ) {
 		return;
 	}
 	cg.zoomed = qfalse;
-#ifndef SMOKINGUNS
-	cg.zoomTime = cg.time;
-#else
 	cg.zoomTime = -1;
-#endif
 }
 
 
@@ -711,11 +635,9 @@ static int CG_CalcFov( void ) {
 			zoomFov = 160;
 		}
 
-#ifdef SMOKINGUNS
 		if(cg.snap->ps.persistant[PERS_TEAM] >= TEAM_SPECTATOR ||
 			cg.snap->ps.stats[STAT_HEALTH] <= 0)
 			cg.zoomed = qfalse;
-#endif
 
 		if ( cg.zoomed ) {
 			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
@@ -869,7 +791,6 @@ static int CG_CalcViewValues( void ) {
 
 	//link to view to head of ppm if dying - edited, only do this if the player killed himself
 	//or specting someone else
-#ifdef SMOKINGUNS
 	if ((((ps->pm_flags & PMF_SUICIDE) || !cgs.deathcam || cgs.gametype == GT_DUEL)
 		    && (ps->pm_type == PM_DEAD) && (!cg.renderingThirdPerson))
 	        || ((cg.snap->ps.pm_flags & PMF_FOLLOW) && (cg.snap->ps.pm_type != PM_CHASECAM)
@@ -877,7 +798,6 @@ static int CG_CalcViewValues( void ) {
 		VectorCopy(cg.anim_viewangles, cg.refdefViewAngles);
 		VectorCopy(cg.anim_vieworigin, cg.refdef.vieworg);
 	}
-#endif
 
 	if (cg_cameraOrbit.integer) {
 		if (cg.time > cg.nextOrbitTime) {
@@ -899,9 +819,6 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 
-#ifndef SMOKINGUNS
-	if ( cg.renderingThirdPerson ) {
-#else
 	// this is a special camera movement around the players
 	if(cg.introend - DU_INTRO_DRAW >= cg.time && cgs.gametype == GT_DUEL &&
 			cg.predictedPlayerState.persistant[PERS_TEAM] == TEAM_FREE &&
@@ -912,18 +829,13 @@ static int CG_CalcViewValues( void ) {
 
 	} else if ((cg.renderingThirdPerson ||(cg.snap->ps.pm_flags & PMF_FOLLOW &&
 	                     cg.snap->ps.pm_type == PM_CHASECAM)) && !cg.introstart) {
-#endif
 		// back away from character
 		CG_OffsetThirdPersonView();
-#ifdef SMOKINGUNS
 		cg.introstart = 0;
-#endif
 	} else {
 		// offset for local bobbing and kicks
 		CG_OffsetFirstPersonView();
-#ifdef SMOKINGUNS
 		cg.introstart = 0;
-#endif
 	}
 
 	// position eye relative to origin
@@ -936,33 +848,6 @@ static int CG_CalcViewValues( void ) {
 	// field of view
 	return CG_CalcFov();
 }
-
-
-/*
-=====================
-CG_PowerupTimerSounds
-=====================
-*/
-#ifndef SMOKINGUNS
-static void CG_PowerupTimerSounds( void ) {
-	int		i;
-	int		t;
-
-	// powerup timers going away
-	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
-		t = cg.snap->ps.powerups[i];
-		if ( t <= cg.time ) {
-			continue;
-		}
-		if ( t - cg.time >= POWERUP_BLINKS * POWERUP_BLINK_TIME ) {
-			continue;
-		}
-		if ( ( t - cg.time ) / POWERUP_BLINK_TIME != ( t - cg.oldTime ) / POWERUP_BLINK_TIME ) {
-			trap_S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_ITEM, cgs.media.wearOffSound );
-		}
-	}
-}
-#endif
 
 /*
 =====================
@@ -987,9 +872,6 @@ CG_PlayBufferedSounds
 static void CG_PlayBufferedSounds( void ) {
 	if ( cg.soundTime < cg.time ) {
 		if (cg.soundBufferOut != cg.soundBufferIn && cg.soundBuffer[cg.soundBufferOut]) {
-#ifndef SMOKINGUNS
-			trap_S_StartLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);
-#endif
 			cg.soundBuffer[cg.soundBufferOut] = 0;
 			cg.soundBufferOut = (cg.soundBufferOut + 1) % MAX_SOUNDBUFFER;
 			cg.soundTime = cg.time + 750;
@@ -1011,12 +893,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	cg.time = serverTime;
 
-#ifdef SMOKINGUNS
 //unlagged - lag simulation #1
 	// adjust the clock to reflect latent snaps
 	cg.time -= cg_latentSnaps.integer * (1000 / sv_fps.integer);
 //unlagged - lag simulation #1
-#endif
 
 	cg.demoPlayback = demoPlayback;
 
@@ -1051,16 +931,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	trap_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );
 	// WP_SEC_PISTOL 's special value has been transmitted.
 	// Restore cg.weaponSelect
-#ifdef SMOKINGUNS
 	if (cg.weaponSelect == WP_SEC_PISTOL)
 		cg.weaponSelect = cg._weaponSelect;
-#endif
 
 	// this counter will be bumped for every valid scene we generate
 	cg.clientFrame++;
 
 	// check if duel start sound has to be played
-#ifdef SMOKINGUNS
 	if(cg.roundstarttime && cg.roundstarttime <= cg.time && cgs.gametype == GT_DUEL){
 		cg.introstart = cg.roundstarttime;
 
@@ -1073,27 +950,20 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		if(cg.duelstartsound == 5)
 			cg.duelstartsound = 0;
 	}
-#endif
 
 	// update cg.predictedPlayerState
 	CG_PredictPlayerState();
 
 	// decide on third person view
-#ifndef SMOKINGUNS
-	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
-#else
 	cg.renderingThirdPerson = cg_thirdPerson.integer || cg.introstart || (cgs.deathcam && (cg.snap->ps.stats[STAT_HEALTH] <= 0)
 		                      && !(cg.snap->ps.pm_flags & PMF_SUICIDE) && !(cg.snap->ps.pm_flags & PMF_FOLLOW)
 							  && (cg.snap->ps.pm_type != PM_CHASECAM) && (cgs.gametype != GT_DUEL));
-#endif
 
 	// build cg.refdef
 	inwater = CG_CalcViewValues();
 
 	// build cg_frustum, from cg.refdef
-#ifdef SMOKINGUNS
 	CG_SetupFrustum();
-#endif
 
 	// first person blend blobs, done after AnglesToAxis
 	if ( !cg.renderingThirdPerson ) {
@@ -1104,9 +974,6 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	if ( !cg.hyperspace ) {
 		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
 		CG_AddMarks();
-#ifndef SMOKINGUNS
-		CG_AddParticles ();
-#endif
 		CG_AddLocalEntities();
 	}
 
@@ -1115,22 +982,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// add buffered sounds
 	CG_PlayBufferedSounds();
 
-	// play buffered voice chats
-#ifndef SMOKINGUNS
-	CG_PlayBufferedVoiceChats();
-#endif
-
 	// finish up the rest of the refdef
 	if ( cg.testModelEntity.hModel ) {
 		CG_AddTestModel();
 	}
 	cg.refdef.time = cg.time;
 	memcpy( cg.refdef.areamask, cg.snap->areamask, sizeof( cg.refdef.areamask ) );
-
-	// warning sounds when powerup is wearing off
-#ifndef SMOKINGUNS
-	CG_PowerupTimerSounds();
-#endif
 
 	// update audio positions
 	trap_S_Respatialize( cg.snap->ps.clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater );

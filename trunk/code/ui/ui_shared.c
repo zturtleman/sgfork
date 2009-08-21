@@ -2363,9 +2363,6 @@ qboolean Item_Slider_HandleKey(itemDef_t *item, int key, qboolean down) {
 			}
 		}
 	}
-#ifndef SMOKINGUNS
-	DC->Print("slider handle key exit\n");
-#endif
 	return qfalse;
 }
 
@@ -2810,20 +2807,12 @@ void Item_TextColor(itemDef_t *item, vec4_t *newColor) {
 
 	Fade(&item->window.flags, &item->window.foreColor[3], parent->fadeClamp, &item->window.nextTime, parent->fadeCycle, qtrue, parent->fadeAmount);
 
-#ifndef SMOKINGUNS
-	if (item->window.flags & WINDOW_HASFOCUS) {
-#else
 	if ((item->window.flags & WINDOW_HASFOCUS) && !(item->window.flags & WINDOW_NOFOCUS)) {
-#endif
 		lowLight[0] = 0.8 * parent->focusColor[0];
 		lowLight[1] = 0.8 * parent->focusColor[1];
 		lowLight[2] = 0.8 * parent->focusColor[2];
 		lowLight[3] = 0.8 * parent->focusColor[3];
-#ifndef SMOKINGUNS
-		LerpColor(parent->focusColor,lowLight,*newColor,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-#else
 		LerpColor(parent->focusColor,lowLight,*newColor,0.5f);
-#endif
 	} else if (item->textStyle == ITEM_TEXTSTYLE_BLINK && !((DC->realTime/BLINK_DIVISOR) & 1)) {
 		lowLight[0] = 0.8 * item->window.foreColor[0];
 		lowLight[1] = 0.8 * item->window.foreColor[1];
@@ -3057,12 +3046,8 @@ void Item_TextField_Paint(itemDef_t *item) {
 		lowLight[1] = 0.8 * parent->focusColor[1];
 		lowLight[2] = 0.8 * parent->focusColor[2];
 		lowLight[3] = 0.8 * parent->focusColor[3];
-#ifndef SMOKINGUNS
-		LerpColor(parent->focusColor,lowLight,newColor,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-#else
 		// do not pulse in SG
 		LerpColor(parent->focusColor,lowLight,newColor,0.5f);
-#endif
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vec4_t));
 	}
@@ -3089,11 +3074,7 @@ void Item_YesNo_Paint(itemDef_t *item) {
 		lowLight[1] = 0.8 * parent->focusColor[1];
 		lowLight[2] = 0.8 * parent->focusColor[2];
 		lowLight[3] = 0.8 * parent->focusColor[3];
-#ifndef SMOKINGUNS
-		LerpColor(parent->focusColor,lowLight,newColor,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-#else
 		LerpColor(parent->focusColor,lowLight,newColor,0.5f);
-#endif
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vec4_t));
 	}
@@ -3116,11 +3097,7 @@ void Item_Multi_Paint(itemDef_t *item) {
 		lowLight[1] = 0.8 * parent->focusColor[1];
 		lowLight[2] = 0.8 * parent->focusColor[2];
 		lowLight[3] = 0.8 * parent->focusColor[3];
-#ifndef SMOKINGUNS
-		LerpColor(parent->focusColor,lowLight,newColor,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-#else
 		LerpColor(parent->focusColor,lowLight,newColor,0.5f);
-#endif
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vec4_t));
 	}
@@ -3156,22 +3133,14 @@ typedef struct
 static bind_t g_bindings[] =
 {
 	{"+scores",			 K_TAB,				-1,		-1, -1},
-#ifndef SMOKINGUNS
-	{"+button2",		 K_ENTER,			-1,		-1, -1},
-#else
 	{"+button2",		 'e',			-1,		-1, -1},
-#endif
 	{"+speed", 			 K_SHIFT,			-1,		-1,	-1},
 	{"+forward", 		 K_UPARROW,		-1,		-1, -1},
 	{"+back", 			 K_DOWNARROW,	-1,		-1, -1},
 	{"+moveleft", 	 ',',					-1,		-1, -1},
 	{"+moveright", 	 '.',					-1,		-1, -1},
 	{"+moveup",			 K_SPACE,			-1,		-1, -1},
-#ifndef SMOKINGUNS
-	{"+movedown",		 'c',				-1,		-1, -1},
-#else
 	{"+movedown",		 K_CTRL,					-1,		-1, -1},
-#endif
 	{"+left", 			 K_LEFTARROW,	-1,		-1, -1},
 	{"+right", 			 K_RIGHTARROW,	-1,		-1, -1},
 	{"+strafe", 		 K_ALT,				-1,		-1, -1},
@@ -3179,47 +3148,13 @@ static bind_t g_bindings[] =
 	{"+lookdown", 	 K_DEL,				-1,		-1, -1},
 	{"+mlook", 			 '/',					-1,		-1, -1},
 	{"centerview", 	 K_END,				-1,		-1, -1},
-#ifndef SMOKINGUNS
-	{"+zoom", 			 -1,				-1,		-1, -1},
-#endif
 	{"weapon 1",		 '1',					-1,		-1, -1},
 	{"weapon 2",		 '2',					-1,		-1, -1},
 	{"weapon 3",		 '3',					-1,		-1, -1},
 	{"weapon 4",		 '4',					-1,		-1, -1},
-#ifndef SMOKINGUNS
-	{"weapon 5",		 '5',				-1,		-1, -1},
-	{"weapon 6",		 '6',				-1,		-1, -1},
-	{"weapon 7",		 '7',				-1,		-1, -1},
-	{"weapon 8",		 '8',				-1,		-1, -1},
-	{"weapon 9",		 '9',				-1,		-1, -1},
-	{"weapon 10",		 '0',				-1,		-1, -1},
-	{"weapon 11",		 -1,				-1,		-1, -1},
-	{"weapon 12",		 -1,				-1,		-1, -1},
-	{"weapon 13",		 -1,				-1,		-1, -1},
-	{"+attack", 		 K_CTRL,			-1,		-1, -1},
-#else
 	{"+attack", 		 K_MOUSE1,				-1,		-1, -1},
-#endif
 	{"weapprev",		 '[',					-1,		-1, -1},
 	{"weapnext", 		 ']',					-1,		-1, -1},
-#ifndef SMOKINGUNS
-	{"+button3", 		 K_MOUSE3,			-1,		-1, -1},
-	{"+button4", 		 K_MOUSE4,			-1,		-1, -1},
-	{"prevTeamMember", 'w',					-1,		-1, -1},
-	{"nextTeamMember", 'r',					-1,		-1, -1},
-	{"nextOrder", 't',					-1,		-1, -1},
-	{"confirmOrder", 'y',					-1,		-1, -1},
-	{"denyOrder", 'n',					-1,		-1, -1},
-	{"taskOffense", 'o',					-1,		-1, -1},
-	{"taskDefense", 'd',					-1,		-1, -1},
-	{"taskPatrol", 'p',					-1,		-1, -1},
-	{"taskCamp", 'c',					-1,		-1, -1},
-	{"taskFollow", 'f',					-1,		-1, -1},
-	{"taskRetrieve", 'v',					-1,		-1, -1},
-	{"taskEscort", 'e',					-1,		-1, -1},
-	{"taskOwnFlag", 'i',					-1,		-1, -1},
-	{"taskSuicide", 'k',					-1,		-1, -1},
-#else
 	{"lastusedweapon",	 'q',					-1,		-1, -1},
 	{"+button3", 		 'f',			-1,		-1, -1},
 	{"+button5", 		 'r',			-1,		-1, -1},
@@ -3241,7 +3176,6 @@ static bind_t g_bindings[] =
 	{"taskEscort", -1,					-1,		-1, -1},
 	{"taskOwnFlag", -1,					-1,		-1, -1},
 	{"taskSuicide", -1,					-1,		-1, -1},
-#endif
 	{"tauntKillInsult", K_F1,			-1,		-1, -1},
 	{"tauntPraise", K_F2,			-1,		-1, -1},
 	{"tauntTaunt", K_F3,			-1,		-1, -1},
@@ -3252,31 +3186,12 @@ static bind_t g_bindings[] =
 	{"messagemode",  -1,					-1,		-1, -1},
 	{"messagemode2", -1,						-1,		-1, -1},
 	{"messagemode3", -1,						-1,		-1, -1},
-#ifndef SMOKINGUNS
-	{"messagemode4", -1,						-1,		-1, -1}
-#else
 	{"messagemode4", -1,						-1,		-1, -1},
 	{"+voiprecord", 		 -1,				-1,		-1, -1}
-#endif
 };
 
 
 static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
-
-#ifndef SMOKINGUNS
-static configcvar_t g_configcvars[] =
-{
-	{"cl_run",			0,					0},
-	{"m_pitch",			0,					0},
-	{"cg_autoswitch",	0,					0},
-	{"sensitivity",		0,					0},
-	{"in_joystick",		0,					0},
-	{"joy_threshold",	0,					0},
-	{"m_filter",		0,					0},
-	{"cl_freelook",		0,					0},
-	{NULL,				0,					0}
-};
-#endif
 
 /*
 =================
@@ -3445,30 +3360,12 @@ void BindingFromName(const char *cvar) {
 }
 
 void Item_Slider_Paint(itemDef_t *item) {
-#ifndef SMOKINGUNS
-	vec4_t newColor, lowLight;
-	float x, y, value;
-	menuDef_t *parent = (menuDef_t*)item->parent;
-#else
 	vec4_t newColor;
 	float x, y, value;
-#endif
 
 	value = (item->cvar) ? DC->getCVarValue(item->cvar) : 0;
 
-#ifndef SMOKINGUNS
-	if (item->window.flags & WINDOW_HASFOCUS) {
-		lowLight[0] = 0.8 * parent->focusColor[0];
-		lowLight[1] = 0.8 * parent->focusColor[1];
-		lowLight[2] = 0.8 * parent->focusColor[2];
-		lowLight[3] = 0.8 * parent->focusColor[3];
-		LerpColor(parent->focusColor,lowLight,newColor,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-	} else {
-		memcpy(&newColor, &item->window.foreColor, sizeof(vec4_t));
-	}
-#else
 	memcpy(&newColor, &item->window.foreColor, sizeof(vec4_t));
-#endif
 
 	y = item->window.rect.y;
 	if (item->text) {
@@ -3509,11 +3406,7 @@ void Item_Bind_Paint(itemDef_t *item) {
 			lowLight[2] = 0.8f * parent->focusColor[2];
 			lowLight[3] = 0.8f * parent->focusColor[3];
 		}
-#ifndef SMOKINGUNS
-		LerpColor(parent->focusColor,lowLight,newColor,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-#else
 		LerpColor(parent->focusColor,lowLight,newColor,0.5f);
-#endif
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vec4_t));
 	}
@@ -3747,11 +3640,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 		DC->drawHandlePic(x, y, SCROLLBAR_SIZE, SCROLLBAR_SIZE, DC->Assets.scrollBarArrowLeft);
 		x += SCROLLBAR_SIZE - 1;
 		size = item->window.rect.w - (SCROLLBAR_SIZE * 2);
-#ifndef SMOKINGUNS
-		DC->drawHandlePic(x, y, size+1, SCROLLBAR_SIZE, DC->Assets.scrollBar);
-#else
 		DC->drawHandlePic(x, y, size+1, SCROLLBAR_SIZE, DC->Assets.scrollBar_horz);
-#endif
 		x += size - 1;
 		DC->drawHandlePic(x, y, SCROLLBAR_SIZE, SCROLLBAR_SIZE, DC->Assets.scrollBarArrowRight);
 		// thumb
@@ -3914,11 +3803,7 @@ void Item_OwnerDraw_Paint(itemDef_t *item) {
 			lowLight[1] = 0.8 * parent->focusColor[1];
 			lowLight[2] = 0.8 * parent->focusColor[2];
 			lowLight[3] = 0.8 * parent->focusColor[3];
-#ifndef SMOKINGUNS
-			LerpColor(parent->focusColor,lowLight,color,0.5+0.5*sin(DC->realTime / PULSE_DIVISOR));
-#else
 			LerpColor(parent->focusColor,lowLight,color,0.5f);
-#endif
 		} else if (item->textStyle == ITEM_TEXTSTYLE_BLINK && !((DC->realTime/BLINK_DIVISOR) & 1)) {
 			lowLight[0] = 0.8 * item->window.foreColor[0];
 			lowLight[1] = 0.8 * item->window.foreColor[1];
@@ -4205,7 +4090,6 @@ void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char 
 				}
 				menu->items[i]->cursorPos = index;
 				DC->feederSelection(menu->items[i]->special, menu->items[i]->cursorPos);
-#ifdef SMOKINGUNS
 				//Com_Printf("Setting feeder to index %d\n",index);
 				// Tequila comment: Update map list positions to show the selected item
 				if ( feeder == FEEDER_ALLMAPS || feeder == FEEDER_MAPS ) {
@@ -4222,7 +4106,6 @@ void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char 
 						listPtr->startPos = 0 ;
 					//Com_Printf("startPos set to %d\n",listPtr->startPos);
 				}
-#endif
 				return;
 			}
 		}
@@ -4763,7 +4646,6 @@ qboolean ItemParse_visible( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-#ifdef SMOKINGUNS
 // Used for buy menu
 qboolean ItemParse_nofocusdraw( itemDef_t *item, int handle ) {
 	int i;
@@ -4776,7 +4658,6 @@ qboolean ItemParse_nofocusdraw( itemDef_t *item, int handle ) {
 	}
 	return qtrue;
 }
-#endif
 
 qboolean ItemParse_ownerdraw( itemDef_t *item, int handle ) {
 	if (!PC_Int_Parse(handle, &item->window.ownerDraw)) {
@@ -5218,9 +5099,7 @@ keywordHash_t itemParseKeywords[] = {
 	{"bordersize", ItemParse_bordersize, NULL},
 	{"visible", ItemParse_visible, NULL},
 	// new keyword
-#ifdef SMOKINGUNS
 	{"nofocusdraw", ItemParse_nofocusdraw, NULL},
-#endif
 	{"ownerdraw", ItemParse_ownerdraw, NULL},
 	{"align", ItemParse_align, NULL},
 	{"textalign", ItemParse_textalign, NULL},
@@ -5768,11 +5647,6 @@ void Menu_Reset(void) {
 displayContextDef_t *Display_GetContext(void) {
 	return DC;
 }
-
-#ifndef SMOKINGUNS
-static float captureX;
-static float captureY;
-#endif
 
 void *Display_CaptureItem(int x, int y) {
 	int i;

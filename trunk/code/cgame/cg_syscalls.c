@@ -446,7 +446,6 @@ qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( CG_R_INPVS, p1, p2 );
 }
 
-#ifdef SMOKINGUNS
 int trap_R_CullBoundingBox( vec3_t box_vertex[8] ) {
 	return syscall( CG_R_CULL_BBOX, box_vertex );
 }
@@ -458,4 +457,3 @@ int trap_R_CullPointAndRadius( vec3_t pt, float radius ) {
 int trap_R_GetFrustumPlane( cplane_t frustum[4] ) {
 	return syscall( CG_R_FRUSTUM_PLANE, frustum );
 }
-#endif

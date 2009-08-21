@@ -153,9 +153,6 @@ typedef enum {
 #define SORT_CLIENTS		2
 #define SORT_GAME			3
 #define SORT_PING			4
-#ifndef SMOKINGUNS
-#define SORT_PUNKBUSTER		5
-#endif
 
 typedef enum {
 	UI_GETAPIVERSION = 0,	// system reserved

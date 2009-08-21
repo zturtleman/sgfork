@@ -41,12 +41,6 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 	float		len;
 	int			i;
 
-#ifndef SMOKINGUNS
-	if ( cg_noProjectileTrail.integer ) {
-		return;
-	}
-#endif
-
 	VectorCopy (start, move);
 	VectorSubtract (end, start, vec);
 	len = VectorNormalize (vec);
@@ -191,197 +185,13 @@ void CG_SpawnEffect( vec3_t org ) {
 	re->reType = RT_MODEL;
 	re->shaderTime = cg.time / 1000.0f;
 
-#ifndef SMOKINGUNS
-	re->customShader = cgs.media.teleportEffectShader;
-#endif
 	re->hModel = cgs.media.teleportEffectModel;
 	AxisClear( re->axis );
 
 	VectorCopy( org, re->origin );
-#ifdef SMOKINGUNS
 	re->origin[2] += 16;
-#else
-	re->origin[2] -= 24;
-#endif
 }
 
-
-#ifndef SMOKINGUNS
-/*
-===============
-CG_LightningBoltBeam
-===============
-*/
-void CG_LightningBoltBeam( vec3_t start, vec3_t end ) {
-	localEntity_t	*le;
-	refEntity_t		*beam;
-
-	le = CG_AllocLocalEntity();
-	le->leFlags = 0;
-	le->leType = LE_SHOWREFENTITY;
-	le->startTime = cg.time;
-	le->endTime = cg.time + 50;
-
-	beam = &le->refEntity;
-
-	VectorCopy( start, beam->origin );
-	// this is the end point
-	VectorCopy( end, beam->oldorigin );
-
-	beam->reType = RT_LIGHTNING;
-	beam->customShader = cgs.media.lightningShader;
-}
-
-/*
-==================
-CG_KamikazeEffect
-==================
-*/
-void CG_KamikazeEffect( vec3_t org ) {
-	localEntity_t	*le;
-	refEntity_t		*re;
-
-	le = CG_AllocLocalEntity();
-	le->leFlags = 0;
-	le->leType = LE_KAMIKAZE;
-	le->startTime = cg.time;
-	le->endTime = cg.time + 3000;//2250;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
-
-	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
-
-	VectorClear(le->angles.trBase);
-
-	re = &le->refEntity;
-
-	re->reType = RT_MODEL;
-	re->shaderTime = cg.time / 1000.0f;
-
-	re->hModel = cgs.media.kamikazeEffectModel;
-
-	VectorCopy( org, re->origin );
-
-}
-
-/*
-==================
-CG_ObeliskExplode
-==================
-*/
-void CG_ObeliskExplode( vec3_t org, int entityNum ) {
-	localEntity_t	*le;
-	vec3_t origin;
-
-	// create an explosion
-	VectorCopy( org, origin );
-	origin[2] += 64;
-	le = CG_MakeExplosion( origin, vec3_origin,
-						   cgs.media.dishFlashModel,
-						   cgs.media.rocketExplosionShader,
-						   600, qtrue, 0, qfalse);
-	le->light = 300;
-	le->lightColor[0] = 1;
-	le->lightColor[1] = 0.75;
-	le->lightColor[2] = 0.0;
-}
-
-/*
-==================
-CG_ObeliskPain
-==================
-*/
-void CG_ObeliskPain( vec3_t org ) {
-	float r;
-	sfxHandle_t sfx;
-
-	// hit sound
-	r = rand() & 3;
-	if ( r < 2 ) {
-		sfx = cgs.media.obeliskHitSound1;
-	} else if ( r == 2 ) {
-		sfx = cgs.media.obeliskHitSound2;
-	} else {
-		sfx = cgs.media.obeliskHitSound3;
-	}
-	trap_S_StartSound ( org, ENTITYNUM_NONE, CHAN_BODY, sfx );
-}
-
-
-/*
-==================
-CG_InvulnerabilityImpact
-==================
-*/
-void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles ) {
-	localEntity_t	*le;
-	refEntity_t		*re;
-	int				r;
-	sfxHandle_t		sfx;
-
-	le = CG_AllocLocalEntity();
-	le->leFlags = 0;
-	le->leType = LE_INVULIMPACT;
-	le->startTime = cg.time;
-	le->endTime = cg.time + 1000;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
-
-	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
-
-	re = &le->refEntity;
-
-	re->reType = RT_MODEL;
-	re->shaderTime = cg.time / 1000.0f;
-
-	re->hModel = cgs.media.invulnerabilityImpactModel;
-
-	VectorCopy( org, re->origin );
-	AnglesToAxis( angles, re->axis );
-
-	r = rand() & 3;
-	if ( r < 2 ) {
-		sfx = cgs.media.invulnerabilityImpactSound1;
-	} else if ( r == 2 ) {
-		sfx = cgs.media.invulnerabilityImpactSound2;
-	} else {
-		sfx = cgs.media.invulnerabilityImpactSound3;
-	}
-	trap_S_StartSound (org, ENTITYNUM_NONE, CHAN_BODY, sfx );
-}
-
-/*
-==================
-CG_InvulnerabilityJuiced
-==================
-*/
-void CG_InvulnerabilityJuiced( vec3_t org ) {
-	localEntity_t	*le;
-	refEntity_t		*re;
-	vec3_t			angles;
-
-	le = CG_AllocLocalEntity();
-	le->leFlags = 0;
-	le->leType = LE_INVULJUICED;
-	le->startTime = cg.time;
-	le->endTime = cg.time + 10000;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
-
-	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
-
-	re = &le->refEntity;
-
-	re->reType = RT_MODEL;
-	re->shaderTime = cg.time / 1000.0f;
-
-	re->hModel = cgs.media.invulnerabilityJuicedModel;
-
-	VectorCopy( org, re->origin );
-	VectorClear(angles);
-	AnglesToAxis( angles, re->axis );
-
-	trap_S_StartSound (org, ENTITYNUM_NONE, CHAN_BODY, cgs.media.invulnerabilityJuicedSound );
-}
-
-#endif
 
 /*
 ==================
@@ -436,11 +246,7 @@ CG_MakeExplosion
 */
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader,
-#ifdef SMOKINGUNS
 								int msec, qboolean isSprite, float radius, qboolean smokeexp) {
-#else
-								int msec, qboolean isSprite ) {
-#endif
 	float			ang;
 	localEntity_t	*ex;
 	int				offset;
@@ -459,17 +265,12 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 
 		// randomly rotate sprite orientation
 		ex->refEntity.rotation = rand() % 360;
-#ifdef SMOKINGUNS
 		if(radius)
 			ex->refEntity.radius = radius;
 		VectorScale( dir, radius/2, tmpVec );
 		VectorAdd( tmpVec, origin, newOrigin );
 		VectorCopy(origin, newOrigin);
 		newOrigin[2] += radius/4;
-#else
-		VectorScale( dir, 16, tmpVec );
-		VectorAdd( tmpVec, origin, newOrigin );
-#endif
 	} else {
 		ex->leType = LE_EXPLOSION;
 		VectorCopy( origin, newOrigin );
@@ -511,36 +312,11 @@ This is the spurt of blood when a character gets hit
 =================
 */
 void CG_Bleed( vec3_t origin, int entityNum ) {
-#ifndef SMOKINGUNS
-	localEntity_t	*ex;
-
-	if ( !cg_blood.integer ) {
-		return;
-	}
-
-	ex = CG_AllocLocalEntity();
-	ex->leType = LE_EXPLOSION;
-
-	ex->startTime = cg.time;
-	ex->endTime = ex->startTime + 500;
-
-	VectorCopy ( origin, ex->refEntity.origin);
-	ex->refEntity.reType = RT_SPRITE;
-	ex->refEntity.rotation = rand() % 360;
-	ex->refEntity.radius = 24;
-
-	ex->refEntity.customShader = cgs.media.bloodExplosionShader;
-#endif
-
 	// don't show player's own blood in view
 	if ( entityNum == cg.snap->ps.clientNum ) {
-#ifndef SMOKINGUNS
-		ex->refEntity.renderfx |= RF_THIRD_PERSON;
-#else
 		cg.landAngleChange = (rand()%30)-15;
 		cg.landTime = cg.time;
 		cg.landChange = 0;
-#endif
 	}
 }
 

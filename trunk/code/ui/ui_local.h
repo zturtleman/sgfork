@@ -34,20 +34,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // global display context
 
-#ifdef SMOKINGUNS
 extern vmCvar_t	ui_specifyAddress;
-#endif
 
 extern vmCvar_t	ui_ffa_fraglimit;
 extern vmCvar_t	ui_ffa_timelimit;
 
-#ifndef SMOKINGUNS
-extern vmCvar_t	ui_tourney_fraglimit;
-extern vmCvar_t	ui_tourney_timelimit;
-#else
 extern vmCvar_t	ui_duel_fraglimit;
 extern vmCvar_t	ui_duel_timelimit;
-#endif
 
 extern vmCvar_t	ui_team_fraglimit;
 extern vmCvar_t	ui_team_timelimit;
@@ -318,13 +311,6 @@ extern void			Bitmap_Init( menubitmap_s *b );
 extern void			Bitmap_Draw( menubitmap_s *b );
 extern void			ScrollList_Draw( menulist_s *l );
 extern sfxHandle_t	ScrollList_Key( menulist_s *l, int key );
-#ifndef SMOKINGUNS
-extern sfxHandle_t	menu_in_sound;
-extern sfxHandle_t	menu_move_sound;
-extern sfxHandle_t	menu_out_sound;
-extern sfxHandle_t	menu_buzz_sound;
-extern sfxHandle_t	menu_null_sound;
-#endif
 extern sfxHandle_t	weaponChangeSound;
 extern vec4_t		menu_text_color;
 extern vec4_t		menu_grayed_color;
@@ -582,17 +568,9 @@ typedef struct {
 } playerInfo_t;
 
 void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int time );
-#ifndef SMOKINGUNS
-void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model, const char *headmodel, char *teamName );
-#else
 void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model );
-#endif
 void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_t viewAngles, vec3_t moveAngles, weapon_t weaponNum, qboolean chat );
-#ifndef SMOKINGUNS
-qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName , const char *headName, const char *teamName);
-#else
 qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName);
-#endif
 
 //
 // ui_atoms.c
@@ -611,10 +589,6 @@ typedef struct {
 	qhandle_t		menuBackNoLogoShader;
 	qhandle_t		charset;
 	qhandle_t		charsetProp;
-#ifndef SMOKINGUNS
-// Tequila comment: Font glowing not used
-	qhandle_t		charsetPropGlow;
-#endif
 	qhandle_t		charsetPropB;
 	qhandle_t		cursor;
 	qhandle_t		rb_on;
@@ -637,11 +611,7 @@ typedef struct {
 #define MAX_SPMAPS 16
 #define PLAYERS_PER_TEAM 5
 #ifndef MAX_PINGREQUESTS
-#ifndef SMOKINGUNS
-#define MAX_PINGREQUESTS		32
-#else
 #define MAX_PINGREQUESTS		16
-#endif
 #endif
 #define MAX_ADDRESSLENGTH		64
 #define MAX_HOSTNAMELENGTH		22
@@ -671,13 +641,7 @@ typedef struct {
   const char *name;
 	const char *imageName;
   qhandle_t headImage;
-#ifndef SMOKINGUNS
-	const char *base;
-	qboolean active;
-	int reference;
-#else
   qboolean female;
-#endif
 } characterInfo;
 
 typedef struct {
@@ -703,10 +667,8 @@ typedef struct {
 
 typedef struct {
   const char *mapName;
-#ifdef SMOKINGUNS
   const char *author;
   const char *description[6];
-#endif
   const char *mapLoadName;
 	const char *imageName;
 	const char *opponentName;
@@ -877,10 +839,6 @@ typedef struct {
 	qhandle_t	q3HeadIcons[MAX_PLAYERMODELS];
 	int				q3SelectedHead;
 
-#ifndef SMOKINGUNS
-	int effectsColor;
-#endif
-
 	qboolean inGameLoad;
 
 }	uiInfo_t;
@@ -1036,10 +994,6 @@ void			trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
 int				trap_RealTime(qtime_t *qtime);
 void			trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
 qboolean		trap_VerifyCDKey( const char *key, const char *chksum);
-
-#ifndef SMOKINGUNS
-void			trap_SetPbClStatus( int status );
-#endif
 
 //
 // ui_addbots.c

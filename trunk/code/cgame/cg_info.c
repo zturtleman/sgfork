@@ -34,7 +34,6 @@ static int			loadingItemIconCount;
 static qhandle_t	loadingPlayerIcons[MAX_LOADING_PLAYER_ICONS];
 static qhandle_t	loadingItemIcons[MAX_LOADING_ITEM_ICONS];
 
-#ifdef SMOKINGUNS
 #define LOADING_ALL 50
 
 //Spoon new loading-draw
@@ -118,35 +117,6 @@ void CG_DrawLoadingStage(void){
 	//right
 	CG_FillRect(640-DISTANCE-LINE, 480-DISTANCE-3*LINE-LOADING_HEIGHT, LINE , LOADING_HEIGHT+2*LINE ,color);
 }
-#endif
-
-/*
-===================
-CG_DrawLoadingIcons
-===================
-*/
-#ifndef SMOKINGUNS
-static void CG_DrawLoadingIcons( void ) {
-	int		n;
-	int		x, y;
-
-	for( n = 0; n < loadingPlayerIconCount; n++ ) {
-		x = 16 + n * 78;
-		y = 324-40;
-		CG_DrawPic( x, y, 64, 64, loadingPlayerIcons[n] );
-	}
-
-	for( n = 0; n < loadingItemIconCount; n++ ) {
-		y = 400-40;
-		if( n >= 13 ) {
-			y += 40;
-		}
-		x = 16 + n % 13 * 48;
-		CG_DrawPic( x, y, 32, 32, loadingItemIcons[n] );
-	}
-}
-#endif
-
 
 /*
 ======================
@@ -197,29 +167,14 @@ void CG_LoadingClient( int clientNum ) {
 		if ( skin ) {
 			*skin++ = '\0';
 		} else {
-#ifndef SMOKINGUNS
-			skin = "default";
-		}
-
-		Com_sprintf( iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", model, skin );
-#else
 			skin = "red";
 		}
 
 		Com_sprintf( iconName, MAX_QPATH, "models/wq3_players/%s/icon_%s.tga", model, skin );
-#endif
 
 		loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		if ( !loadingPlayerIcons[loadingPlayerIconCount] ) {
-#ifndef SMOKINGUNS
-			Com_sprintf( iconName, MAX_QPATH, "models/players/characters/%s/icon_%s.tga", model, skin );
-			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
-		}
-		if ( !loadingPlayerIcons[loadingPlayerIconCount] ) {
-			Com_sprintf( iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", DEFAULT_MODEL, "default" );
-#else
 			Com_sprintf( iconName, MAX_QPATH, "models/wq3_players/%s/icon_%s.tga", DEFAULT_MODEL, "red" );
-#endif
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		}
 		if ( loadingPlayerIcons[loadingPlayerIconCount] ) {
@@ -252,12 +207,8 @@ void CG_DrawInformation( void ) {
 	int			y;
 	int			value;
 	qhandle_t	levelshot;
-#ifndef SMOKINGUNS
-	qhandle_t	detail;
-#else
 	qhandle_t	background, photo;
 	float		*color;
-#endif
 	char		buf[1024];
 
 	info = CG_ConfigString( CS_SERVERINFO );
@@ -265,29 +216,13 @@ void CG_DrawInformation( void ) {
 
 	s = Info_ValueForKey( info, "mapname" );
 
-#ifdef SMOKINGUNS
 	// draw the background
 	background = trap_R_RegisterShaderNoMip( "ui/bg/main.tga");
 
 	trap_R_SetColor( NULL );
 	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
-#endif
 
 	levelshot = trap_R_RegisterShaderNoMip( va( "levelshots/%s.tga", s ) );
-#ifndef SMOKINGUNS
-	if ( !levelshot ) {
-		levelshot = trap_R_RegisterShaderNoMip( "menu/art/unknownmap" );
-	}
-	trap_R_SetColor( NULL );
-	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot );
-
-	// blend a detail texture over it
-	detail = trap_R_RegisterShader( "levelShotDetail" );
-	trap_R_DrawStretchPic( 0, 0, cgs.glconfig.vidWidth, cgs.glconfig.vidHeight, 0, 0, 2.5, 2, detail );
-
-	// draw the icons of things as they are loaded
-	CG_DrawLoadingIcons();
-#else
 	if ( levelshot ) {
 		photo = trap_R_RegisterShaderNoMip( "ui/bg/photo.tga");
 
@@ -299,33 +234,20 @@ void CG_DrawInformation( void ) {
 		color = colorWhite;
 
 	CG_DrawLoadingStage();
-#endif
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
 	if ( cg.infoScreenText[0] ) {
-#ifndef SMOKINGUNS
-		UI_DrawProportionalString( 320, 128-32, va("Loading... %s", cg.infoScreenText),
-#else
 		UI_DrawProportionalString( 320, 454, va("Loading... %s", cg.infoScreenText),
-#endif
 			UI_CENTER|UI_SMALLFONT, colorWhite );
 	} else {
-#ifndef SMOKINGUNS
-		UI_DrawProportionalString( 320, 128-32, "Awaiting snapshot...",
-#else
 		UI_DrawProportionalString( 320, 452, "Awaiting snapshot...",
-#endif
 			UI_CENTER|UI_SMALLFONT, colorWhite );
 	}
 
 	// draw info string information
 
-#ifndef SMOKINGUNS
-	y = 180-32;
-#else
 	y = 30;
-#endif
 
 	// don't print server lines if playing a local game
 	trap_Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
@@ -357,12 +279,10 @@ void CG_DrawInformation( void ) {
 		y += 10;
 	}
 
-#ifdef SMOKINGUNS
 	if(levelshot)
 		y = 120;
 	else
 		y = 200;
-#endif
 
 	// map-specific message (long map name)
 	s = CG_ConfigString( CS_MESSAGE );
@@ -382,50 +302,23 @@ void CG_DrawInformation( void ) {
 	// game type
 	switch ( cgs.gametype ) {
 	case GT_FFA:
-#ifndef SMOKINGUNS
-		s = "Free For All";
-#else
 		s = "Deathmatch";
-#endif
 		break;
 	case GT_SINGLE_PLAYER:
 		s = "Single Player";
 		break;
-#ifndef SMOKINGUNS
-	case GT_TOURNAMENT:
-		s = "Tournament";
-#else
 	case GT_DUEL:
 		s = "Duel";
-#endif
 		break;
 	case GT_TEAM:
 		s = "Team Deathmatch";
 		break;
-#ifdef SMOKINGUNS
 	case GT_RTP:
 		s = "Round Teamplay";
 		break;
 	case GT_BR:
 		s = "Bank Robbery";
 		break;
-#endif
-#ifndef SMOKINGUNS
-	case GT_CTF:
-		s = "Capture The Flag";
-		break;
-#ifdef MISSIONPACK
-	case GT_1FCTF:
-		s = "One Flag CTF";
-		break;
-	case GT_OBELISK:
-		s = "Overload";
-		break;
-	case GT_HARVESTER:
-		s = "Harvester";
-		break;
-#endif
-#endif
 	default:
 		s = "Unknown Gametype";
 		break;
@@ -441,11 +334,7 @@ void CG_DrawInformation( void ) {
 		y += PROP_HEIGHT;
 	}
 
-#ifndef SMOKINGUNS
-	if (cgs.gametype < GT_CTF ) {
-#else
 	if (cgs.gametype < GT_RTP && cgs.gametype != GT_DUEL) {
-#endif
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 		if ( value ) {
 			UI_DrawProportionalString( 320, y, va( "fraglimit %i", value ),
@@ -454,16 +343,6 @@ void CG_DrawInformation( void ) {
 		}
 	}
 
-#ifndef SMOKINGUNS
-	if (cgs.gametype >= GT_CTF) {
-		value = atoi( Info_ValueForKey( info, "capturelimit" ) );
-		if ( value ) {
-			UI_DrawProportionalString( 320, y, va( "capturelimit %i", value ),
-				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
-			y += PROP_HEIGHT;
-		}
-	}
-#else
 	if (cgs.gametype == GT_DUEL) {
 		value = atoi( Info_ValueForKey( info, "duellimit" ) );
 		if ( value ) {
@@ -481,7 +360,6 @@ void CG_DrawInformation( void ) {
 			y += PROP_HEIGHT;
 		}
 	}
-#endif
 }
 
 

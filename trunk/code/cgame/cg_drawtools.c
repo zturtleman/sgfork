@@ -375,14 +375,10 @@ float *CG_TeamColor( int team ) {
 
 	switch ( team ) {
 	case TEAM_RED:
-#ifdef SMOKINGUNS
 	case TEAM_RED_SPECTATOR:
-#endif
 		return red;
 	case TEAM_BLUE:
-#ifdef SMOKINGUNS
 	case TEAM_BLUE_SPECTATOR:
-#endif
 		return blue;
 	case TEAM_SPECTATOR:
 		return spectator;
@@ -460,108 +456,6 @@ static int	propMap[128][3] = {
 {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1},
 {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1}, {0, 0, -1},
 
-#ifndef SMOKINGUNS
-{0, 0, PROP_SPACE_WIDTH},		// SPACE
-{11, 122, 7},	// !
-{154, 181, 14},	// "
-{55, 122, 17},	// #
-{79, 122, 18},	// $
-{101, 122, 23},	// %
-{153, 122, 18},	// &
-{9, 93, 7},		// '
-{207, 122, 8},	// (
-{230, 122, 9},	// )
-{177, 122, 18},	// *
-{30, 152, 18},	// +
-{85, 181, 7},	// ,
-{34, 93, 11},	// -
-{110, 181, 6},	// .
-{130, 152, 14},	// /
-
-{22, 64, 17},	// 0
-{41, 64, 12},	// 1
-{58, 64, 17},	// 2
-{78, 64, 18},	// 3
-{98, 64, 19},	// 4
-{120, 64, 18},	// 5
-{141, 64, 18},	// 6
-{204, 64, 16},	// 7
-{162, 64, 17},	// 8
-{182, 64, 18},	// 9
-{59, 181, 7},	// :
-{35,181, 7},	// ;
-{203, 152, 14},	// <
-{56, 93, 14},	// =
-{228, 152, 14},	// >
-{177, 181, 18},	// ?
-
-{28, 122, 22},	// @
-{5, 4, 18},		// A
-{27, 4, 18},	// B
-{48, 4, 18},	// C
-{69, 4, 17},	// D
-{90, 4, 13},	// E
-{106, 4, 13},	// F
-{121, 4, 18},	// G
-{143, 4, 17},	// H
-{164, 4, 8},	// I
-{175, 4, 16},	// J
-{195, 4, 18},	// K
-{216, 4, 12},	// L
-{230, 4, 23},	// M
-{6, 34, 18},	// N
-{27, 34, 18},	// O
-
-{48, 34, 18},	// P
-{68, 34, 18},	// Q
-{90, 34, 17},	// R
-{110, 34, 18},	// S
-{130, 34, 14},	// T
-{146, 34, 18},	// U
-{166, 34, 19},	// V
-{185, 34, 29},	// W
-{215, 34, 18},	// X
-{234, 34, 18},	// Y
-{5, 64, 14},	// Z
-{60, 152, 7},	// [
-{106, 151, 13},	// '\'
-{83, 152, 7},	// ]
-{128, 122, 17},	// ^
-{4, 152, 21},	// _
-
-{134, 181, 5},	// '
-{5, 4, 18},		// A
-{27, 4, 18},	// B
-{48, 4, 18},	// C
-{69, 4, 17},	// D
-{90, 4, 13},	// E
-{106, 4, 13},	// F
-{121, 4, 18},	// G
-{143, 4, 17},	// H
-{164, 4, 8},	// I
-{175, 4, 16},	// J
-{195, 4, 18},	// K
-{216, 4, 12},	// L
-{230, 4, 23},	// M
-{6, 34, 18},	// N
-{27, 34, 18},	// O
-
-{48, 34, 18},	// P
-{68, 34, 18},	// Q
-{90, 34, 17},	// R
-{110, 34, 18},	// S
-{130, 34, 14},	// T
-{146, 34, 18},	// U
-{166, 34, 19},	// V
-{185, 34, 29},	// W
-{215, 34, 18},	// X
-{234, 34, 18},	// Y
-{5, 64, 14},	// Z
-{153, 152, 13},	// {
-{11, 181, 5},	// |
-{180, 152, 13},	// }
-{79, 93, 17},	// ~
-#else
 {0, 0, PROP_SPACE_WIDTH},		// SPACE
 {7, 160, 5},	// !
 {71, 223, 15},	// "
@@ -664,7 +558,6 @@ static int	propMap[128][3] = {
 {6, 221, 2},	// |
 {184, 207, 11},	// }
 {91, 130, 16},	// ~
-#endif
 {0, 0, -1}		// DEL
 };
 
@@ -870,12 +763,8 @@ UI_ProportionalSizeScale
 */
 float UI_ProportionalSizeScale( int style ) {
 	if(  style & UI_SMALLFONT ) {
-#ifndef SMOKINGUNS
-		return 0.75;
-#else
 // Tequila comment: Adjusted the scale for small ui font
 		return 0.45;
-#endif
 	}
 
 	return 1.00;
@@ -924,25 +813,6 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
 		return;
 	}
-
-#ifndef SMOKINGUNS
-// Tequila comment: Removed that as it is not used: the charset is not
-// existing and if this is enabled, the loading stage texts are not shown
-	if ( style & UI_PULSE ) {
-		drawcolor[0] = color[0] * 0.8;
-		drawcolor[1] = color[1] * 0.8;
-		drawcolor[2] = color[2] * 0.8;
-		drawcolor[3] = color[3];
-		UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
-
-		drawcolor[0] = color[0];
-		drawcolor[1] = color[1];
-		drawcolor[2] = color[2];
-		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
-		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
-		return;
-	}
-#endif
 
 	UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 }

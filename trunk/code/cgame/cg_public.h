@@ -184,16 +184,12 @@ typedef enum {
 	CG_CEIL,
 	CG_TESTPRINTINT,
 	CG_TESTPRINTFLOAT,
-#ifndef SMOKINGUNS
-	CG_ACOS
-#else
 	CG_ACOS,
 
 	/// Smokin' Guns specific syscalls
 	CG_R_CULL_BBOX = 150,
 	CG_R_CULL_SPHERE,
 	CG_R_FRUSTUM_PLANE
-#endif
 } cgameImport_t;
 
 
