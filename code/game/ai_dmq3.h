@@ -136,8 +136,6 @@ void BotClearActivateGoalStack(bot_state_t *bs);
 int BotTeam(bot_state_t *bs);
 //retuns the opposite team of the bot
 int BotOppositeTeam(bot_state_t *bs);
-//returns the flag the bot is carrying (CTFFLAG_?)
-int BotCTFCarryingFlag(bot_state_t *bs);
 //remember the last ordered task
 void BotRememberLastOrderedTask(bot_state_t *bs);
 //set ctf goals (defend base, get enemy flag) during seek

@@ -3304,7 +3304,6 @@ void BotCheckForGrenades(bot_state_t *bs, entityState_t *state) {
 
 	bs->explosives[bs->numexplosives] = state->number;
 	bs->numexplosives++;*/
-#endif
 }
 
 /*
