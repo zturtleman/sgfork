@@ -54,7 +54,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "match.h"
 
 // for the voice chats
-#include "../../ui/menudef.h"
+#include "../../base/ui/menudef.h"
 
 /*
 ==================
