@@ -141,11 +141,7 @@ BotAI_Trace
 void BotAI_Trace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int passent, int contentmask) {
 	trace_t trace;
 
-#ifndef SMOKINGUNS
-	trap_Trace(&trace, start, mins, maxs, end, passent, contentmask);
-#else
 	trap_Trace_New(&trace, start, mins, maxs, end, passent, contentmask);
-#endif
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
@@ -159,11 +155,7 @@ void BotAI_Trace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, 
 	bsptrace->ent = trace.entityNum;
 	bsptrace->exp_dist = 0;
 	bsptrace->sidenum = 0;
-#ifndef SMOKINGUNS
-	bsptrace->contents = 0;
-#else
 	bsptrace->contents = trace.contents;
-#endif
 }
 
 /*
@@ -294,30 +286,6 @@ void BotReportStatus(bot_state_t *bs) {
 	if (Q_stricmp(netname, bs->teamleader) == 0) leader = "L";
 	else leader = " ";
 
-#ifndef SMOKINGUNS
-	strcpy(flagstatus, "  ");
-	if (gametype == GT_CTF) {
-		if (BotCTFCarryingFlag(bs)) {
-			if (BotTeam(bs) == TEAM_RED) strcpy(flagstatus, S_COLOR_RED"F ");
-			else strcpy(flagstatus, S_COLOR_BLUE"F ");
-		}
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF) {
-		if (Bot1FCTFCarryingFlag(bs)) {
-			if (BotTeam(bs) == TEAM_RED) strcpy(flagstatus, S_COLOR_RED"F ");
-			else strcpy(flagstatus, S_COLOR_BLUE"F ");
-		}
-	}
-	else if (gametype == GT_HARVESTER) {
-		if (BotHarvesterCarryingCubes(bs)) {
-			if (BotTeam(bs) == TEAM_RED) Com_sprintf(flagstatus, sizeof(flagstatus), S_COLOR_RED"%2d", bs->inventory[INVENTORY_REDCUBE]);
-			else Com_sprintf(flagstatus, sizeof(flagstatus), S_COLOR_BLUE"%2d", bs->inventory[INVENTORY_BLUECUBE]);
-		}
-	}
-#endif
-#endif
-
 	switch(bs->ltgtype) {
 		case LTG_TEAMHELP:
 		{
@@ -445,28 +413,6 @@ void BotSetInfoConfigString(bot_state_t *bs) {
 	ClientName(bs->client, netname, sizeof(netname));
 	if (Q_stricmp(netname, bs->teamleader) == 0) leader = "L";
 	else leader = " ";
-
-#ifndef SMOKINGUNS
-	strcpy(carrying, "  ");
-	if (gametype == GT_CTF) {
-		if (BotCTFCarryingFlag(bs)) {
-			strcpy(carrying, "F ");
-		}
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF) {
-		if (Bot1FCTFCarryingFlag(bs)) {
-			strcpy(carrying, "F ");
-		}
-	}
-	else if (gametype == GT_HARVESTER) {
-		if (BotHarvesterCarryingCubes(bs)) {
-			if (BotTeam(bs) == TEAM_RED) Com_sprintf(carrying, sizeof(carrying), "%2d", bs->inventory[INVENTORY_REDCUBE]);
-			else Com_sprintf(carrying, sizeof(carrying), "%2d", bs->inventory[INVENTORY_BLUECUBE]);
-		}
-	}
-#endif
-#endif
 
 	switch(bs->ltgtype) {
 		case LTG_TEAMHELP:
@@ -669,13 +615,8 @@ void BotInterbreeding(void) {
 	trap_Cvar_Update(&bot_interbreedchar);
 	if (!strlen(bot_interbreedchar.string)) return;
 	//make sure we are in tournament mode
-#ifndef SMOKINGUNS
-	if (gametype != GT_TOURNAMENT) {
-		trap_Cvar_Set("g_gametype", va("%d", GT_TOURNAMENT));
-#else
 	if (gametype != GT_DUEL) {
 		trap_Cvar_Set("g_gametype", va("%i", GT_DUEL));
-#endif
 		ExitLevel();
 		return;
 	}
@@ -836,11 +777,7 @@ void BotChangeViewAngles(bot_state_t *bs, float thinktime) {
 BotInputToUserCommand
 ==============
 */
-#ifndef SMOKINGUNS
-void BotInputToUserCommand(bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3], int time) {
-#else
 void BotInputToUserCommand(bot_state_t *bs, bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3], int time) {
-#endif
 	vec3_t angles, forward, right;
 	short temp;
 	int j;
@@ -859,10 +796,8 @@ void BotInputToUserCommand(bot_state_t *bs, bot_input_t *bi, usercmd_t *ucmd, in
 	//set the buttons
 	if (bi->actionflags & ACTION_RESPAWN) ucmd->buttons = BUTTON_ATTACK;
 	if (bi->actionflags & ACTION_ATTACK) ucmd->buttons |= BUTTON_ATTACK;
-#ifdef SMOKINGUNS
 	if (bs->flags & BFL_ATTACK) ucmd->buttons |= BUTTON_ATTACK;
 	if (bs->flags & BFL_ATTACK2) ucmd->buttons |= BUTTON_ALT_ATTACK;
-#endif
 
 	if (bi->actionflags & ACTION_TALK) ucmd->buttons |= BUTTON_TALK;
 	if (bi->actionflags & ACTION_GESTURE) ucmd->buttons |= BUTTON_GESTURE;
@@ -876,7 +811,6 @@ void BotInputToUserCommand(bot_state_t *bs, bot_input_t *bi, usercmd_t *ucmd, in
 	if (bi->actionflags & ACTION_FOLLOWME) ucmd->buttons |= BUTTON_FOLLOWME;
 
 	// reloading
-#ifdef SMOKINGUNS
 	if (bs->flags & BFL_RELOAD){
 		ucmd->buttons |= BUTTON_RELOAD;
 
@@ -894,14 +828,9 @@ void BotInputToUserCommand(bot_state_t *bs, bot_input_t *bi, usercmd_t *ucmd, in
 	if(bs->flags & BFL_ACT_BUTTON){
 		ucmd->buttons |= BUTTON_ACTIVATE;
 	}
-#endif
 
 	//
-#ifndef SMOKINGUNS
-	ucmd->weapon = bi->weapon;
-#else
 	ucmd->weapon = bs->cmdweapon;
-#endif
 	//set the view angles
 	//NOTE: the ucmd->angles are the angles WITHOUT the delta angles
 	ucmd->angles[PITCH] = ANGLE2SHORT(bi->viewangles[PITCH]);
@@ -969,11 +898,7 @@ void BotUpdateInput(bot_state_t *bs, int time, int elapsed_time) {
 		if (bs->lastucmd.buttons & BUTTON_ATTACK) bi.actionflags &= ~(ACTION_RESPAWN|ACTION_ATTACK);
 	}
 	//convert the bot input to a usercmd
-#ifndef SMOKINGUNS
-	BotInputToUserCommand(&bi, &bs->lastucmd, bs->cur_ps.delta_angles, time);
-#else
 	BotInputToUserCommand(bs, &bi, &bs->lastucmd, bs->cur_ps.delta_angles, time);
-#endif
 	//subtract the delta angles
 	for (j = 0; j < 3; j++) {
 		bs->viewangles[j] = AngleMod(bs->viewangles[j] - SHORT2ANGLE(bs->cur_ps.delta_angles[j]));
@@ -1066,17 +991,6 @@ int BotAI(int client, float thinktime) {
 			args[strlen(args)-1] = '\0';
 			trap_BotQueueConsoleMessage(bs->cs, CMS_CHAT, args);
 		}
-#ifndef SMOKINGUNS
-		else if (!Q_stricmp(buf, "vchat")) {
-			BotVoiceChatCommand(bs, SAY_ALL, args);
-		}
-		else if (!Q_stricmp(buf, "vtchat")) {
-			BotVoiceChatCommand(bs, SAY_TEAM, args);
-		}
-		else if (!Q_stricmp(buf, "vtell")) {
-			BotVoiceChatCommand(bs, SAY_TELL, args);
-		}
-#endif
 		else if (!Q_stricmp(buf, "scores"))
 			{ /*FIXME: parse scores?*/ }
 		else if (!Q_stricmp(buf, "clientLevelShot"))
@@ -1100,11 +1014,7 @@ int BotAI(int client, float thinktime) {
 	//the real AI
 	BotDeathmatchAI(bs, thinktime);
 	//set the weapon selection every AI frame
-#ifndef SMOKINGUNS
-	trap_EA_SelectWeapon(bs->client, bs->weaponnum);
-#else
 	bs->cmdweapon = bs->weaponnum;
-#endif
 	//subtract the delta angles
 	for (j = 0; j < 3; j++) {
 		bs->viewangles[j] = AngleMod(bs->viewangles[j] - SHORT2ANGLE(bs->cur_ps.delta_angles[j]));
@@ -1429,10 +1339,6 @@ int BotAILoadMap( int restart ) {
 	return qtrue;
 }
 
-#ifndef SMOKINGUNS
-void ProximityMine_Trigger( gentity_t *trigger, gentity_t *other, trace_t *trace );
-#endif
-
 /*
 ==================
 BotAIStartFrame
@@ -1537,11 +1443,7 @@ int BotAIStartFrame(int time) {
 				continue;
 			}
 			// do not update missiles
-#ifndef SMOKINGUNS
-			if (ent->s.eType == ET_MISSILE && ent->s.weapon != WP_GRAPPLING_HOOK) {
-#else
 			if (ent->s.eType == ET_MISSILE) {
-#endif
 				trap_BotLibUpdateEntity(i, NULL);
 				continue;
 			}
@@ -1550,15 +1452,6 @@ int BotAIStartFrame(int time) {
 				trap_BotLibUpdateEntity(i, NULL);
 				continue;
 			}
-#ifndef SMOKINGUNS
-			// never link prox mine triggers
-			if (ent->r.contents == CONTENTS_TRIGGER) {
-				if (ent->touch == ProximityMine_Trigger) {
-					trap_BotLibUpdateEntity(i, NULL);
-					continue;
-				}
-			}
-#endif
 			//
 			memset(&state, 0, sizeof(bot_entitystate_t));
 			//
@@ -1696,9 +1589,6 @@ int BotInitLibrary(void) {
 	trap_Cvar_VariableStringBuffer("fs_homepath", buf, sizeof(buf));
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
-#ifndef SMOKINGUNS
-	trap_BotLibDefine("MISSIONPACK");
-#endif
 	//setup the bot library
 	return trap_BotLibSetup();
 }

@@ -1786,7 +1786,6 @@ int Q_snprintf(char *str, size_t length, const char *fmt, ...)
 // This is really dirty
 // Support only %123s syntax of sscanf to prevent segfault
 // Add a 'null' char at the end
-#ifdef SMOKINGUNS
 int _atos( const char **stringPtr , char *dest , int limit )
 {
 	int		len ;
@@ -1828,7 +1827,6 @@ int _atos( const char **stringPtr , char *dest , int limit )
 	
 	return len ;
 }
-#endif
 
 /* this is really crappy */
 
@@ -1839,9 +1837,7 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 	int		cmd;
 	int		**arg;
 	int		count;
-#ifdef SMOKINGUNS
 	int		len ;
-#endif
 
 	arg = (int **)&fmt + 1;
 	count = 0;
@@ -1852,10 +1848,6 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 			continue;
 		}
 
-#ifndef SMOKINGUNS
-		cmd = fmt[1];
-		fmt += 2;
-#else
 		fmt ++ ;
 		len = -1 ;
 		if ( *fmt > '0' && *fmt < '9' ) {
@@ -1865,7 +1857,6 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 		}
 		cmd = fmt[0];
 		fmt ++ ;
-#endif
 
 		switch ( cmd ) {
 		case 'i':
@@ -1876,11 +1867,9 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 		case 'f':
 			*(float *)*arg = _atof( &buffer );
 			break;
-#ifdef SMOKINGUNS
 		case 's':
 			_atos( &buffer , (char*)*arg , len ) ;
 			break;
-#endif
 		}
 		arg++;
 	}
