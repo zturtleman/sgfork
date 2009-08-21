@@ -2106,12 +2106,12 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 		if(atoi(Info_ValueForKey(info, "g_gametype")) < GT_TEAM)
 			s = va("Join Game");
 		else
-			s = va("Join %s", Info_ValueForKey(info, "g_redteamname") );
+			s = va("Join Red");
 		break;
 	case UI_JOIN_BLUE:
 		if(atoi(Info_ValueForKey(info, "g_gametype")) < GT_TEAM){
 		} else
-			s = va("Join %s", Info_ValueForKey(info, "g_blueteamname") );
+			s = va("Join Blue");
 		break;
 #endif
     default:
@@ -2157,22 +2157,7 @@ static void UI_DrawBotSkill(rectDef_t *rect, float scale, vec4_t color, int text
 }
 
 static void UI_DrawRedBlue(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
-#ifndef SMOKINGUNS
 	Text_Paint(rect->x, rect->y, scale, color, (uiInfo.redBlue == 0) ? "Red" : "Blue", 0, 0, textStyle);
-#else
-	char info[MAX_INFO_STRING];
-	char *teamname;
-
-	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-
-	if(uiInfo.redBlue == 0){
-		teamname = Info_ValueForKey(info, "g_redteamname");
-	} else {
-		teamname = Info_ValueForKey(info, "g_blueteamname");
-	}
-
-	Text_Paint(rect->x, rect->y, scale, color, teamname, 0, 0, textStyle);
-#endif
 }
 
 static void UI_DrawCrosshair(rectDef_t *rect, float scale, vec4_t color) {
@@ -4208,8 +4193,8 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cvar_Set("ui_sv_fraglimit", Info_ValueForKey( serverinfo, "fraglimit" ));
 			trap_Cvar_Set("ui_sv_duellimit", Info_ValueForKey( serverinfo, "duellimit" ));
 			trap_Cvar_Set("ui_sv_timelimit", Info_ValueForKey( serverinfo, "timelimit" ));
-			trap_Cvar_Set("ui_sv_redteamname", Info_ValueForKey( serverinfo, "g_redteamname" ));
-			trap_Cvar_Set("ui_sv_blueteamname", Info_ValueForKey( serverinfo, "g_blueteamname" ));
+			trap_Cvar_Set("ui_sv_redteamname", Info_ValueForKey( serverinfo, "g_redteam" ));
+			trap_Cvar_Set("ui_sv_blueteamname", Info_ValueForKey( serverinfo, "g_blueteam" ));
 			trap_Cvar_Set("ui_sv_protocol", Info_ValueForKey( serverinfo, "protocol" ));
 			trap_Cvar_Set("ui_sv_maxclients", Info_ValueForKey( serverinfo, "sv_maxclients" ));
 			trap_Cvar_Set("ui_sv_hostname", Info_ValueForKey( serverinfo, "sv_hostname" ));
@@ -6751,11 +6736,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_blueteam, "ui_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE },
 #endif
 	{ &ui_dedicated, "ui_dedicated", "0", CVAR_ARCHIVE },
-#ifndef SMOKINGUNS
-	{ &ui_gameType, "ui_gametype", "3", CVAR_ARCHIVE },
-#else
 	{ &ui_gameType, "ui_gametype", "0", CVAR_ARCHIVE },
-#endif
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
 	{ &ui_netGameType, "ui_netGametype", "3", CVAR_ARCHIVE },
 #ifndef SMOKINGUNS

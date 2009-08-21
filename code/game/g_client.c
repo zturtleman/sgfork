@@ -1165,8 +1165,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	// colors
 //FIXME: Not protected from buffer overflow
 	strcpy(c1, Info_ValueForKey( userinfo, "color" ));
-	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteamname" ));
-	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteamname" ));
+	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
+	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));
 	strcpy(guid, Info_ValueForKey( userinfo, "cl_guid" ));
 	strcpy(version, Info_ValueForKey( userinfo, "cl_version" ));
 
