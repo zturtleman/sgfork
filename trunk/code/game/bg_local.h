@@ -26,21 +26,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	MIN_WALK_NORMAL	0.7f		// can't walk on very steep slopes
 
-#ifndef SMOKINGUNS
-#define	STEPSIZE		18
-#else
 #define	STEPSIZE		22
-#endif
 
 #define	JUMP_VELOCITY	270
 
-#ifndef SMOKINGUNS
-#define	TIMER_LAND		130
-#define	TIMER_GESTURE	(34*66+50)
-#else
 #define	TIMER_LAND		200
 #define	TIMER_GESTURE	1600
-#endif
 
 #define	OVERCLIP		1.001f
 
@@ -56,9 +47,7 @@ typedef struct {
 	qboolean	walking;
 	qboolean	groundPlane;
 	trace_t		groundTrace;
-#ifdef SMOKINGUNS
 	qboolean	ladder; // We'll use this to tell when the player is on a ladder
-#endif
 
 	float		impactSpeed;
 

@@ -583,7 +583,16 @@ int BotChat_Death(bot_state_t *bs) {
 		else if (bs->botdeathtype == MOD_TELEFRAG)
 			BotAI_BotInitialChat(bs, "death_telefrag", name, NULL);
 			//choose between insult and praise
-			else if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
+    else {
+      if ((bs->botdeathtype == MOD_KNIFE) && random() < 0.5) {
+
+        if (bs->botdeathtype == MOD_KNIFE)
+          BotAI_BotInitialChat(bs, "death_gauntlet",
+              name,                       // 0
+              BotWeaponNameForMeansOfDeath(bs->botdeathtype),   // 1
+              NULL);
+      }
+		else if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
 				BotAI_BotInitialChat(bs, "death_insult",
 							name,												// 0
 							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
@@ -637,6 +646,13 @@ int BotChat_Kill(bot_state_t *bs) {
 	{
 		//don't chat in teamplay
 		//choose between insult and praise
+    //
+    if (bs->enemydeathtype == MOD_KNIFE) {
+      BotAI_BotInitialChat(bs, "kill_gauntlet", name, NULL);
+    }
+    else if (bs->enemydeathtype == MOD_TELEFRAG) {
+      BotAI_BotInitialChat(bs, "kill_telefrag", name, NULL);
+    }
 		else if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
 			BotAI_BotInitialChat(bs, "kill_insult", name, NULL);
 		}

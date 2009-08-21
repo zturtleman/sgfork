@@ -99,9 +99,7 @@ double atof( const char *string );
 double _atof( const char **stringPtr );
 int atoi( const char *string );
 int _atoi( const char **stringPtr );
-#ifdef SMOKINGUNS
 int _atos( const char **stringPtr , char *dest , int limit );
-#endif
 
 int Q_vsnprintf( char *buffer, size_t length, const char *fmt, va_list argptr );
 int Q_snprintf( char *buffer, size_t length, const char *fmt, ... ) __attribute__ ((format (printf, 3, 4)));

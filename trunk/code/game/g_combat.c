@@ -68,7 +68,6 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	CalculateRanks();
 }
 
-#ifdef SMOKINGUNS
 void AddScoreRTPTeam( int team, int score ) {
 	// no scoring during pre-match warmup
 	if ( level.warmupTime) {
@@ -92,7 +91,6 @@ void AddScoreRTP( gentity_t *ent, int score ) {
 	level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
 	CalculateRanks();
 }
-#endif
 
 /*
 =================
@@ -103,39 +101,10 @@ Toss the weapon and powerups for the killed player
 */
 void TossClientItems( gentity_t *self ) {
 	gitem_t		*item;
-#ifndef SMOKINGUNS
-	int			weapon;
-#endif
 	float		angle;
 	int			i;
 	gentity_t	*drop;
 
-#ifndef SMOKINGUNS
-	// drop the weapon if not a gauntlet or machinegun
-	weapon = self->s.weapon;
-
-	// make a special check to see if they are changing to a new
-	// weapon that isn't the mg or gauntlet.  Without this, a client
-	// can pick up a weapon, be killed, and not drop the weapon because
-	// their weapon change hasn't completed yet and they are still holding the MG.
-	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
-		if ( self->client->ps.weaponstate == WEAPON_DROPPING ) {
-			weapon = self->client->pers.cmd.weapon;
-		}
-		if ( !( self->client->ps.stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
-			weapon = WP_NONE;
-		}
-	}
-
-	if ( weapon > WP_MACHINEGUN && weapon != WP_GRAPPLING_HOOK &&
-		self->client->ps.ammo[ weapon ] ) {
-		// find the item type for this weapon
-		item = BG_FindItemForWeapon( weapon );
-
-		// spawn the item
-		Drop_Item( self, item, 0 );
-	}
-#else
 	gentity_t	*sec_pistol_drop;
 
 	// in duel, no items will be  dropped
@@ -198,18 +167,10 @@ void TossClientItems( gentity_t *self ) {
 		self->client->ps.ammo[i] = 0;
 		self->client->ps.stats[STAT_WEAPONS] &= ~( 1 << i );
 	}
-#endif
 
 	// drop all the powerups if not in teamplay
-#ifndef SMOKINGUNS
-	if ( g_gametype.integer != GT_TEAM ) {
-#endif
 		angle = 45;
 		for ( i = 1 ; i < PW_NUM_POWERUPS ; i++ ) {
-#ifndef SMOKINGUNS
-			if ( self->client->ps.powerups[ i ] > level.time ) {
-				item = BG_FindItemForPowerup( i );
-#else
 			if(i >= DM_HEAD_1 && i <= DM_LEGS_2)
 				continue;
 
@@ -223,31 +184,18 @@ void TossClientItems( gentity_t *self ) {
 					item = BG_FindItemForClassname("item_money");
 				else
 					continue;
-#endif
 				if ( !item ) {
 					continue;
 				}
 				drop = Drop_Item( self, item, angle );
 				// decide how many seconds it has left
-#ifndef SMOKINGUNS
-				drop->count = ( self->client->ps.powerups[ i ] - level.time ) / 1000;
-				if ( drop->count < 1 ) {
-					drop->count = 1;
-				}
-#else
 				drop->count = 1;
-#endif
 				angle += 45;
 
 				// remove the powerup
-#ifdef SMOKINGUNS
 				self->client->ps.powerups[i] = 0;
-#endif
 			}
 		}
-#ifndef SMOKINGUNS
-	}
-#else
 	// drop armor
 	if( self->client->ps.stats[STAT_ARMOR]){
 		item = BG_FindItem("Boiler Plate");
@@ -260,121 +208,19 @@ void TossClientItems( gentity_t *self ) {
 		// This prevent the player to drop another boiler plate, several times.
 		self->client->ps.stats[STAT_ARMOR] = 0;
 	}
-#endif
 }
-
-#ifndef SMOKINGUNS
-
-/*
-=================
-TossClientCubes
-=================
-*/
-extern gentity_t	*neutralObelisk;
-
-void TossClientCubes( gentity_t *self ) {
-	gitem_t		*item;
-	gentity_t	*drop;
-	vec3_t		velocity;
-	vec3_t		angles;
-	vec3_t		origin;
-
-	self->client->ps.generic1 = 0;
-
-	// this should never happen but we should never
-	// get the server to crash due to skull being spawned in
-	if (!G_EntitiesFree()) {
-		return;
-	}
-
-	if( self->client->sess.sessionTeam == TEAM_RED ) {
-		item = BG_FindItem( "Red Cube" );
-	}
-	else {
-		item = BG_FindItem( "Blue Cube" );
-	}
-
-	angles[YAW] = (float)(level.time % 360);
-	angles[PITCH] = 0;	// always forward
-	angles[ROLL] = 0;
-
-	AngleVectors( angles, velocity, NULL, NULL );
-	VectorScale( velocity, 150, velocity );
-	velocity[2] += 200 + crandom() * 50;
-
-	if( neutralObelisk ) {
-		VectorCopy( neutralObelisk->s.pos.trBase, origin );
-		origin[2] += 44;
-	} else {
-		VectorClear( origin ) ;
-	}
-
-	drop = LaunchItem( item, origin, velocity );
-
-	drop->nextthink = level.time + g_cubeTimeout.integer * 1000;
-	drop->think = G_FreeEntity;
-	drop->spawnflags = self->client->sess.sessionTeam;
-}
-
-
-/*
-=================
-TossClientPersistantPowerups
-=================
-*/
-void TossClientPersistantPowerups( gentity_t *ent ) {
-	gentity_t	*powerup;
-
-	if( !ent->client ) {
-		return;
-	}
-
-	if( !ent->client->persistantPowerup ) {
-		return;
-	}
-
-	powerup = ent->client->persistantPowerup;
-
-	powerup->r.svFlags &= ~SVF_NOCLIENT;
-	powerup->s.eFlags &= ~EF_NODRAW;
-	powerup->r.contents = CONTENTS_TRIGGER;
-	trap_LinkEntity( powerup );
-
-	ent->client->ps.stats[STAT_PERSISTANT_POWERUP] = 0;
-	ent->client->persistantPowerup = NULL;
-}
-#endif
-
 
 /*
 ==================
 LookAtKiller
 ==================
 */
-#ifndef SMOKINGUNS
-void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) {
-#else
 void LookAtKiller( gentity_t *self, gentity_t *attacker ) {
-#endif
 	vec3_t		dir;
 	vec3_t		angles;
 
 	if ( attacker && attacker != self ) {
 		VectorSubtract (attacker->s.pos.trBase, self->s.pos.trBase, dir);
-#ifndef SMOKINGUNS
-	} else if ( inflictor && inflictor != self ) {
-		VectorSubtract (inflictor->s.pos.trBase, self->s.pos.trBase, dir);
-	} else {
-		self->client->ps.stats[STAT_DEAD_YAW] = self->s.angles[YAW];
-		return;
-	}
-
-	self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
-
-	angles[YAW] = vectoyaw ( dir );
-	angles[PITCH] = 0;
-	angles[ROLL] = 0;
-#else
     } else {
 		return; //if client doesnt have killer
 	}
@@ -385,7 +231,6 @@ void LookAtKiller( gentity_t *self, gentity_t *attacker ) {
 	self->client->ps.grapplePoint[YAW]   = angles[YAW];
 	self->client->ps.grapplePoint[PITCH] = angles[PITCH];
 	self->client->ps.grapplePoint[ROLL]  = 0;
-#endif
 }
 
 /*
@@ -418,62 +263,9 @@ void GibEntity( gentity_t *self, int killer ) {
 	self->r.contents = 0;
 }
 
-/*
-==================
-body_die
-==================
-*/
-#ifndef SMOKINGUNS
-void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
-	if ( self->health > GIB_HEALTH ) {
-		return;
-	}
-	if ( !g_blood.integer ) {
-		self->health = GIB_HEALTH+1;
-		return;
-	}
-
-	GibEntity( self, 0 );
-}
-#endif
-
-
 // these are just for logging, the client prints its own messages
 // Tequila comment: enum should match meansOfDeath_t in bg_public.h
 char	*modNames[] = {
-#ifndef SMOKINGUNS
-	"MOD_UNKNOWN",
-	"MOD_SHOTGUN",
-	"MOD_GAUNTLET",
-	"MOD_MACHINEGUN",
-	"MOD_GRENADE",
-	"MOD_GRENADE_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_PLASMA",
-	"MOD_PLASMA_SPLASH",
-	"MOD_RAILGUN",
-	"MOD_LIGHTNING",
-	"MOD_BFG",
-	"MOD_BFG_SPLASH",
-	"MOD_WATER",
-	"MOD_SLIME",
-	"MOD_LAVA",
-	"MOD_CRUSH",
-	"MOD_TELEFRAG",
-	"MOD_FALLING",
-	"MOD_SUICIDE",
-	"MOD_TARGET_LASER",
-	"MOD_TRIGGER_HURT",
-#ifdef MISSIONPACK
-	"MOD_NAIL",
-	"MOD_CHAINGUN",
-	"MOD_PROXIMITY_MINE",
-	"MOD_KAMIKAZE",
-	"MOD_JUICED",
-#endif
-	"MOD_GRAPPLE"
-#else
 	"MOD_UNKNOWN",
 	//melee
 	"MOD_KNIFE",
@@ -510,39 +302,7 @@ char	*modNames[] = {
 	"MOD_WORLD_DAMAGE",
 	"MOD_TRIGGER_HURT",
 	"MOD_BOILER"
-#endif
 };
-
-#ifndef SMOKINGUNS
-/*
-==================
-Kamikaze_DeathActivate
-==================
-*/
-void Kamikaze_DeathActivate( gentity_t *ent ) {
-	G_StartKamikaze(ent);
-	G_FreeEntity(ent);
-}
-
-/*
-==================
-Kamikaze_DeathTimer
-==================
-*/
-void Kamikaze_DeathTimer( gentity_t *self ) {
-	gentity_t *ent;
-
-	ent = G_Spawn();
-	ent->classname = "kamikaze timer";
-	VectorCopy(self->s.pos.trBase, ent->s.pos.trBase);
-	ent->r.svFlags |= SVF_NOCLIENT;
-	ent->think = Kamikaze_DeathActivate;
-	ent->nextthink = level.time + 5 * 1000;
-
-	ent->activator = self;
-}
-
-#endif
 
 /*
 ==================
@@ -643,9 +403,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	int			killer;
 	int			i;
 	char		*killerName, *obit;
-#ifdef SMOKINGUNS
 	int fallanim = 0;
-#endif
 
 	if ( self->client->ps.pm_type == PM_DEAD ) {
 		return;
@@ -655,12 +413,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		return;
 	}
 
-#ifdef SMOKINGUNS
 //unlagged - backward reconciliation #2
 	// make sure the body shows up in the client's current position
 	G_UnTimeShiftClient( self );
 //unlagged - backward reconciliation #2
-#endif
 
 	// check for an almost capture
 #ifndef SMOKINGUNS
@@ -1198,7 +954,6 @@ int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t i
 }
 #endif
 
-#ifdef SMOKINGUNS
 #define	L_PRINT	0
 
 /*
@@ -1495,7 +1250,6 @@ static qboolean CheckTeamKills( gentity_t *attacker, gentity_t *targ, int mod ) 
 #endif
 	return qfalse;
 }
-#endif
 
 /*
 ============
@@ -1678,10 +1432,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			if ( !g_friendlyFire.integer ) {
 				return;
 			}
-#ifdef SMOKINGUNS
 			// Can be used later in case of TK limit reached to protect the last victim
 			hsave = targ->health;
-#endif
 		}
 #ifndef SMOKINGUNS
 		if (mod == MOD_PROXIMITY_MINE) {
@@ -1905,7 +1657,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 			targ->enemy = attacker;
 
-#ifdef SMOKINGUNS
 			// Target is not killed if TK limit is hit
 			if ( g_friendlyFire.integer && CheckTeamKills(attacker,targ,mod) ) {
 				targ->client->ps.stats[STAT_HEALTH] = targ->health = hsave;
@@ -1941,7 +1692,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			}
 			// Tequila comment: ->die can be NULL
 			if (targ->die)
-#endif
 			targ->die (targ, inflictor, attacker, take, mod);
 			return;
 		} else if ( targ->pain ) {
@@ -1951,7 +1701,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 }
 
-#ifdef SMOKINGUNS
 #define SMALL 2
 void G_LookForBreakableType(gentity_t *ent){
 	vec3_t	origin, origin2;
@@ -1999,7 +1748,6 @@ void G_LookForBreakableType(gentity_t *ent){
 
 	G_BreakablePrepare(ent, shaderNum);
 }
-#endif
 
 
 /*
@@ -2014,9 +1762,7 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	vec3_t	dest;
 	trace_t	tr;
 	vec3_t	midpoint;
-#ifdef SMOKINGUNS
 	int shaderNum;
-#endif
 
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
@@ -2024,11 +1770,6 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	VectorScale (midpoint, 0.5, midpoint);
 
 	VectorCopy (midpoint, dest);
-#ifndef SMOKINGUNS
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
-		return qtrue;
-#else
 	//prepare breakable by Spoon
 	if(targ->s.eType == ET_BREAKABLE){
 
@@ -2051,51 +1792,34 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number){
 		return qtrue;
 	}
-#endif
 
 	// this should probably check in the plane of projection,
 	// rather than in world coordinate, and also include Z
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] += 15.0;
-#ifndef SMOKINGUNS
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#else
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#endif
 	if (tr.fraction == 1.0)
 		return qtrue;
 
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
-#ifndef SMOKINGUNS
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#else
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#endif
 	if (tr.fraction == 1.0)
 		return qtrue;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
-#ifndef SMOKINGUNS
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#else
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#endif
 	if (tr.fraction == 1.0)
 		return qtrue;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
-#ifndef SMOKINGUNS
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#else
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-#endif
 	if (tr.fraction == 1.0)
 		return qtrue;
 

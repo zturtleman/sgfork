@@ -195,16 +195,6 @@ int BotNearbyGoal(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 
 	//check if the bot should go for air
 	if (BotGoForAir(bs, tfl, ltg, range)) return qtrue;
-	//if the bot is carrying the enemy flag
-	if (BotCTFCarryingFlag(bs)) {
-		//if the bot is just a few secs away from the base
-		if (trap_AAS_AreaTravelTimeToGoalArea(bs->areanum, bs->origin,
-				bs->teamgoal.areanum, TFL_DEFAULT) < 300) {
-			//make the range really small
-			range = 50;
-		}
-	}
-	//
 	ret = trap_BotChooseNBGItem(bs->gs, bs->origin, bs->inventory, tfl, ltg, range);
 	/*
 	if (ret)
@@ -1959,7 +1949,6 @@ int AINode_Seek_NBG(bot_state_t *bs) {
 		goal.entitynum>=0 && goal.entitynum<MAX_GENTITIES && g_entities[goal.entitynum].classname &&
 		!strcmp("item_money", g_entities[goal.entitynum].classname))
 		bs->nbg_time = 0;
-#endif
 	//if the bot touches the current goal
 	else if (BotReachedGoal(bs, &goal)) {
 		BotChooseWeapon(bs);
