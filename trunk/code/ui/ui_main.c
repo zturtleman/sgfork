@@ -74,7 +74,6 @@ static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
 	{"All", ""},
-	{"Smokin' Guns", "smokinguns"}	
 };
 
 static const char *teamArenaGameTypes[] = {
