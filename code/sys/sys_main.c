@@ -77,11 +77,7 @@ Sys_SetDefaultInstallPath
 */
 void Sys_SetDefaultInstallPath(const char *path)
 {
-#ifndef SMOKINGUNS
 	Q_strncpyz(installPath, path, sizeof(installPath));
-#else
-	Q_strncpyz(installPath, Sys_GetSystemInstallPath(path), sizeof(installPath));
-#endif
 }
 
 /*
