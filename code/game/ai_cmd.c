@@ -83,35 +83,11 @@ void BotPrintTeamGoal(bot_state_t *bs) {
 			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna accompany a team mate for %1.0f secs\n", netname, t);
 			break;
 		}
-#ifndef SMOKINGUNS
-		case LTG_GETFLAG:
-		{
-			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna get the flag for %1.0f secs\n", netname, t);
-			break;
-		}
-#endif
 		case LTG_RUSHBASE:
 		{
 			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna rush to the base for %1.0f secs\n", netname, t);
 			break;
 		}
-#ifndef SMOKINGUNS
-		case LTG_RETURNFLAG:
-		{
-			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna try to return the flag for %1.0f secs\n", netname, t);
-			break;
-		}
-		case LTG_ATTACKENEMYBASE:
-		{
-			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna attack the enemy base for %1.0f secs\n", netname, t);
-			break;
-		}
-		case LTG_HARVEST:
-		{
-			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna harvest for %1.0f secs\n", netname, t);
-			break;
-		}
-#endif
 		case LTG_DEFENDKEYAREA:
 		{
 			BotAI_Print(PRT_MESSAGE, "%s: I'm gonna defend a key area for %1.0f secs\n", netname, t);
@@ -827,294 +803,6 @@ void BotMatch_Patrol(bot_state_t *bs, bot_match_t *match) {
 
 /*
 ==================
-BotMatch_GetFlag
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_GetFlag(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_MESSAGE_SIZE];
-	int client;
-
-	if (gametype == GT_CTF) {
-		if (!ctf_redflag.areanum || !ctf_blueflag.areanum)
-			return;
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF) {
-		if (!ctf_neutralflag.areanum || !ctf_redflag.areanum || !ctf_blueflag.areanum)
-			return;
-	}
-#endif
-	else {
-		return;
-	}
-	//if not addressed to this bot
-	if (!BotAddressedToBot(bs, match)) return;
-	//
-	trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-	//
-	client = FindClientByName(netname);
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_GETFLAG;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + CTF_GETFLAG_TIME;
-	// get an alternate route in ctf
-	if (gametype == GT_CTF) {
-		//get an alternative route goal towards the enemy base
-		BotGetAlternateRouteGoal(bs, BotOppositeTeam(bs));
-	}
-	//
-	BotSetTeamStatus(bs);
-	// remember last ordered task
-	BotRememberLastOrderedTask(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-/*
-==================
-BotMatch_AttackEnemyBase
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_AttackEnemyBase(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_MESSAGE_SIZE];
-	int client;
-
-	if (gametype == GT_CTF) {
-		BotMatch_GetFlag(bs, match);
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF || gametype == GT_OBELISK || gametype == GT_HARVESTER) {
-		if (!redobelisk.areanum || !blueobelisk.areanum)
-			return;
-	}
-#endif
-	else {
-		return;
-	}
-	//if not addressed to this bot
-	if (!BotAddressedToBot(bs, match)) return;
-	//
-	trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-	//
-	client = FindClientByName(netname);
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_ATTACKENEMYBASE;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + TEAM_ATTACKENEMYBASE_TIME;
-	bs->attackaway_time = 0;
-	//
-	BotSetTeamStatus(bs);
-	// remember last ordered task
-	BotRememberLastOrderedTask(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-#ifndef SMOKINGUNS
-/*
-==================
-BotMatch_Harvest
-==================
-*/
-void BotMatch_Harvest(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_MESSAGE_SIZE];
-	int client;
-
-	if (gametype == GT_HARVESTER) {
-		if (!neutralobelisk.areanum || !redobelisk.areanum || !blueobelisk.areanum)
-			return;
-	}
-	else {
-		return;
-	}
-	//if not addressed to this bot
-	if (!BotAddressedToBot(bs, match)) return;
-	//
-	trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-	//
-	client = FindClientByName(netname);
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_HARVEST;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + TEAM_HARVEST_TIME;
-	bs->harvestaway_time = 0;
-	//
-	BotSetTeamStatus(bs);
-	// remember last ordered task
-	BotRememberLastOrderedTask(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-/*
-==================
-BotMatch_RushBase
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_RushBase(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_MESSAGE_SIZE];
-	int client;
-
-	if (gametype == GT_CTF) {
-		if (!ctf_redflag.areanum || !ctf_blueflag.areanum)
-			return;
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF || gametype == GT_HARVESTER) {
-		if (!redobelisk.areanum || !blueobelisk.areanum)
-			return;
-	}
-#endif
-	else {
-		return;
-	}
-	//if not addressed to this bot
-	if (!BotAddressedToBot(bs, match)) return;
-	//
-	trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-	//
-	client = FindClientByName(netname);
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_RUSHBASE;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + CTF_RUSHBASE_TIME;
-	bs->rushbaseaway_time = 0;
-	//
-	BotSetTeamStatus(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-/*
-==================
-BotMatch_TaskPreference
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_TaskPreference(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_NETNAME];
-	char teammatename[MAX_MESSAGE_SIZE];
-	int teammate, preference;
-
-	ClientName(bs->client, netname, sizeof(netname));
-	if (Q_stricmp(netname, bs->teamleader) != 0) return;
-
-	trap_BotMatchVariable(match, NETNAME, teammatename, sizeof(teammatename));
-	teammate = ClientFromName(teammatename);
-	if (teammate < 0) return;
-
-	preference = BotGetTeamMateTaskPreference(bs, teammate);
-	switch(match->subtype)
-	{
-		case ST_DEFENDER:
-		{
-			preference &= ~TEAMTP_ATTACKER;
-			preference |= TEAMTP_DEFENDER;
-			break;
-		}
-		case ST_ATTACKER:
-		{
-			preference &= ~TEAMTP_DEFENDER;
-			preference |= TEAMTP_ATTACKER;
-			break;
-		}
-		case ST_ROAMER:
-		{
-			preference &= ~(TEAMTP_ATTACKER|TEAMTP_DEFENDER);
-			break;
-		}
-	}
-	BotSetTeamMateTaskPreference(bs, teammate, preference);
-	//
-	EasyClientName(teammate, teammatename, sizeof(teammatename));
-	BotAI_BotInitialChat(bs, "keepinmind", teammatename, NULL);
-	trap_BotEnterChat(bs->cs, teammate, CHAT_TELL);
-	BotVoiceChatOnly(bs, teammate, VOICECHAT_YES);
-	trap_EA_Action(bs->client, ACTION_AFFIRMATIVE);
-}
-#endif
-
-/*
-==================
-BotMatch_ReturnFlag
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_ReturnFlag(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_MESSAGE_SIZE];
-	int client;
-
-	//if not in CTF mode
-	if (
-		gametype != GT_CTF
-#ifdef MISSIONPACK
-		&& gametype != GT_1FCTF
-#endif
-		)
-		return;
-	//if not addressed to this bot
-	if (!BotAddressedToBot(bs, match))
-		return;
-	//
-	trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-	//
-	client = FindClientByName(netname);
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_RETURNFLAG;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + CTF_RETURNFLAG_TIME;
-	bs->rushbaseaway_time = 0;
-	//
-	BotSetTeamStatus(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-/*
-==================
 BotMatch_JoinSubteam
 ==================
 */
@@ -1365,25 +1053,6 @@ void BotMatch_StopTeamLeaderShip(bot_state_t *bs, bot_match_t *match) {
 
 /*
 ==================
-BotMatch_WhoIsTeamLeader
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_WhoIsTeamLeader(bot_state_t *bs, bot_match_t *match) {
-	char netname[MAX_MESSAGE_SIZE];
-
-	if (!TeamPlayIsOn()) return;
-
-	ClientName(bs->client, netname, sizeof(netname));
-	//if this bot IS the team leader
-	if (!Q_stricmp(netname, bs->teamleader)) {
-		trap_EA_SayTeam(bs->client, "I'm the team leader\n");
-	}
-}
-#endif
-
-/*
-==================
 BotMatch_WhatAreYouDoing
 ==================
 */
@@ -1437,33 +1106,6 @@ void BotMatch_WhatAreYouDoing(bot_state_t *bs, bot_match_t *match) {
 			BotAI_BotInitialChat(bs, "patrolling", NULL);
 			break;
 		}
-#ifndef SMOKINGUNS
-		case LTG_GETFLAG:
-		{
-			BotAI_BotInitialChat(bs, "capturingflag", NULL);
-			break;
-		}
-		case LTG_RUSHBASE:
-		{
-			BotAI_BotInitialChat(bs, "rushingbase", NULL);
-			break;
-		}
-		case LTG_RETURNFLAG:
-		{
-			BotAI_BotInitialChat(bs, "returningflag", NULL);
-			break;
-		}
-		case LTG_ATTACKENEMYBASE:
-		{
-			BotAI_BotInitialChat(bs, "attackingenemybase", NULL);
-			break;
-		}
-		case LTG_HARVEST:
-		{
-			BotAI_BotInitialChat(bs, "harvesting", NULL);
-			break;
-		}
-#endif
 		default:
 		{
 			BotAI_BotInitialChat(bs, "roaming", NULL);
@@ -1522,109 +1164,6 @@ float BotNearestVisibleItem(bot_state_t *bs, char *itemname, bot_goal_t *goal) {
 	} while(i > 0);
 	return bestdist;
 }
-
-/*
-==================
-BotMatch_WhereAreYou
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
-	float dist, bestdist;
-	int i, bestitem, redtt, bluett, client;
-	bot_goal_t goal;
-	char netname[MAX_MESSAGE_SIZE];
-	char *nearbyitems[] = {
-		"Shotgun",
-		"Grenade Launcher",
-		"Rocket Launcher",
-		"Plasmagun",
-		"Railgun",
-		"Lightning Gun",
-		"BFG10K",
-		"Quad Damage",
-		"Regeneration",
-		"Battle Suit",
-		"Speed",
-		"Invisibility",
-		"Flight",
-		"Armor",
-		"Heavy Armor",
-		"Red Flag",
-		"Blue Flag",
-#ifdef MISSIONPACK
-		"Nailgun",
-		"Prox Launcher",
-		"Chaingun",
-		"Scout",
-		"Guard",
-		"Doubler",
-		"Ammo Regen",
-		"Neutral Flag",
-		"Red Obelisk",
-		"Blue Obelisk",
-		"Neutral Obelisk",
-#endif
-		NULL
-	};
-	//
-	if (!TeamPlayIsOn())
-		return;
-	//if not addressed to this bot
-	if (!BotAddressedToBot(bs, match))
-		return;
-
-	bestitem = -1;
-	bestdist = 999999;
-	for (i = 0; nearbyitems[i]; i++) {
-		dist = BotNearestVisibleItem(bs, nearbyitems[i], &goal);
-		if (dist < bestdist) {
-			bestdist = dist;
-			bestitem = i;
-		}
-	}
-	if (bestitem != -1) {
-		if (gametype == GT_CTF
-#ifdef MISSIONPACK
-			|| gametype == GT_1FCTF
-#endif
-			) {
-			redtt = trap_AAS_AreaTravelTimeToGoalArea(bs->areanum, bs->origin, ctf_redflag.areanum, TFL_DEFAULT);
-			bluett = trap_AAS_AreaTravelTimeToGoalArea(bs->areanum, bs->origin, ctf_blueflag.areanum, TFL_DEFAULT);
-			if (redtt < (redtt + bluett) * 0.4) {
-				BotAI_BotInitialChat(bs, "teamlocation", nearbyitems[bestitem], "red", NULL);
-			}
-			else if (bluett < (redtt + bluett) * 0.4) {
-				BotAI_BotInitialChat(bs, "teamlocation", nearbyitems[bestitem], "blue", NULL);
-			}
-			else {
-				BotAI_BotInitialChat(bs, "location", nearbyitems[bestitem], NULL);
-			}
-		}
-#ifdef MISSIONPACK
-		else if (gametype == GT_OBELISK || gametype == GT_HARVESTER) {
-			redtt = trap_AAS_AreaTravelTimeToGoalArea(bs->areanum, bs->origin, redobelisk.areanum, TFL_DEFAULT);
-			bluett = trap_AAS_AreaTravelTimeToGoalArea(bs->areanum, bs->origin, blueobelisk.areanum, TFL_DEFAULT);
-			if (redtt < (redtt + bluett) * 0.4) {
-				BotAI_BotInitialChat(bs, "teamlocation", nearbyitems[bestitem], "red", NULL);
-			}
-			else if (bluett < (redtt + bluett) * 0.4) {
-				BotAI_BotInitialChat(bs, "teamlocation", nearbyitems[bestitem], "blue", NULL);
-			}
-			else {
-				BotAI_BotInitialChat(bs, "location", nearbyitems[bestitem], NULL);
-			}
-		}
-#endif
-		else {
-			BotAI_BotInitialChat(bs, "location", nearbyitems[bestitem], NULL);
-		}
-		trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-		client = ClientFromName(netname);
-		trap_BotEnterChat(bs->cs, client, CHAT_TELL);
-	}
-}
-#endif
 
 /*
 ==================
@@ -1733,59 +1272,6 @@ void BotMatch_Kill(bot_state_t *bs, bot_match_t *match) {
 #endif //DEBUG
 }
 
-/*
-==================
-BotMatch_CTF
-==================
-*/
-#ifndef SMOKINGUNS
-void BotMatch_CTF(bot_state_t *bs, bot_match_t *match) {
-
-	char flag[128], netname[MAX_NETNAME];
-
-	if (gametype == GT_CTF) {
-		trap_BotMatchVariable(match, FLAG, flag, sizeof(flag));
-		if (match->subtype & ST_GOTFLAG) {
-			if (!Q_stricmp(flag, "red")) {
-				bs->redflagstatus = 1;
-				if (BotTeam(bs) == TEAM_BLUE) {
-					trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-					bs->flagcarrier = ClientFromName(netname);
-				}
-			}
-			else {
-				bs->blueflagstatus = 1;
-				if (BotTeam(bs) == TEAM_RED) {
-					trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-					bs->flagcarrier = ClientFromName(netname);
-				}
-			}
-			bs->flagstatuschanged = 1;
-			bs->lastflagcapture_time = FloatTime();
-		}
-		else if (match->subtype & ST_CAPTUREDFLAG) {
-			bs->redflagstatus = 0;
-			bs->blueflagstatus = 0;
-			bs->flagcarrier = 0;
-			bs->flagstatuschanged = 1;
-		}
-		else if (match->subtype & ST_RETURNEDFLAG) {
-			if (!Q_stricmp(flag, "red")) bs->redflagstatus = 0;
-			else bs->blueflagstatus = 0;
-			bs->flagstatuschanged = 1;
-		}
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF) {
-		if (match->subtype & ST_1FCTFGOTFLAG) {
-			trap_BotMatchVariable(match, NETNAME, netname, sizeof(netname));
-			bs->flagcarrier = ClientFromName(netname);
-		}
-	}
-#endif
-}
-#endif
-
 void BotMatch_EnterGame(bot_state_t *bs, bot_match_t *match) {
 	int client;
 	char netname[MAX_NETNAME];
@@ -1851,51 +1337,6 @@ int BotMatchMessage(bot_state_t *bs, char *message) {
 			break;
 		}
 		//CTF & 1FCTF
-#ifndef SMOKINGUNS
-		case MSG_GETFLAG:				//ctf get the enemy flag
-		{
-			BotMatch_GetFlag(bs, &match);
-			break;
-		}
-#ifdef MISSIONPACK
-		//CTF & 1FCTF & Obelisk & Harvester
-		case MSG_ATTACKENEMYBASE:
-		{
-			BotMatch_AttackEnemyBase(bs, &match);
-			break;
-		}
-		//Harvester
-		case MSG_HARVEST:
-		{
-			BotMatch_Harvest(bs, &match);
-			break;
-		}
-#endif
-		//CTF & 1FCTF & Harvester
-		case MSG_RUSHBASE:				//ctf rush to the base
-		{
-			BotMatch_RushBase(bs, &match);
-			break;
-		}
-		//CTF & 1FCTF
-		case MSG_RETURNFLAG:
-		{
-			BotMatch_ReturnFlag(bs, &match);
-			break;
-		}
-		//CTF & 1FCTF & Obelisk & Harvester
-		case MSG_TASKPREFERENCE:
-		{
-			BotMatch_TaskPreference(bs, &match);
-			break;
-		}
-		//CTF & 1FCTF
-		case MSG_CTF:
-		{
-			BotMatch_CTF(bs, &match);
-			break;
-		}
-#endif
 		case MSG_GETITEM:
 		{
 			BotMatch_GetItem(bs, &match);
@@ -1957,9 +1398,6 @@ int BotMatchMessage(bot_state_t *bs, char *message) {
 		}
 		case MSG_WHOISTEAMLAEDER:
 		{
-#ifndef SMOKINGUNS
-			BotMatch_WhoIsTeamLeader(bs, &match);
-#endif
 			break;
 		}
 		case MSG_WHATAREYOUDOING:		//ask a bot what he/she is doing
@@ -1974,9 +1412,6 @@ int BotMatchMessage(bot_state_t *bs, char *message) {
 		}
 		case MSG_WHEREAREYOU:
 		{
-#ifndef SMOKINGUNS
-			BotMatch_WhereAreYou(bs, &match);
-#endif
 			break;
 		}
 		case MSG_LEADTHEWAY:

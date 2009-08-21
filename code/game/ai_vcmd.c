@@ -68,86 +68,10 @@ typedef struct voiceCommand_s
 
 /*
 ==================
-BotVoiceChat_GetFlag
-==================
-*/
-#ifndef SMOKINGUNS
-void BotVoiceChat_GetFlag(bot_state_t *bs, int client, int mode) {
-	//
-	if (gametype == GT_CTF) {
-		if (!ctf_redflag.areanum || !ctf_blueflag.areanum)
-			return;
-	}
-#ifdef MISSIONPACK
-	else if (gametype == GT_1FCTF) {
-		if (!ctf_neutralflag.areanum || !ctf_redflag.areanum || !ctf_blueflag.areanum)
-			return;
-	}
-#endif
-	else {
-		return;
-	}
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_GETFLAG;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + CTF_GETFLAG_TIME;
-	// get an alternate route in ctf
-	if (gametype == GT_CTF) {
-		//get an alternative route goal towards the enemy base
-		BotGetAlternateRouteGoal(bs, BotOppositeTeam(bs));
-	}
-	//
-	BotSetTeamStatus(bs);
-	// remember last ordered task
-	BotRememberLastOrderedTask(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-/*
-==================
 BotVoiceChat_Offense
 ==================
 */
 void BotVoiceChat_Offense(bot_state_t *bs, int client, int mode) {
-#ifndef SMOKINGUNS
-	if ( gametype == GT_CTF
-#ifdef MISSIONPACK
-		|| gametype == GT_1FCTF
-#endif
-		) {
-		BotVoiceChat_GetFlag(bs, client, mode);
-		return;
-	}
-#ifdef MISSIONPACK
-	if (gametype == GT_HARVESTER) {
-		//
-		bs->decisionmaker = client;
-		bs->ordered = qtrue;
-		bs->order_time = FloatTime();
-		//set the time to send a message to the team mates
-		bs->teammessage_time = FloatTime() + 2 * random();
-		//set the ltg type
-		bs->ltgtype = LTG_HARVEST;
-		//set the team goal time
-		bs->teamgoal_time = FloatTime() + TEAM_HARVEST_TIME;
-		bs->harvestaway_time = 0;
-		//
-		BotSetTeamStatus(bs);
-		// remember last ordered task
-		BotRememberLastOrderedTask(bs);
-	}
-	else
-#endif
-#endif
 	{
 		//
 		bs->decisionmaker = client;
@@ -176,34 +100,6 @@ BotVoiceChat_Defend
 ==================
 */
 void BotVoiceChat_Defend(bot_state_t *bs, int client, int mode) {
-#ifndef SMOKINGUNS
-#ifdef MISSIONPACK
-	if ( gametype == GT_OBELISK || gametype == GT_HARVESTER) {
-		//
-		switch(BotTeam(bs)) {
-			case TEAM_RED: memcpy(&bs->teamgoal, &redobelisk, sizeof(bot_goal_t)); break;
-			case TEAM_BLUE: memcpy(&bs->teamgoal, &blueobelisk, sizeof(bot_goal_t)); break;
-			default: return;
-		}
-	}
-	else
-#endif
-		if (gametype == GT_CTF
-#ifdef MISSIONPACK
-			|| gametype == GT_1FCTF
-#endif
-			) {
-		//
-		switch(BotTeam(bs)) {
-			case TEAM_RED: memcpy(&bs->teamgoal, &ctf_redflag, sizeof(bot_goal_t)); break;
-			case TEAM_BLUE: memcpy(&bs->teamgoal, &ctf_blueflag, sizeof(bot_goal_t)); break;
-			default: return;
-		}
-	}
-	else {
-		return;
-	}
-#endif
 	//
 	bs->decisionmaker = client;
 	bs->ordered = qtrue;
@@ -224,17 +120,6 @@ void BotVoiceChat_Defend(bot_state_t *bs, int client, int mode) {
 	BotPrintTeamGoal(bs);
 #endif //DEBUG
 }
-
-/*
-==================
-BotVoiceChat_DefendFlag
-==================
-*/
-#ifndef SMOKINGUNS
-void BotVoiceChat_DefendFlag(bot_state_t *bs, int client, int mode) {
-	BotVoiceChat_Defend(bs, client, mode);
-}
-#endif
 
 /*
 ==================
@@ -369,169 +254,15 @@ void BotVoiceChat_FollowMe(bot_state_t *bs, int client, int mode) {
 #endif //DEBUG
 }
 
-/*
-==================
-BotVoiceChat_FollowFlagCarrier
-==================
-*/
-#ifndef SMOKINGUNS
-void BotVoiceChat_FollowFlagCarrier(bot_state_t *bs, int client, int mode) {
-	int carrier;
-
-	carrier = BotTeamFlagCarrier(bs);
-	if (carrier >= 0)
-		BotVoiceChat_FollowMe(bs, carrier, mode);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-
-/*
-==================
-BotVoiceChat_ReturnFlag
-==================
-*/
-void BotVoiceChat_ReturnFlag(bot_state_t *bs, int client, int mode) {
-	//if not in CTF mode
-	if (
-		gametype != GT_CTF
-#ifdef MISSIONPACK
-		&& gametype != GT_1FCTF
-#endif
-		) {
-		return;
-	}
-	//
-	bs->decisionmaker = client;
-	bs->ordered = qtrue;
-	bs->order_time = FloatTime();
-	//set the time to send a message to the team mates
-	bs->teammessage_time = FloatTime() + 2 * random();
-	//set the ltg type
-	bs->ltgtype = LTG_RETURNFLAG;
-	//set the team goal time
-	bs->teamgoal_time = FloatTime() + CTF_RETURNFLAG_TIME;
-	bs->rushbaseaway_time = 0;
-	BotSetTeamStatus(bs);
-#ifdef DEBUG
-	BotPrintTeamGoal(bs);
-#endif //DEBUG
-}
-#endif
-
-/*
-==================
-BotVoiceChat_StartLeader
-==================
-*/
-#ifndef SMOKINGUNS
-void BotVoiceChat_StartLeader(bot_state_t *bs, int client, int mode) {
-	ClientName(client, bs->teamleader, sizeof(bs->teamleader));
-}
-
-/*
-==================
-BotVoiceChat_StopLeader
-==================
-*/
-void BotVoiceChat_StopLeader(bot_state_t *bs, int client, int mode) {
-	char netname[MAX_MESSAGE_SIZE];
-
-	if (!Q_stricmp(bs->teamleader, ClientName(client, netname, sizeof(netname)))) {
-		bs->teamleader[0] = '\0';
-		notleader[client] = qtrue;
-	}
-}
-
-/*
-==================
-BotVoiceChat_WhoIsLeader
-==================
-*/
-void BotVoiceChat_WhoIsLeader(bot_state_t *bs, int client, int mode) {
-	char netname[MAX_MESSAGE_SIZE];
-
-	if (!TeamPlayIsOn()) return;
-
-	ClientName(bs->client, netname, sizeof(netname));
-	//if this bot IS the team leader
-	if (!Q_stricmp(netname, bs->teamleader)) {
-		BotAI_BotInitialChat(bs, "iamteamleader", NULL);
-		trap_BotEnterChat(bs->cs, 0, CHAT_TEAM);
-		BotVoiceChatOnly(bs, -1, VOICECHAT_STARTLEADER);
-	}
-}
-#endif
-
-/*
-==================
-BotVoiceChat_WantOnDefense
-==================
-*/
-#ifndef SMOKINGUNS
-void BotVoiceChat_WantOnDefense(bot_state_t *bs, int client, int mode) {
-	char netname[MAX_NETNAME];
-
-	int preference;
-
-	preference = BotGetTeamMateTaskPreference(bs, client);
-	preference &= ~TEAMTP_ATTACKER;
-	preference |= TEAMTP_DEFENDER;
-	BotSetTeamMateTaskPreference(bs, client, preference);
-	//
-	EasyClientName(client, netname, sizeof(netname));
-	BotAI_BotInitialChat(bs, "keepinmind", netname, NULL);
-	trap_BotEnterChat(bs->cs, client, CHAT_TELL);
-	BotVoiceChatOnly(bs, client, VOICECHAT_YES);
-	trap_EA_Action(bs->client, ACTION_AFFIRMATIVE);
-}
-
-/*
-==================
-BotVoiceChat_WantOnOffense
-==================
-*/
-void BotVoiceChat_WantOnOffense(bot_state_t *bs, int client, int mode) {
-	char netname[MAX_NETNAME];
-	int preference;
-
-	preference = BotGetTeamMateTaskPreference(bs, client);
-	preference &= ~TEAMTP_DEFENDER;
-	preference |= TEAMTP_ATTACKER;
-	BotSetTeamMateTaskPreference(bs, client, preference);
-	//
-	EasyClientName(client, netname, sizeof(netname));
-	BotAI_BotInitialChat(bs, "keepinmind", netname, NULL);
-	trap_BotEnterChat(bs->cs, client, CHAT_TELL);
-	BotVoiceChatOnly(bs, client, VOICECHAT_YES);
-	trap_EA_Action(bs->client, ACTION_AFFIRMATIVE);
-}
-#endif
-
 void BotVoiceChat_Dummy(bot_state_t *bs, int client, int mode) {
 }
 
 voiceCommand_t voiceCommands[] = {
-#ifndef SMOKINGUNS
-	{VOICECHAT_GETFLAG, BotVoiceChat_GetFlag},
-#endif
 	{VOICECHAT_OFFENSE, BotVoiceChat_Offense },
 	{VOICECHAT_DEFEND, BotVoiceChat_Defend },
-#ifndef SMOKINGUNS
-	{VOICECHAT_DEFENDFLAG, BotVoiceChat_DefendFlag },
-#endif
 	{VOICECHAT_PATROL, BotVoiceChat_Patrol },
 	{VOICECHAT_CAMP, BotVoiceChat_Camp },
 	{VOICECHAT_FOLLOWME, BotVoiceChat_FollowMe },
-#ifndef SMOKINGUNS
-	{VOICECHAT_FOLLOWFLAGCARRIER, BotVoiceChat_FollowFlagCarrier },
-	{VOICECHAT_RETURNFLAG, BotVoiceChat_ReturnFlag },
-	{VOICECHAT_STARTLEADER, BotVoiceChat_StartLeader },
-	{VOICECHAT_STOPLEADER, BotVoiceChat_StopLeader },
-	{VOICECHAT_WHOISLEADER, BotVoiceChat_WhoIsLeader },
-	{VOICECHAT_WANTONDEFENSE, BotVoiceChat_WantOnDefense },
-	{VOICECHAT_WANTONOFFENSE, BotVoiceChat_WantOnOffense },
-#endif
 	{NULL, BotVoiceChat_Dummy}
 };
 

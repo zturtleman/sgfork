@@ -64,10 +64,6 @@ qboolean EntityIsDead(aas_entityinfo_t *entinfo);
 qboolean EntityIsInvisible(aas_entityinfo_t *entinfo);
 //returns true if the entity is shooting
 qboolean EntityIsShooting(aas_entityinfo_t *entinfo);
-#ifndef SMOKINGUNS
-//returns true if this entity has the kamikaze
-qboolean EntityHasKamikaze(aas_entityinfo_t *entinfo);
-#endif
 // set a user info key/value pair
 void BotSetUserInfo(bot_state_t *bs, char *key, char *value);
 // set the team status (offense, defense etc.)
@@ -95,11 +91,6 @@ int BotWantsToChase(bot_state_t *bs);
 //returns true if the bot wants to help
 int BotWantsToHelp(bot_state_t *bs);
 //returns true if the bot can and wants to rocketjump
-#ifndef SMOKINGUNS
-int BotCanAndWantsToRocketJump(bot_state_t *bs);
-// returns true if the bot has a persistant powerup and a weapon
-int BotHasPersistantPowerupAndWeapon(bot_state_t *bs);
-#endif
 //returns true if the bot wants to and goes camping
 int BotWantsToCamp(bot_state_t *bs);
 //the bot will perform attack movements
@@ -117,12 +108,8 @@ int BotEnemyFlagCarrierVisible(bot_state_t *bs);
 //get the number of visible teammates and enemies
 void BotVisibleTeamMatesAndEnemies(bot_state_t *bs, int *teammates, int *enemies, float range);
 //returns true if within the field of vision for the given angles
-#ifndef SMOKINGUNS
-qboolean InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles);
-#else
 qboolean InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles, int client);
 qboolean BotIsARealEnemy(int client, int other);
-#endif
 //returns true and sets the .enemy field when an enemy is found
 int BotFindEnemy(bot_state_t *bs, int curenemy);
 //returns a roam goal
@@ -134,9 +121,7 @@ void BotAimAtEnemy(bot_state_t *bs);
 //check if the bot should attack
 void BotCheckAttack(bot_state_t *bs);
 //and if he should reload
-#ifdef SMOKINGUNS
 void BotCheckReload(bot_state_t *bs, int weapon, int reloadbit);
-#endif
 //AI when the bot is blocked
 void BotAIBlocked(bot_state_t *bs, bot_moveresult_t *moveresult, int activate);
 //AI to predict obstacles
@@ -160,19 +145,6 @@ void BotCTFSeekGoals(bot_state_t *bs);
 //set ctf goals (defend base, get enemy flag) during retreat
 void BotCTFRetreatGoals(bot_state_t *bs);
 //
-#ifndef SMOKINGUNS
-int Bot1FCTFCarryingFlag(bot_state_t *bs);
-int BotHarvesterCarryingCubes(bot_state_t *bs);
-void Bot1FCTFSeekGoals(bot_state_t *bs);
-void Bot1FCTFRetreatGoals(bot_state_t *bs);
-void BotObeliskSeekGoals(bot_state_t *bs);
-void BotObeliskRetreatGoals(bot_state_t *bs);
-void BotGoHarvest(bot_state_t *bs);
-void BotHarvesterSeekGoals(bot_state_t *bs);
-void BotHarvesterRetreatGoals(bot_state_t *bs);
-int BotTeamCubeCarrierVisible(bot_state_t *bs);
-int BotEnemyCubeCarrierVisible(bot_state_t *bs);
-#endif
 //get a random alternate route goal towards the given base
 int BotGetAlternateRouteGoal(bot_state_t *bs, int base);
 //returns either the alternate route goal or the given goal
@@ -209,17 +181,6 @@ extern vmCvar_t bot_nochat;
 extern vmCvar_t bot_testrchat;
 extern vmCvar_t bot_challenge;
 
-#ifndef SMOKINGUNS
-extern bot_goal_t ctf_redflag;
-extern bot_goal_t ctf_blueflag;
-extern bot_goal_t ctf_neutralflag;
-extern bot_goal_t redobelisk;
-extern bot_goal_t blueobelisk;
-extern bot_goal_t neutralobelisk;
-#endif
-
 // ai nodes
-#ifdef SMOKINGUNS
 extern vec3_t	ai_nodes[MAX_AINODES];
 extern int		ai_nodecount;
-#endif
