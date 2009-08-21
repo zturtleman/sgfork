@@ -109,7 +109,6 @@ void SP_trigger_multiple( gentity_t *ent ) {
 	trap_LinkEntity (ent);
 }
 
-#ifdef SMOKINGUNS
 void Touch_Escape( gentity_t *self, gentity_t *other, trace_t *trace ){
 
 	int reward ;
@@ -153,7 +152,6 @@ void SP_trigger_escape( gentity_t *ent ) {
 
 	trap_LinkEntity (ent);
 }
-#endif
 
 
 /*
@@ -177,27 +175,6 @@ void SP_trigger_always (gentity_t *ent) {
 	ent->nextthink = level.time + 300;
 	ent->think = trigger_always_think;
 }
-
-
-/*
-==============================================================================
-
-trigger_push
-
-==============================================================================
-*/
-
-#ifndef SMOKINGUNS
-void trigger_push_touch (gentity_t *self, gentity_t *other, trace_t *trace ) {
-
-	if ( !other->client ) {
-		return;
-	}
-
-	BG_TouchJumpPad( &other->client->ps, &self->s );
-}
-#endif
-
 
 /*
 =================
@@ -240,30 +217,6 @@ void AimAtTarget( gentity_t *self ) {
 	self->s.origin2[2] = time * gravity;
 }
 
-
-/*QUAKED trigger_push (.5 .5 .5) ?
-Must point at a target_position, which will be the apex of the leap.
-This will be client side predicted, unlike target_push
-*/
-#ifndef SMOKINGUNS
-void SP_trigger_push( gentity_t *self ) {
-	InitTrigger (self);
-
-	// unlike other triggers, we need to send this one to the client
-	self->r.svFlags &= ~SVF_NOCLIENT;
-
-	// make sure the client precaches this sound
-	G_SoundIndex("sound/world/jumppad.wav");
-
-	self->s.eType = ET_PUSH_TRIGGER;
-	self->touch = trigger_push_touch;
-	self->think = AimAtTarget;
-	self->nextthink = level.time + FRAMETIME;
-	trap_LinkEntity (self);
-}
-#endif
-
-
 void Use_target_push( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( !activator->client ) {
 		return;
@@ -272,11 +225,6 @@ void Use_target_push( gentity_t *self, gentity_t *other, gentity_t *activator ) 
 	if ( activator->client->ps.pm_type != PM_NORMAL ) {
 		return;
 	}
-#ifndef SMOKINGUNS
-	if ( activator->client->ps.powerups[PW_FLIGHT] ) {
-		return;
-	}
-#endif
 
 	VectorCopy (self->s.origin2, activator->client->ps.velocity);
 
@@ -286,101 +234,6 @@ void Use_target_push( gentity_t *self, gentity_t *other, gentity_t *activator ) 
 		G_Sound( activator, CHAN_AUTO, self->noise_index );
 	}
 }
-
-/*QUAKED target_push (.5 .5 .5) (-8 -8 -8) (8 8 8) bouncepad
-Pushes the activator in the direction.of angle, or towards a target apex.
-"speed"		defaults to 1000
-if "bouncepad", play bounce noise instead of windfly
-*/
-#ifndef SMOKINGUNS
-void SP_target_push( gentity_t *self ) {
-	if (!self->speed) {
-		self->speed = 1000;
-	}
-	G_SetMovedir (self->s.angles, self->s.origin2);
-	VectorScale (self->s.origin2, self->speed, self->s.origin2);
-
-	if ( self->spawnflags & 1 ) {
-		self->noise_index = G_SoundIndex("sound/world/jumppad.wav");
-	} else {
-		self->noise_index = G_SoundIndex("sound/misc/windfly.wav");
-	}
-	if ( self->target ) {
-		VectorCopy( self->s.origin, self->r.absmin );
-		VectorCopy( self->s.origin, self->r.absmax );
-		self->think = AimAtTarget;
-		self->nextthink = level.time + FRAMETIME;
-	}
-	self->use = Use_target_push;
-}
-#endif
-
-/*
-==============================================================================
-
-trigger_teleport
-
-==============================================================================
-*/
-
-#ifndef SMOKINGUNS
-void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace ) {
-	gentity_t	*dest;
-
-	if ( !other->client ) {
-		return;
-	}
-	if ( other->client->ps.pm_type == PM_DEAD ) {
-		return;
-	}
-	// Spectators only?
-	if ( ( self->spawnflags & 1 ) &&
-		other->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		return;
-	}
-
-
-	dest = 	G_PickTarget( self->target );
-	if (!dest) {
-		G_Printf ("Couldn't find teleporter destination\n");
-		return;
-	}
-
-	TeleportPlayer( other, dest->s.origin, dest->s.angles );
-}
-#endif
-
-
-/*QUAKED trigger_teleport (.5 .5 .5) ? SPECTATOR
-Allows client side prediction of teleportation events.
-Must point at a target_position, which will be the teleport destination.
-
-If spectator is set, only spectators can use this teleport
-Spectator teleporters are not normally placed in the editor, but are created
-automatically near doors to allow spectators to move through them
-*/
-#ifndef SMOKINGUNS
-void SP_trigger_teleport( gentity_t *self ) {
-	InitTrigger (self);
-
-	// unlike other triggers, we need to send this one to the client
-	// unless is a spectator trigger
-	if ( self->spawnflags & 1 ) {
-		self->r.svFlags |= SVF_NOCLIENT;
-	} else {
-		self->r.svFlags &= ~SVF_NOCLIENT;
-	}
-
-	// make sure the client precaches this sound
-	G_SoundIndex("sound/world/jumppad.wav");
-
-	self->s.eType = ET_TELEPORT_TRIGGER;
-	self->touch = trigger_teleporter_touch;
-
-	trap_LinkEntity (self);
-}
-#endif
-
 
 /*
 ==============================================================================
