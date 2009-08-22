@@ -151,7 +151,6 @@ void SV_GetChallenge(netadr_t from)
 	NET_OutOfBandPrint( NS_SERVER, challenge->adr, "challengeResponse %i %s", challenge->challenge, clientChallenge);
 }
 
-#ifdef SMOKINGUNS
 static qboolean SV_TrustedClient( char* ip, char *info ) {
 
 	// look up the authorize server's IP if it has not been resolved before
@@ -192,7 +191,6 @@ static qboolean SV_TrustedClient( char* ip, char *info ) {
 
 	return qfalse;
 }
-#endif
 
 /*
 ====================
@@ -234,15 +232,6 @@ void SV_AuthorizeIpPacket( netadr_t from ) {
 	s = Cmd_Argv( 2 );
 	r = Cmd_Argv( 3 );			// reason
 
-#ifndef SMOKINGUNS
-	if ( !Q_stricmp( s, "demo" ) ) {
-		// they are a demo client trying to connect to a real server
-		NET_OutOfBandPrint( NS_SERVER, challengeptr->adr, "print\nServer is not a demo server\n" );
-		// clear the challenge record so it won't timeout and let them through
-		Com_Memset( challengeptr, 0, sizeof( *challengeptr ) );
-		return;
-	}
-#endif
 	if ( !Q_stricmp( s, "accept" ) ) {
 		NET_OutOfBandPrint(NS_SERVER, challengeptr->adr,
 			"challengeResponse %d %d", challengeptr->challenge, challengeptr->clientChallenge);
@@ -530,14 +519,12 @@ gotnewcl:
 		return;
 	}
 
-#ifdef SMOKINGUNS
 	// Tequila comment: Trusted client should present a valid GUID, but only IPV4 clients are supported for now
 	if (from.type == NA_IP && !Sys_IsLANAddress(from) && !SV_TrustedClient( ip, userinfo )) {
 		NET_OutOfBandPrint( NS_SERVER, from, "print\nThis server only accepts trusted clients.\n" );
 		Com_Printf("We rejected an untrusted client\n");
 		return;
 	}
-#endif
 
 	SV_UserinfoChanged( newcl );
 
