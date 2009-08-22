@@ -281,9 +281,6 @@ vidmode_t r_vidModes[] =
 	{ "Mode  8: 1280x1024",		1280,	1024,	1 },
 	{ "Mode  9: 1600x1200",		1600,	1200,	1 },
 	{ "Mode 10: 2048x1536",		2048,	1536,	1 },
-#ifndef SMOKINGUNS
-	{ "Mode 11: 856x480 (wide)",856,	480,	1 }
-#else
     { "Mode 11: 856x480 (wide)",856,	480,	1 },
     { "Mode 12: 1280x800 (wide)",1280,	800,	1 },
     { "Mode 13: 1440x900 (wide)",1440,	900,	1 },
@@ -292,7 +289,6 @@ vidmode_t r_vidModes[] =
     { "Mode 16: 1920x1080 (wide)",1920,	1080,	1 },
     { "Mode 17: 1920x1200 (wide)",1920,	1200,	1 },
     { "Mode 18: 2560x1600 (wide)",2560,	1600,	1 }
-#endif
 };
 static int	s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
@@ -1252,11 +1248,9 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.TakeVideoFrame = RE_TakeVideoFrame;
 
 	// Smokin' Guns specific exported functions
-#ifdef SMOKINGUNS
 	re.CullBox = R_CullBox;
 	re.CullPointAndRadius = R_CullPointAndRadius;
 	re.GetFrustumPlane = R_GetFrustumPlane;
-#endif
 
 	return &re;
 }

@@ -27,7 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_public.h"
 
-#ifdef SMOKINGUNS
 vec3_t	playerMins = {-14, -14, MINS_Z};
 vec3_t	playerMaxs = {14, 14, MAXS_Z};
 
@@ -1554,7 +1553,6 @@ wpinfo_t bg_weaponlist[] =
 		WPS_OTHER
 	},
 };
-#endif
 
 /*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
 DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.
@@ -1571,9 +1569,6 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 "random" random number of plus or minus seconds varied from the respawn time
 "count" override quantity or duration on most items.
 */
-#ifndef SMOKINGUNS
-#error "bg_itemlist not merged, you have bad defines"
-#else
 gitem_t	bg_itemlist[] =
 {
 	{
@@ -2115,55 +2110,8 @@ gitem_t	bg_itemlist[] =
 	// end of list marker
 	{NULL}
 };
-#endif
 
 int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
-
-
-/*
-==============
-BG_FindItemForPowerup
-==============
-*/
-#ifndef SMOKINGUNS
-gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
-	int		i;
-
-	for ( i = 0 ; i < bg_numItems ; i++ ) {
-		if ( (bg_itemlist[i].giType == IT_POWERUP ||
-					bg_itemlist[i].giType == IT_TEAM ||
-					bg_itemlist[i].giType == IT_PERSISTANT_POWERUP) &&
-			bg_itemlist[i].giTag == pw ) {
-			return &bg_itemlist[i];
-		}
-	}
-
-	return NULL;
-}
-#endif
-
-
-/*
-==============
-BG_FindItemForHoldable
-==============
-*/
-#ifndef SMOKINGUNS
-gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
-	int		i;
-
-	for ( i = 0 ; i < bg_numItems ; i++ ) {
-		if ( bg_itemlist[i].giType == IT_HOLDABLE && bg_itemlist[i].giTag == pw ) {
-			return &bg_itemlist[i];
-		}
-	}
-
-	Com_Error( ERR_DROP, "HoldableItem not found" );
-
-	return NULL;
-}
-#endif
-
 
 /*
 ===============
@@ -2180,11 +2128,7 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 		}
 	}
 
-#ifndef SMOKINGUNS
-	Com_Error( ERR_DROP, "Couldn't find item for weapon %i", weapon);
-#else
 	Com_Printf( "Couldn't find item for weapon %i\nPlease report on http://www.smokin-guns.net forum or http://sourceforge.net/projects/smokinguns\n", weapon);
-#endif
 	return NULL;
 }
 
@@ -2194,7 +2138,6 @@ BG_FindItemForAmmo
 
 ===============
 */
-#ifdef SMOKINGUNS
 gitem_t	*BG_FindItemForAmmo( weapon_t ammo ) {
 	gitem_t	*it;
 
@@ -2240,7 +2183,6 @@ gitem_t	*BG_FindItemForClassname( const char *classname ) {
 
 	return NULL;
 }
-#endif
 
 /*
 ===============
@@ -2296,9 +2238,6 @@ This needs to be the same for client side prediction and server use.
 */
 qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
 	gitem_t	*item;
-#ifndef SMOKINGUNS
-	int		upperBound;
-#else
 	int		belt = 1, i;
 
 // hika additional comments:
@@ -2312,25 +2251,18 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	if(ent->eType == ET_TURRET){
 		return qfalse;
 	}
-#endif
 
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
-#ifndef SMOKINGUNS
-		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
-	}
-#else
 		return qfalse;
 	}
 
 	if(ps->persistant[PERS_TEAM] >= TEAM_SPECTATOR)
 		return qfalse;
-#endif
 
 	item = &bg_itemlist[ent->modelindex];
 
 	switch( item->giType ) {
 	case IT_WEAPON:
-#ifdef SMOKINGUNS
 		//can't pickup the same weapon twice
 		switch(item->giTag){
 		case WP_KNIFE:
@@ -2369,15 +2301,9 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 				}
 			}
 		}
-#endif
 		return qtrue;	// weapons are always picked up
 
 	case IT_AMMO:
-#ifndef SMOKINGUNS
-		if ( ps->ammo[ item->giTag ] >= 200 ) {
-			return qfalse;		// can't hold any more
-		}
-#else
 		switch(item->giTag){
 
 		case WP_BULLETS_CLIP:
@@ -2410,48 +2336,17 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 				return qfalse;
 			break;
 		}
-#endif
 		return qtrue;
 
 	case IT_ARMOR:
-#ifndef SMOKINGUNS
-#ifdef MISSIONPACK
-		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT ) {
-			return qfalse;
-		}
-
-		// we also clamp armor to the maxhealth for handicapping
-		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
-			upperBound = ps->stats[STAT_MAX_HEALTH];
-		}
-		else {
-			upperBound = ps->stats[STAT_MAX_HEALTH] * 2;
-		}
-
-		if ( ps->stats[STAT_ARMOR] >= upperBound ) {
-			return qfalse;
-		}
-#else
-		if ( ps->stats[STAT_ARMOR] >= ps->stats[STAT_MAX_HEALTH] * 2 ) {
-			return qfalse;
-		}
-#endif
-#else
 		if ( ps->stats[STAT_ARMOR] >= BOILER_PLATE ) {
 			return qfalse;
 		}
-#endif
 		return qtrue;
 
 	case IT_HEALTH:
 		// small and mega healths will go over the max, otherwise
 		// don't pick up if already at max
-#ifndef SMOKINGUNS
-		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
-			upperBound = ps->stats[STAT_MAX_HEALTH];
-		}
-		else
-#endif
 		if ( item->quantity == 5 || item->quantity == 100 ) {
 			if ( ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] * 2 ) {
 				return qfalse;
@@ -2465,7 +2360,6 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		return qtrue;
 
 	case IT_POWERUP:
-#ifdef SMOKINGUNS
 		//if he already has this powerup
 		if(ps->powerups[item->giTag])
 			return qfalse;
@@ -2480,69 +2374,9 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 					return qfalse;
 			}
 		}
-#endif
 		return qtrue;	// powerups are always picked up
 
-#ifndef SMOKINGUNS
-	case IT_PERSISTANT_POWERUP:
-		// can only hold one item at a time
-		if ( ps->stats[STAT_PERSISTANT_POWERUP] ) {
-			return qfalse;
-		}
-
-		// check team only
-		if( ( ent->generic1 & 2 ) && ( ps->persistant[PERS_TEAM] != TEAM_RED ) ) {
-			return qfalse;
-		}
-		if( ( ent->generic1 & 4 ) && ( ps->persistant[PERS_TEAM] != TEAM_BLUE ) ) {
-			return qfalse;
-		}
-
-		return qtrue;
-#endif
-
 	case IT_TEAM: // team items, such as flags
-#ifndef SMOKINGUNS
-#ifdef MISSIONPACK		
-		if( gametype == GT_1FCTF ) {
-			// neutral flag can always be picked up
-			if( item->giTag == PW_NEUTRALFLAG ) {
-				return qtrue;
-			}
-			if (ps->persistant[PERS_TEAM] == TEAM_RED) {
-				if (item->giTag == PW_BLUEFLAG  && ps->powerups[PW_NEUTRALFLAG] ) {
-					return qtrue;
-				}
-			} else if (ps->persistant[PERS_TEAM] == TEAM_BLUE) {
-				if (item->giTag == PW_REDFLAG  && ps->powerups[PW_NEUTRALFLAG] ) {
-					return qtrue;
-				}
-			}
-		}
-#endif
-		if( gametype == GT_CTF ) {
-			// ent->modelindex2 is non-zero on items if they are dropped
-			// we need to know this because we can pick up our dropped flag (and return it)
-			// but we can't pick up our flag at base
-			if (ps->persistant[PERS_TEAM] == TEAM_RED) {
-				if (item->giTag == PW_BLUEFLAG ||
-					(item->giTag == PW_REDFLAG && ent->modelindex2) ||
-					(item->giTag == PW_REDFLAG && ps->powerups[PW_BLUEFLAG]) )
-					return qtrue;
-			} else if (ps->persistant[PERS_TEAM] == TEAM_BLUE) {
-				if (item->giTag == PW_REDFLAG ||
-					(item->giTag == PW_BLUEFLAG && ent->modelindex2) ||
-					(item->giTag == PW_BLUEFLAG && ps->powerups[PW_REDFLAG]) )
-					return qtrue;
-			}
-		}
-
-#ifdef MISSIONPACK
-		if( gametype == GT_HARVESTER ) {
-			return qtrue;
-		}
-#endif
-#endif
 		return qfalse;
 
 	case IT_HOLDABLE:
@@ -2607,7 +2441,6 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 		VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
 		result[2] -= 0.5 * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
-#ifdef SMOKINGUNS
 	case TR_GRAVITY_LOW:
 		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
 		VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
@@ -2618,7 +2451,6 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 		VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
 		result[2] -= 0.4 * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
-#endif
 	default:
 		Com_Error( ERR_DROP, "BG_EvaluateTrajectory: unknown trType: %i", tr->trType );
 		break;
@@ -2662,7 +2494,6 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 		VectorCopy( tr->trDelta, result );
 		result[2] -= DEFAULT_GRAVITY * deltaTime;		// FIXME: local gravity...
 		break;
-#ifdef SMOKINGUNS
 	case TR_GRAVITY_LOW:
 		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
 		VectorCopy( tr->trDelta, result );
@@ -2673,7 +2504,6 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 		VectorCopy( tr->trDelta, result );
 		result[2] -= DEFAULT_GRAVITY/1.5 * deltaTime;		// FIXME: local gravity...
 		break;
-#endif
 	default:
 		Com_Error( ERR_DROP, "BG_EvaluateTrajectoryDelta: unknown trType: %i", tr->trType );
 		break;
@@ -2709,9 +2539,6 @@ char *eventnames[] = {
 	"EV_WATER_CLEAR",	// head leaves
 
 	"EV_ITEM_PICKUP",			// normal item pickups are predictable
-#ifndef SMOKINGUNS
-	"EV_GLOBAL_ITEM_PICKUP",	// powerup / team sounds are broadcast to everyone
-#endif
 
 	"EV_NOAMMO",
 	"EV_CHANGE_WEAPON",
@@ -2768,18 +2595,6 @@ char *eventnames[] = {
 	"EV_GIB_PLAYER",			// gib a previously living player
 	"EV_SCOREPLUM",			// score plum
 
-#ifndef SMOKINGUNS
-//#ifdef MISSIONPACK
-	"EV_PROXIMITY_MINE_STICK",
-	"EV_PROXIMITY_MINE_TRIGGER",
-	"EV_KAMIKAZE",			// kamikaze explodes
-	"EV_OBELISKEXPLODE",		// obelisk explodes
-	"EV_INVUL_IMPACT",		// invulnerability sphere impact
-	"EV_JUICED",				// invulnerability juiced effect
-	"EV_LIGHTNINGBOLT",		// lightning bolt bounced of invulnerability sphere
-//#endif
-#endif
-
 	"EV_DEBUG_LINE",
 	"EV_STOPLOOPINGSOUND",
 	"EV_TAUNT"
@@ -2819,48 +2634,6 @@ void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerSta
 
 /*
 ========================
-BG_TouchJumpPad
-========================
-*/
-#ifndef SMOKINGUNS
-void BG_TouchJumpPad( playerState_t *ps, entityState_t *jumppad ) {
-	vec3_t	angles;
-	float p;
-	int effectNum;
-
-	// spectators don't use jump pads
-	if ( ps->pm_type != PM_NORMAL ) {
-		return;
-	}
-
-	// flying characters don't hit bounce pads
-	if ( ps->powerups[PW_FLIGHT] ) {
-		return;
-	}
-
-	// if we didn't hit this same jumppad the previous frame
-	// then don't play the event sound again if we are in a fat trigger
-	if ( ps->jumppad_ent != jumppad->number ) {
-
-		vectoangles( jumppad->origin2, angles);
-		p = fabs( AngleNormalize180( angles[PITCH] ) );
-		if( p < 45 ) {
-			effectNum = 0;
-		} else {
-			effectNum = 1;
-		}
-		BG_AddPredictableEventToPlayerstate( EV_JUMP_PAD, effectNum, ps );
-	}
-	// remember hitting this jumppad this frame
-	ps->jumppad_ent = jumppad->number;
-	ps->jumppad_frame = ps->pmove_framecount;
-	// give the player the velocity from the jumppad
-	VectorCopy( jumppad->origin2, ps->velocity );
-}
-#endif
-
-/*
-========================
 BG_PlayerStateToEntityState
 
 This is done after each set of usercmd_t on the server,
@@ -2870,13 +2643,9 @@ and after local prediction on the client
 void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap ) {
 	int		i;
 
-#ifndef SMOKINGUNS
-	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
-#else
 	if(ps->pm_type == PM_SPECTATOR && !(ps->stats[STAT_FLAGS] & SF_BOT)){
 		s->eType = ET_FLY;
 	} else if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
-#endif
 		s->eType = ET_INVISIBLE;
 	} else if ( ps->stats[STAT_HEALTH] <= GIB_HEALTH ) {
 		s->eType = ET_INVISIBLE;
@@ -2933,7 +2702,6 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 	s->powerups = 0;
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		if ( ps->powerups[ i ] ) {
-#ifdef SMOKINGUNS
 			if(i == PW_SCOPE && ps->powerups[i] != 2)
 				continue;
 
@@ -2945,20 +2713,16 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 				i++;
 				continue;
 			}
-#endif
 			s->powerups |= 1 << i;
 		}
 	}
-#ifdef SMOKINGUNS
 	s->time = ps->powerups[PW_BURNBIT];
 	s->time2 = ps->stats[STAT_WEAPONS];
 	s->frame = ps->weapon2;
-#endif
 
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
 
-#ifdef SMOKINGUNS
 	if((ps->weapon == WP_MOLOTOV || ps->weapon == WP_DYNAMITE) &&
 		ps->stats[STAT_WP_MODE] < 0){
 		s->powerups |= (1 << PW_BURN);
@@ -2970,7 +2734,6 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 	// Of course, WP_AKIMBO should be less than the max int capacity
 	if (ps->stats[STAT_FLAGS] & SF_SEC_PISTOL)
 		s->time2 |= (1 << WP_AKIMBO);
-#endif
 }
 
 /*
@@ -2984,13 +2747,9 @@ and after local prediction on the client
 void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap ) {
 	int		i;
 
-#ifndef SMOKINGUNS
-	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
-#else
 	if(ps->pm_type == PM_SPECTATOR && !(ps->stats[STAT_FLAGS] & SF_BOT)){
 		s->eType = ET_FLY;
 	} else if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
-#endif
 		s->eType = ET_INVISIBLE;
 	} else if ( ps->stats[STAT_HEALTH] <= GIB_HEALTH ) {
 		s->eType = ET_INVISIBLE;
@@ -3051,7 +2810,6 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	s->powerups = 0;
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		if ( ps->powerups[ i ] ) {
-#ifdef SMOKINGUNS
 			if(i == PW_SCOPE && ps->powerups[i] != 2)
 				continue;
 
@@ -3064,20 +2822,16 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 				i++;
 				continue;
 			}
-#endif
 			s->powerups |= 1 << i;
 		}
 	}
-#ifdef SMOKINGUNS
 	s->time = ps->powerups[PW_BURNBIT];
 	s->time2 = ps->stats[STAT_WEAPONS];
 	s->frame = ps->weapon2;
-#endif
 
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
 
-#ifdef SMOKINGUNS
 	if((ps->weapon == WP_MOLOTOV || ps->weapon == WP_DYNAMITE) &&
 		ps->stats[STAT_WP_MODE] < 0){
 		s->powerups |= (1 << PW_BURN);
@@ -3089,7 +2843,6 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	// Of course, WP_AKIMBO should be less than the max int capacity
 	if (ps->stats[STAT_FLAGS] & SF_SEC_PISTOL)
 		s->time2 |= (1 << WP_AKIMBO);
-#endif
 }
 
 /*
@@ -3098,7 +2851,6 @@ BG_AnimLength
 by Spoon
 ==========================
 */
-#ifdef SMOKINGUNS
 int BG_AnimLength( int anim, int weapon) {
 	int length;
 
@@ -3456,4 +3208,3 @@ hit_info_t	hit_info[NUM_HIT_LOCATIONS] = {
 	{"hit_l_foot_l",		"foot",		"foot",		HIT_FOOT_L,			PART_LOWER	},
 	{"hit_l_pelvis",		"groin",	"butt",		HIT_PELVIS,			PART_LOWER	}
 };
-#endif

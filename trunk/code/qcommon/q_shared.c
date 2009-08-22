@@ -1394,7 +1394,6 @@ char *Com_SkipTokens( char *s, int numTokens, char *sep )
 		return s;
 }
 
-#ifdef SMOKINGUNS
 //unlagged - attack prediction #3
 // moved from g_weapon.c
 /*
@@ -1419,4 +1418,3 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 	}
 }
 //unlagged - attack prediction #3
-#endif

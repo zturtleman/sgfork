@@ -344,11 +344,9 @@ void	Svcmd_EntityList_f (void) {
 		case ET_MOVER:
 			G_Printf("ET_MOVER            ");
 			break;
-#ifdef SMOKINGUNS
 		case ET_BREAKABLE:
 			G_Printf("ET_BREAKABLE		  ");
 			break;
-#endif
 		case ET_BEAM:
 			G_Printf("ET_BEAM             ");
 			break;
@@ -442,7 +440,6 @@ void	Svcmd_ForceTeam_f( void ) {
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
-#ifdef SMOKINGUNS
 void Svcmd_KickBots_f(void){
 	int i;
 	gentity_t *ent;
@@ -455,7 +452,6 @@ void Svcmd_KickBots_f(void){
 		}
 	}
 }
-#endif
 
 char	*ConcatArgs( int start );
 
@@ -490,12 +486,10 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 
-#ifdef SMOKINGUNS
 	if (Q_stricmp (cmd, "kickbots") == 0) {
 		Svcmd_KickBots_f();
 		return qtrue;
 	}
-#endif
 
 	if (Q_stricmp (cmd, "botlist") == 0) {
 		Svcmd_BotList_f();
@@ -527,7 +521,6 @@ qboolean	ConsoleCommand( void ) {
 			trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(1) ) );
 			return qtrue;
 		}
-#ifdef SMOKINGUNS
 		else if (Q_stricmp (cmd, "bigtext") == 0 || Q_stricmp (cmd, "cp") == 0) {
 			const char *arg = ConcatArgs(1);
 			if ( Q_strncmp ("-1", arg, strlen(arg)) == 0 )
@@ -540,7 +533,6 @@ qboolean	ConsoleCommand( void ) {
 			}
 			return qtrue;
 		}
-#endif
 		// everything else will also be printed as a say command
 		trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(0) ) );
 		return qtrue;

@@ -315,7 +315,6 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 RotateVectorAroundVector
 ===============
 */
-#ifdef SMOKINGUNS
 void RotateVectorAroundVector( vec3_t origin, vec3_t deg_angles, vec3_t point){
 	vec3_t p, p1, p2;
 	vec3_t angles;
@@ -340,7 +339,6 @@ void RotateVectorAroundVector( vec3_t origin, vec3_t deg_angles, vec3_t point){
 
 	VectorCopy(p2, point);
 }
-#endif
 
 /*
 ===============
@@ -668,7 +666,6 @@ float AngleNormalize180 ( float angle ) {
 	return angle;
 }
 
-#ifdef SMOKINGUNS
 void AnglesNormalize180 (vec3_t angles){
 	int i;
 
@@ -682,7 +679,6 @@ void AnglesNormalize180 (vec3_t angles){
 		}
 	}
 }
-#endif
 
 /*
 =================

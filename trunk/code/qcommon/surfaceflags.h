@@ -31,10 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	CONTENTS_SOLID			1		// an eye is never valid in a solid
 
-#ifdef SMOKINGUNS
 //make dynamite shootable
 #define CONTENTS_TRIGGER2		2
-#endif
 
 #define	CONTENTS_LAVA			8
 #define	CONTENTS_SLIME			16
@@ -79,10 +77,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	SURF_SKIP				0x200	// completely ignore, allowing non-closed brushes
 #define	SURF_NOLIGHTMAP			0x400	// surface doesn't need a lightmap
 #define	SURF_POINTLIGHT			0x800	// generate lighting info at vertexes
-#ifdef SMOKINGUNS
 #define	SURF_METAL				0x1000	// clanking footsteps
 // hika comments: Keep SURF_METALSTEPS for the engine !
-#endif
 #define	SURF_METALSTEPS			0x1000	// clanking footsteps
 #define	SURF_NOSTEPS			0x2000	// no footstep sounds
 #define	SURF_NONSOLID			0x4000	// don't collide against curves with this set
@@ -91,7 +87,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	SURF_NODLIGHT			0x20000	// don't dlight even if solid (solid lava, skies)
 #define SURF_DUST				0x40000 // leave a dust trail when walking on this surface
 
-#ifdef SMOKINGUNS
 //smokinguns surfs
 #define	SURF_WOOD				0x80000 //wood
 #define	SURF_CLOTH				0x100000
@@ -107,4 +102,3 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //for creating the tex-files and reading them
 #define	MAX_LINES 400
-#endif

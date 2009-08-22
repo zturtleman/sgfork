@@ -138,9 +138,7 @@ void Sys_Exit( int ex )
 {
 	CON_Shutdown( );
 
-#ifdef SMOKINGUNS
 	Sys_PlatformExit();
-#endif
 
 #ifndef DEDICATED
 	SDL_Quit( );
@@ -455,7 +453,6 @@ void Sys_ParseArgs( int argc, char **argv )
 				!strcmp( argv[1], "-v" ) )
 		{
 			const char* date = __DATE__;
-#ifdef SMOKINGUNS
 			const char* time = __TIME__;
 			fprintf( stdout, "%s\n", argv[0] );
 #ifdef DEDICATED
@@ -465,13 +462,6 @@ void Sys_ParseArgs( int argc, char **argv )
 #endif
 			fprintf( stdout, "Release: " XSTRING(SG_RELEASE) "\n" );
 			fprintf( stdout, "Flavour: " OS_STRING " " ARCH_STRING "\n" );
-#else
-#ifdef DEDICATED
-			fprintf( stdout, Q3_VERSION " dedicated server (%s)\n", date );
-#else
-			fprintf( stdout, Q3_VERSION " client (%s)\n", date );
-#endif
-#endif
 			Sys_Exit(0);
 		}
 	}
@@ -522,7 +512,7 @@ int main( int argc, char **argv )
 	int   i;
 	char  commandLine[ MAX_STRING_CHARS ] = { 0 };
 
-#if defined SMOKINGUNS && defined DEDICATED
+#if defined DEDICATED
 	char *cv_name, *cv_value;
 	char *quser = NULL, *qjail = NULL;
 	qboolean qdaemon = qfalse;
@@ -566,7 +556,7 @@ int main( int argc, char **argv )
 	{
 		Q_strcat( commandLine, sizeof( commandLine ), argv[ i ] );
 		Q_strcat( commandLine, sizeof( commandLine ), " " );
-#if defined SMOKINGUNS && defined DEDICATED
+#if defined DEDICATED
 		// Original code for handling the special cvars by hika AT bsdmon DOT com
 		// This is where we can get some special cvars like
 		// sv_chroot, sv_user
@@ -614,12 +604,10 @@ int main( int argc, char **argv )
 	signal( SIGSEGV, Sys_SigHandler );
 	signal( SIGTERM, Sys_SigHandler );
 
-#ifdef SMOKINGUNS
 	Sys_PlatformPostInit(argv[0]);
 
 	// Create a ROM cvar to let the mod know the Smokin' Guns standalone engine is in use.
 	Cvar_Get("sa_engine_inuse", "1", CVAR_ROM);
-#endif
 
 	while( 1 )
 	{

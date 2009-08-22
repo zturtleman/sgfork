@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Used to determine where to store user-specific files
 static char homePath[ MAX_OSPATH ] = { 0 };
 
-#if defined SMOKINGUNS && defined DEDICATED
+#if defined DEDICATED
 uid_t saved_euid;
 #endif
 
@@ -58,17 +58,9 @@ char *Sys_DefaultHomePath(void)
 		{
 			Q_strncpyz( homePath, p, sizeof( homePath ) );
 #ifdef MACOS_X
-#ifndef SMOKINGUNS
-			Q_strcat( homePath, sizeof( homePath ), "/Library/Application Support/Quake3" );
-#else
 			Q_strcat( homePath, sizeof( homePath ), "/Library/Application Support/SmokinGuns" );
-#endif
-#else
-#ifndef SMOKINGUNS
-			Q_strcat( homePath, sizeof( homePath ), "/.q3a" );
 #else
 			Q_strcat( homePath, sizeof( homePath ), "/.smokinguns" );
-#endif
 #endif
 			if( mkdir( homePath, 0777 ) )
 			{
@@ -89,7 +81,6 @@ char *Sys_DefaultHomePath(void)
 Sys_TestSysInstallPath
 =================
 */
-#ifdef SMOKINGUNS
 #define BASEPAK "sg_pak0.pk3"
 qboolean Sys_TestSysInstallPath(const char *path)
 {
@@ -104,26 +95,22 @@ qboolean Sys_TestSysInstallPath(const char *path)
 		return qfalse;
 	}
 }
-#endif
 
 /*
 ==================
 Sys_Readlink
 ==================
 */
-#ifdef SMOKINGUNS
 int Sys_Readlink( const char *path, char *buf, int bufsiz )
 {
 	return readlink( path, buf, bufsiz );
 }
-#endif
 
 /*
 ==================
 Sys_GetSystemInstallPath
 ==================
 */
-#ifdef SMOKINGUNS
 const char *Sys_GetSystemInstallPath(const char *path)
 {
 #ifndef MACOS_X
@@ -198,7 +185,6 @@ const char *Sys_GetSystemInstallPath(const char *path)
 #endif
 	return path;
 }
-#endif
 
 /*
 ================
@@ -681,7 +667,6 @@ Sys_PlatformPostInit
 Unix specific post init
 ==============
 */
-#if defined SMOKINGUNS
 void Sys_PlatformPostInit( char *progname )
 {
 #ifdef DEDICATED
@@ -864,5 +849,4 @@ void Sys_LockMyself(const char *qjail, const char *quser) {
 		}
 	}
 }
-#endif
 #endif

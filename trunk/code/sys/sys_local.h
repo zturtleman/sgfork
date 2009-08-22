@@ -54,7 +54,6 @@ void Sys_SigHandler( int signal );
 void Sys_ErrorDialog( const char *error );
 void Sys_AnsiColorPrint( const char *msg );
 
-#ifdef SMOKINGUNS
 void Sys_PlatformPostInit( char *progname );
 void Sys_PlatformExit( void );
 #ifdef DEDICATED
@@ -66,5 +65,4 @@ pid_t Sys_Getpid( void );
 #endif
 void Sys_LockMyself(const char *qjail, const char *quser);
 void Sys_Daemonize( void );
-#endif
 #endif

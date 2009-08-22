@@ -27,10 +27,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern displayContextDef_t cgDC;
 
-#ifdef SMOKINGUNS
 void CG_DrawField (int x, int y, int width, int value);
 void CG_DrawMoneyField (int x, int y, int width, int value);
-#endif
 
 // set in CG_ParseTeamInfo
 
@@ -438,11 +436,9 @@ static void CG_DrawPlayerScore( rectDef_t *rect, float scale, vec4_t color, qhan
 	char num[16];
 	int value = cg.snap->ps.persistant[PERS_SCORE];
 
-#ifdef SMOKINGUNS
 	if(cgs.gametype == GT_DUEL){
 		value = cgs.clientinfo[cg.snap->ps.clientNum].losses;
 	}
-#endif
 
 	if (shader) {
 		trap_R_SetColor( color );
@@ -455,7 +451,6 @@ static void CG_DrawPlayerScore( rectDef_t *rect, float scale, vec4_t color, qhan
 	}
 }
 
-#ifdef SMOKINGUNS
 static void CG_DrawRoundtime( rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
 	int value;
 
@@ -482,7 +477,6 @@ static void CG_DrawRoundtime( rectDef_t *rect, float scale, vec4_t color, qhandl
 	value = CG_Text_Width(s, scale, 0);
 	CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, s, 0, 0, textStyle);
 }
-#endif
 
 static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 	int		value;
@@ -564,10 +558,8 @@ static void CG_DrawPlayerHealth(rectDef_t *rect, float scale, vec4_t color, qhan
 	ps = &cg.snap->ps;
 
 	value = ps->stats[STAT_HEALTH];
-#ifdef SMOKINGUNS
 	if(value < 0)
 		value = 0;
-#endif
 
 	if (shader) {
 		trap_R_SetColor( color );
