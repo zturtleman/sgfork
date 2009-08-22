@@ -1149,10 +1149,8 @@ int R_CullLocalBox (vec3_t bounds[2]);
 int R_CullPointAndRadius( vec3_t origin, float radius );
 int R_CullLocalPointAndRadius( vec3_t origin, float radius );
 
-#ifdef SMOKINGUNS
 int R_CullBox (vec3_t transformedBounds[8]);
 void R_GetFrustumPlane( cplane_t frustum[4] );
-#endif
 
 void R_SetupProjection(viewParms_t *dest, float zProj, qboolean computeFrustum);
 void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, orientationr_t *or );

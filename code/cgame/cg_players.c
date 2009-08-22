@@ -2683,7 +2683,7 @@ void CG_Player( centity_t *cent ) {
 		 &torso.oldframe, &torso.frame, &torso.backlerp );
 
 
-#if defined SMOKINGUNS && defined HIT_DATA
+#if defined HIT_DATA
 	if(hit_model.integer && cent->currentState.clientNum == cg.snap->ps.clientNum){
 		vec3_t			legsAngles, torsoAngles;
 

@@ -234,19 +234,11 @@ void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
 
-#ifndef SMOKINGUNS
-	CG_DrawStringExt( x, y, s, color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
-#else
 	CG_Text_Paint(x, y, 0.3f, color, s, 0, 0, 0);
-#endif
 }
 
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
-#ifndef SMOKINGUNS
-	CG_DrawStringExt( x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
-#else
 	CG_Text_Paint(x, y, 0.3f, color, s, 0, 0, 3);
-#endif
 }
 
 /*

@@ -639,22 +639,18 @@ void Sys_PlatformInit( void )
 Sys_PlatformPostInit
 ==============
 */
-#if defined SMOKINGUNS
 void Sys_PlatformPostInit( char *progname )
 {
 }
-#endif
 
 /*
 ==================
 Sys_PlatformExit
 ==================
 */
-#ifdef SMOKINGUNS
 void Sys_PlatformExit( void )
 {
 }
-#endif
 
 /*
 ==================
@@ -663,7 +659,7 @@ Sys_LockMyself
 Not implemented for WIN32
 ==================
 */
-#if defined SMOKINGUNS && defined DEDICATED
+#if defined DEDICATED
 void Sys_LockMyself(const char *qjail, const char *quser)
 {
 }

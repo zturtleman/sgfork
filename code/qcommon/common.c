@@ -38,23 +38,15 @@ int demo_protocols[] =
 #define MAX_NUM_ARGVS	50
 
 #define MIN_DEDICATED_COMHUNKMEGS 1
-#ifndef SMOKINGUNS
-#define MIN_COMHUNKMEGS		56
-#else
 #ifndef DEDICATED
 #define MIN_COMHUNKMEGS		96
 #else
 #define MIN_COMHUNKMEGS		48
 #endif
-#endif
-#ifndef SMOKINGUNS
-#define DEF_COMHUNKMEGS		64
-#else
 #ifndef DEDICATED
 #define DEF_COMHUNKMEGS		96
 #else
 #define DEF_COMHUNKMEGS		48
-#endif
 #endif
 #define DEF_COMZONEMEGS		24
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)

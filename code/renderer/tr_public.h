@@ -101,11 +101,9 @@ typedef struct {
 
 	void (*TakeVideoFrame)( int h, int w, byte* captureBuffer, byte *encodeBuffer, qboolean motionJpeg );
 	// Smokin' Guns specific exported functions
-#ifdef SMOKINGUNS
 	int		(*CullBox)( vec3_t transformedBounds[8] );
 	int		(*CullPointAndRadius)( vec3_t origin, float radius );
 	void	(*GetFrustumPlane)( cplane_t frustum[4] );
-#endif
 } refexport_t;
 
 //

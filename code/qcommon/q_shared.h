@@ -280,11 +280,7 @@ typedef enum {
 
 #define PROP_GAP_WIDTH			3
 #define PROP_SPACE_WIDTH		8
-#ifndef SMOKINGUNS
-#define PROP_HEIGHT				27
-#else
 #define PROP_HEIGHT				24
-#endif
 #define PROP_SMALL_SIZE_SCALE	0.75
 
 #define BLINK_DIVISOR			200
@@ -499,12 +495,10 @@ typedef struct {
 #define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
 #define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
-#ifdef SMOKINGUNS
 //unlagged - attack prediction #3
 // moved from g_weapon.c
 void SnapVectorTowards( vec3_t v, vec3_t to );
 //unlagged - attack prediction #3
-#endif
 
 // just in case you don't want to use the macros
 vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
@@ -636,18 +630,14 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
-#ifdef SMOKINGUNS
 void AnglesNormalize180 (vec3_t angles);
-#endif
 
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
-#ifdef SMOKINGUNS
 void RotateVectorAroundVector( vec3_t origin, vec3_t angles, vec3_t point);
-#endif
 // perpendicular vector could be replaced by this
 
 //int	PlaneTypeForNormal (vec3_t normal);
@@ -989,9 +979,7 @@ typedef enum {
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
 
-#ifdef SMOKINGUNS
 #define MAX_MAPPARTS		32		// used in duel
-#endif
 
 #define	GENTITYNUM_BITS		10		// don't need to send any more
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
@@ -1155,14 +1143,12 @@ typedef struct playerState_s {
 										// only generate a small move value for that frame
 										// walking will use different animations and
 										// won't generate footsteps
-#ifdef SMOKINGUNS
 #define	BUTTON_RELOAD		32
 #define	BUTTON_ALT_ATTACK	64
 #define BUTTON_ACTIVATE		128
 #define BUTTON_BUYMENU		256			// +button8/-button8, open/close the buy menu
 #define BUTTON_CHOOSE_CANCEL 8192		// +button13, cancel weapon choose mode
 #define BUTTON_CHOOSE_MODE	16384		// +button14, to notify the server that the client
-#endif									// is in weapon choose mode, meaning that the
 										// next +attack press will be to select weapon,
 										// not to fire the gun
 #define BUTTON_AFFIRMATIVE	32
@@ -1198,13 +1184,9 @@ typedef enum {
 	TR_LINEAR,
 	TR_LINEAR_STOP,
 	TR_SINE,					// value = base + sin( time / duration ) * delta
-#ifndef SMOKINGUNS
-	TR_GRAVITY
-#else
 	TR_GRAVITY,
 	TR_GRAVITY_LOW,
 	TR_GRAVITY_LOW2
-#endif
 } trType_t;
 
 typedef struct {
@@ -1267,9 +1249,7 @@ typedef struct entityState_s {
 
 	// Joe Kari: attempt to add far clipping to entities
 	// for instance, the engine itself should be modified (msg.c)
-#ifdef SMOKINGUNS
 	//int		farclip_dist;
-#endif
 } entityState_t;
 
 typedef enum {

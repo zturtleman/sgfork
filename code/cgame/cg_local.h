@@ -85,19 +85,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
-#ifndef SMOKINGUNS
-#define	DEFAULT_MODEL			"sarge"
-#ifdef MISSIONPACK
-#define	DEFAULT_TEAM_MODEL		"james"
-#define	DEFAULT_TEAM_HEAD		"*james"
-#else
-#define	DEFAULT_TEAM_MODEL		"sarge"
-#define	DEFAULT_TEAM_HEAD		"sarge"
-#endif
-
-#define DEFAULT_REDTEAM_NAME		"Stroggs"
-#define DEFAULT_BLUETEAM_NAME		"Pagans"
-#else
 #define	DEFAULT_MODEL			"wq_male1"
 #define	DEFAULT_TEAM_MODEL		"wq_male1"
 #define	DEFAULT_TEAM_HEAD		"wq_male1"
@@ -111,7 +98,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CULL_IN				0	// completely unclipped
 #define	CULL_CLIP			1	// clipped by one or more planes
 #define	CULL_OUT			2	// completely outside the clipping planes
-#endif
 
 typedef enum {
 	FOOTSTEP_NORMAL,
@@ -120,20 +106,15 @@ typedef enum {
 	FOOTSTEP_MECH,
 	FOOTSTEP_ENERGY,
 	FOOTSTEP_METAL,
-#ifdef SMOKINGUNS
 	FOOTSTEP_CLOTH,
 	FOOTSTEP_GRASS,
-#endif
 	FOOTSTEP_SPLASH,
-#ifdef SMOKINGUNS
 	FOOTSTEP_SNOW,
 	FOOTSTEP_SAND,
-#endif
 
 	FOOTSTEP_TOTAL
 } footstep_t;
 
-#ifdef SMOKINGUNS
 typedef enum {
 	IMPACT_WOOD,
 	IMPACT_WATER,
@@ -152,7 +133,6 @@ typedef enum {
 	MENU_BUY,
 	MENU_DUEL_FINISHED
 } menutype_t;
-#endif
 
 typedef enum {
 	IMPACTSOUND_DEFAULT,
@@ -191,18 +171,12 @@ typedef struct {
 	animation_t	*animation;
 	int			animationTime;		// time when the first frame of the animation will be exact
 
-#ifdef SMOKINGUNS
 	int	weaponAnim;
-#endif
 } lerpFrame_t;
 
 
 typedef struct {
-#ifndef SMOKINGUNS
-	lerpFrame_t		legs, torso, flag;
-#else
 	lerpFrame_t		legs, torso, flag, weapon, weapon2;
-#endif
 	int				painTime;
 	int				painDirection;	// flip from 0 to 1
 	int				lightningFiring;
@@ -217,12 +191,10 @@ typedef struct {
 	qboolean		barrelSpinning;
 
 	//gatling
-#ifdef SMOKINGUNS
 	float			middleAngle;
 	float			gatlingAngle;
 
 	int				eFlags;
-#endif
 } playerEntity_t;
 
 //=================================================
@@ -238,9 +210,7 @@ typedef struct centity_s {
 	qboolean		currentValid;	// true if cg.frame holds this entity
 
 	int				muzzleFlashTime;	// move to playerEntity?
-#ifdef SMOKINGUNS
 	int				muzzleFlashTime2;	// 2nd weapon
-#endif
 	int				previousEvent;
 	int				teleportFlag;
 
@@ -266,7 +236,6 @@ typedef struct centity_s {
 	vec3_t			lerpOrigin;
 	vec3_t			lerpAngles;
 
-#ifdef SMOKINGUNS
 	// additional smoke effects for pistols
 	int				smokeTime;
 	int				lastSmokeTime;
@@ -299,7 +268,6 @@ typedef struct centity_s {
 	// which are good things to know :D
 	// see ../game/bg_misc.c in BG_PlayerStateToEntityStateExtraPolate()
 	// and BG_PlayerStateToEntityState()
-#endif
 } centity_t;
 
 
@@ -311,9 +279,7 @@ typedef struct centity_s {
 typedef struct markPoly_s {
 	struct markPoly_s	*prevMark, *nextMark;
 	int			time;
-#ifdef SMOKINGUNS
 	int			duration;
-#endif
 	qhandle_t	markShader;
 	qboolean	alphaFade;		// fade alpha instead of rgb
 	float		color[4];
@@ -332,13 +298,7 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
-#ifndef SMOKINGUNS
-	LE_KAMIKAZE,
-	LE_INVULIMPACT,
-	LE_INVULJUICED,
-#else
 	LE_SMOKE,
-#endif
 	LE_SHOWREFENTITY
 } leType_t;
 
@@ -346,9 +306,6 @@ typedef enum {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
 	LEF_SOUND1			 = 0x0004,			// sound 1 for kamikaze
-#ifndef SMOKINGUNS
-	LEF_SOUND2			 = 0x0008			// sound 2 for kamikaze
-#else
 	LEF_SOUND2			 = 0x0008,			// sound 2 for kamikaze
 	LEF_BREAKS			 = 0x0010,
 	LEF_PARTICLE		 = 0x0020,
@@ -361,7 +318,6 @@ typedef enum {
 	LEF_BREAKS_DEF		 = 0x1000,
 	LEF_MARK			 = 0x2000, // manually created impact mark (on breakables)
 	LEF_REMOVE			 = 0x4000	// remove after round-restart
-#endif
 } leFlag_t;
 
 typedef enum {
@@ -372,12 +328,10 @@ typedef enum {
 
 typedef enum {
 	LEBS_NONE,
-#ifdef SMOKINGUNS
 	LEBS_GLASS,
 	LEBS_METAL,
 	LEBS_WOOD,
 	LEBS_DEFAULT,
-#endif
 	LEBS_BLOOD,
 	LEBS_BRASS
 } leBounceSoundType_t;	// fragment local entities can make sounds on impacts
@@ -408,20 +362,16 @@ typedef struct localEntity_s {
 	leMarkType_t		leMarkType;		// mark to leave on fragment impact
 	leBounceSoundType_t	leBounceSoundType;
 
-#ifdef SMOKINGUNS
 	vec3_t			vector;
 	int				boost, wind;
-#endif
 
 	refEntity_t		refEntity;
 
 	// Added by hika
-#ifdef SMOKINGUNS
 	qboolean		visible;	// State in the last CG_IsLocalEntityVisible() call
 	int				visibleTime;// cg.time value, when CG_IsLocalEntityVisible() was called
 	vec_t			distFromCamera;	// Distance from the camera
 					                // ** not an accurate value, but OK for us :D **
-#endif
 } localEntity_t;
 
 //======================================================================
@@ -443,10 +393,8 @@ typedef struct {
 	int				captures;
 	qboolean		perfect;
 	int				team;
-#ifdef SMOKINGUNS
 	qboolean		realspec;
 	qboolean		won;
-#endif
 } score_t;
 
 // each client has an associated clientInfo_t
@@ -499,10 +447,6 @@ typedef struct {
 	qboolean		deferred;
 
 	qboolean		newAnims;		// true if using the new mission pack animations
-#ifndef SMOKINGUNS
-	qboolean		fixedlegs;		// true if legs yaw is always the same as torso yaw
-	qboolean		fixedtorso;		// true if torso never changes yaw
-#endif
 
 	vec3_t			headOffset;		// move head in icon views
 	footstep_t		footsteps;
@@ -517,14 +461,12 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
-#ifdef SMOKINGUNS
 	qhandle_t		holsterSkin;
 
 	//damage skins
 	qhandle_t		legsSkin_damage_1, legsSkin_damage_2;
 	qhandle_t		torsoSkin_damage_1, torsoSkin_damage_2;
 	qhandle_t		headSkin_damage_1, headSkin_damage_2;
-#endif
 
 	qhandle_t		modelIcon;
 
@@ -542,10 +484,8 @@ typedef struct weaponInfo_s {
 	gitem_t			*item;
 
 	qhandle_t		handsModel;			// the hands don't actually draw, they just position the weapon
-#ifdef SMOKINGUNS
 	qhandle_t		l_weaponModel;		// "real" hands-model, first person view, left handed
 	qhandle_t		r_weaponModel;		// right handed
-#endif
 	qhandle_t		weaponModel;
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
@@ -555,9 +495,7 @@ typedef struct weaponInfo_s {
 	float			flashDlight;
 	vec3_t			flashDlightColor;
 	sfxHandle_t		flashSound[4];		// fast firing weapons randomly choose
-#ifdef SMOKINGUNS
 	sfxHandle_t		reloadSound;
-#endif
 
 	qhandle_t		weaponIcon;
 	qhandle_t		ammoIcon;
@@ -575,12 +513,6 @@ typedef struct weaponInfo_s {
 
 	float			trailRadius;
 	float			wiTrailTime;
-
-#ifndef SMOKINGUNS
-	sfxHandle_t		readySound;
-	sfxHandle_t		firingSound;
-	qboolean		loopFireSound;
-#endif
 } weaponInfo_t;
 
 
@@ -617,11 +549,9 @@ typedef struct {
 
 #define MAX_PREDICTED_EVENTS	16
 
-#ifdef SMOKINGUNS
 //unlagged - optimized prediction
 #define NUM_SAVED_STATES (CMD_BACKUP + 2)
 //unlagged - optimized prediction
-#endif
 
 typedef struct {
 	int			clientFrame;		// incremented each frame
@@ -633,9 +563,7 @@ typedef struct {
 	int			deferredPlayerLoading;
 	qboolean	loading;			// don't defer players at initial startup
 	qboolean	intermissionStarted;	// don't play voice rewards, because game will end shortly
-#ifdef SMOKINGUNS
 	qboolean	readytostart;
-#endif
 
 	// there are only one or two snapshot_t that are relevent at a time
 	int			latestSnapshotNum;	// the number of snapshots the client system has received
@@ -683,16 +611,12 @@ typedef struct {
 	int			duckTime;
 
 	float		landChange;				// for landing hard
-#ifdef SMOKINGUNS
 	float		landAngleChange;
-#endif
 	int			landTime;
 
-#ifdef SMOKINGUNS
 	float		shootChange;
 	float		shootAngleChange;
 	int			shootTime;
-#endif
 
 	// input state sent to server
 	int			weaponSelect;
@@ -735,9 +659,7 @@ typedef struct {
 	int				spectatorPaintX2;										// current paint x
 	int				spectatorOffset;										// current offset from start
 	int				spectatorPaintLen; 									// current offset from start
-#ifdef SMOKINGUNS
 	vec4_t		spectatorCurrentColor;									// current color from start
-#endif
 
 	// skull trails
 	skulltrail_t	skulltrails[MAX_CLIENTS];
@@ -780,22 +702,13 @@ typedef struct {
 	int			soundTime;
 	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
 
-#ifndef SMOKINGUNS
-	// for voice chat buffer
-	int			voiceChatTime;
-	int			voiceChatBufferIn;
-	int			voiceChatBufferOut;
-#endif
-
 	// warmup countdown
 	int			warmup;
 	int			warmupCount;
 
 	//==========================
 
-#ifdef SMOKINGUNS
 	int			itemPickupQuant;
-#endif
 	int			itemPickup;
 	int			itemPickupTime;
 	int			itemPickupBlendTime;	// the pulse around the crosshair is timed seperately
@@ -839,7 +752,6 @@ typedef struct {
 	char			testModelName[MAX_QPATH];
 	qboolean		testGun;
 
-#ifdef SMOKINGUNS
 //unlagged - optimized prediction
 	int			lastPredictedCommand;
 	int			lastServerTime;
@@ -943,7 +855,6 @@ typedef struct {
 	qboolean landTypes[MAX_CLIENTS];
 
 	vec3_t escapePoint;
-#endif
 } cg_t;
 
 
@@ -952,7 +863,6 @@ typedef struct {
 // Other media that can be tied to clients, weapons, or items are
 // stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
 typedef struct {
-#ifdef SMOKINGUNS
 	// Spoon icons for ui
 	qhandle_t	dead;
 	qhandle_t	won[5];
@@ -1030,15 +940,8 @@ typedef struct {
 	qhandle_t	sharps_scope;
 	qhandle_t	scope_sharps;
 
-	// Spoon End
-#endif
-
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
-#ifndef SMOKINGUNS
-// Tequila comment: Removed that as it is not used, charset not existing
-	qhandle_t	charsetPropGlow;
-#endif
 	qhandle_t	charsetPropB;
 	qhandle_t	whiteShader;
 
@@ -1063,18 +966,6 @@ typedef struct {
 	qhandle_t	redFlagBaseModel;
 	qhandle_t	blueFlagBaseModel;
 	qhandle_t	neutralFlagBaseModel;
-
-#ifndef SMOKINGUNS
-	qhandle_t	overloadBaseModel;
-	qhandle_t	overloadTargetModel;
-	qhandle_t	overloadLightsModel;
-	qhandle_t	overloadEnergyModel;
-
-	qhandle_t	harvesterModel;
-	qhandle_t	harvesterRedSkin;
-	qhandle_t	harvesterBlueSkin;
-	qhandle_t	harvesterNeutralModel;
-#endif
 
 	qhandle_t	armorModel;
 	qhandle_t	armorIcon;
@@ -1108,25 +999,16 @@ typedef struct {
 	qhandle_t	friendShader;
 
 	qhandle_t	balloonShader;
-#ifdef SMOKINGUNS
 	qhandle_t	balloonBuyShader;
-#endif
 	qhandle_t	connectionShader;
 
 	qhandle_t	selectShader;
 	qhandle_t	viewBloodShader;
 	qhandle_t	tracerShader;
-#ifndef SMOKINGUNS
-	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
-#else
 	qhandle_t	crosshairShader;
 	qhandle_t	crosshairFriendShader;
-#endif
 	qhandle_t	lagometerShader;
 	qhandle_t	backTileShader;
-#ifndef SMOKINGUNS
-	qhandle_t	noammoShader;
-#endif
 
 	qhandle_t	smokePuffShader;
 	qhandle_t	smokePuffRageProShader;
@@ -1134,15 +1016,9 @@ typedef struct {
 	qhandle_t	plasmaBallShader;
 	qhandle_t	waterBubbleShader;
 	qhandle_t	bloodTrailShader;
-#ifndef SMOKINGUNS
-	qhandle_t	nailPuffShader;
-	qhandle_t	blueProxMine;
-#endif
 
 	qhandle_t	numberShaders[11];
-#ifdef SMOKINGUNS
 	qhandle_t	numbermoneyShaders[11];
-#endif
 
 	qhandle_t	shadowMarkShader;
 
@@ -1179,36 +1055,15 @@ typedef struct {
 	qhandle_t	plasmaExplosionShader;
 	qhandle_t	bulletExplosionShader;
 	qhandle_t	rocketExplosionShader;
-#ifndef SMOKINGUNS
-	qhandle_t	grenadeExplosionShader;
-#else
 	qhandle_t	bulletPuffShader;
 	qhandle_t	dynamiteExplosionShader;
-#endif
 	qhandle_t	bfgExplosionShader;
 	qhandle_t	bloodExplosionShader;
 
 	// special effects models
 	qhandle_t	teleportEffectModel;
 	qhandle_t	teleportEffectShader;
-#ifndef SMOKINGUNS
-	qhandle_t	kamikazeEffectModel;
-	qhandle_t	kamikazeShockWave;
-	qhandle_t	kamikazeHeadModel;
-	qhandle_t	kamikazeHeadTrail;
-	qhandle_t	guardPowerupModel;
-	qhandle_t	scoutPowerupModel;
-	qhandle_t	doublerPowerupModel;
-	qhandle_t	ammoRegenPowerupModel;
-	qhandle_t	invulnerabilityImpactModel;
-	qhandle_t	invulnerabilityJuicedModel;
-	qhandle_t	medkitUsageModel;
 	qhandle_t	dustPuffShader;
-	qhandle_t	heartShader;
-	qhandle_t	invulnerabilityPowerupModel;
-#else
-	qhandle_t	dustPuffShader;
-#endif
 
 	// scoreboard headers
 	qhandle_t	scoreboardName;
@@ -1225,200 +1080,41 @@ typedef struct {
 	qhandle_t	medalCapture;
 
 	// sounds
-#ifndef SMOKINGUNS
-	sfxHandle_t	quadSound;
-#endif
 	sfxHandle_t	tracerSound;
 	sfxHandle_t	selectSound;
-#ifndef SMOKINGUNS
-	sfxHandle_t	useNothingSound;
-	sfxHandle_t	wearOffSound;
-#else
 	sfxHandle_t snd_pistol_raise;
 	sfxHandle_t	snd_winch66_raise;
 	sfxHandle_t	snd_lightn_raise;
 	sfxHandle_t	snd_sharps_raise;
 	sfxHandle_t	snd_shotgun_raise;
 	sfxHandle_t snd_winch97_raise;
-#endif
 	sfxHandle_t	footsteps[FOOTSTEP_TOTAL][4];
-#ifdef SMOKINGUNS
 	sfxHandle_t	snd_death[11];
 
 	//impact sounds on specific surfaces
 	sfxHandle_t	impact[IMPACT_TOTAL][3];
-#endif
 
 	sfxHandle_t	sfx_lghit1;
 	sfxHandle_t	sfx_lghit2;
 	sfxHandle_t	sfx_lghit3;
-#ifndef SMOKINGUNS
-	sfxHandle_t	sfx_ric1;
-	sfxHandle_t	sfx_ric2;
-	sfxHandle_t	sfx_ric3;
-	sfxHandle_t	sfx_railg;
-#else
 	sfxHandle_t	sfx_ric[6];
-#endif
 	sfxHandle_t	sfx_rockexp;
-#ifndef SMOKINGUNS
-	sfxHandle_t	sfx_plasmaexp;
-	sfxHandle_t	sfx_proxexp;
-	sfxHandle_t	sfx_nghit;
-	sfxHandle_t	sfx_nghitflesh;
-	sfxHandle_t	sfx_nghitmetal;
-	sfxHandle_t	sfx_chghit;
-	sfxHandle_t	sfx_chghitflesh;
-	sfxHandle_t	sfx_chghitmetal;
-	sfxHandle_t kamikazeExplodeSound;
-	sfxHandle_t kamikazeImplodeSound;
-	sfxHandle_t kamikazeFarSound;
-	sfxHandle_t useInvulnerabilitySound;
-	sfxHandle_t invulnerabilityImpactSound1;
-	sfxHandle_t invulnerabilityImpactSound2;
-	sfxHandle_t invulnerabilityImpactSound3;
-	sfxHandle_t invulnerabilityJuicedSound;
-	sfxHandle_t obeliskHitSound1;
-	sfxHandle_t obeliskHitSound2;
-	sfxHandle_t obeliskHitSound3;
-	sfxHandle_t	obeliskRespawnSound;
-	sfxHandle_t	winnerSound;
-	sfxHandle_t	loserSound;
-	sfxHandle_t	youSuckSound;
-	sfxHandle_t	gibSound;
-	sfxHandle_t	gibBounce1Sound;
-	sfxHandle_t	gibBounce2Sound;
-	sfxHandle_t	gibBounce3Sound;
-	sfxHandle_t	teleInSound;
-	sfxHandle_t	teleOutSound;
-#endif
 	sfxHandle_t	noAmmoSound;
-#ifndef SMOKINGUNS
-	sfxHandle_t	respawnSound;
-#endif
 	sfxHandle_t talkSound;
-#ifdef SMOKINGUNS
 	sfxHandle_t talkSound1;
 	sfxHandle_t talkSound2;
 	sfxHandle_t talkSound3;
-#endif
 	sfxHandle_t landSound;
 	sfxHandle_t fallSound;
-#ifndef SMOKINGUNS
-	sfxHandle_t jumpPadSound;
-
-	sfxHandle_t oneMinuteSound;
-	sfxHandle_t fiveMinuteSound;
-	sfxHandle_t suddenDeathSound;
-
-	sfxHandle_t threeFragSound;
-	sfxHandle_t twoFragSound;
-	sfxHandle_t oneFragSound;
-
-	sfxHandle_t hitSound;
-	sfxHandle_t hitSoundHighArmor;
-	sfxHandle_t hitSoundLowArmor;
-	sfxHandle_t hitTeamSound;
-	sfxHandle_t impressiveSound;
-	sfxHandle_t excellentSound;
-	sfxHandle_t deniedSound;
-	sfxHandle_t humiliationSound;
-	sfxHandle_t assistSound;
-	sfxHandle_t defendSound;
-	sfxHandle_t firstImpressiveSound;
-	sfxHandle_t firstExcellentSound;
-	sfxHandle_t firstHumiliationSound;
-
-	sfxHandle_t takenLeadSound;
-	sfxHandle_t tiedLeadSound;
-	sfxHandle_t lostLeadSound;
-
-	sfxHandle_t voteNow;
-	sfxHandle_t votePassed;
-	sfxHandle_t voteFailed;
-#endif
 
 	sfxHandle_t watrInSound;
 	sfxHandle_t watrOutSound;
 	sfxHandle_t watrUnSound;
 
-#ifndef SMOKINGUNS
-	sfxHandle_t flightSound;
-	sfxHandle_t medkitSound;
-
-	sfxHandle_t weaponHoverSound;
-#endif
-
-	// teamplay sounds
-#ifndef SMOKINGUNS
-	sfxHandle_t captureAwardSound;
-	sfxHandle_t redScoredSound;
-	sfxHandle_t blueScoredSound;
-	sfxHandle_t redLeadsSound;
-	sfxHandle_t blueLeadsSound;
-	sfxHandle_t teamsTiedSound;
-
-	sfxHandle_t	captureYourTeamSound;
-	sfxHandle_t	captureOpponentSound;
-	sfxHandle_t	returnYourTeamSound;
-	sfxHandle_t	returnOpponentSound;
-	sfxHandle_t	takenYourTeamSound;
-	sfxHandle_t	takenOpponentSound;
-
-	sfxHandle_t redFlagReturnedSound;
-	sfxHandle_t blueFlagReturnedSound;
-	sfxHandle_t neutralFlagReturnedSound;
-	sfxHandle_t	enemyTookYourFlagSound;
-	sfxHandle_t	enemyTookTheFlagSound;
-	sfxHandle_t yourTeamTookEnemyFlagSound;
-	sfxHandle_t yourTeamTookTheFlagSound;
-	sfxHandle_t	youHaveFlagSound;
-	sfxHandle_t yourBaseIsUnderAttackSound;
-	sfxHandle_t holyShitSound;
-#endif
-
-	// tournament sounds
-#ifndef SMOKINGUNS
-	sfxHandle_t	count3Sound;
-	sfxHandle_t	count2Sound;
-	sfxHandle_t	count1Sound;
-	sfxHandle_t	countFightSound;
-	sfxHandle_t	countPrepareSound;
-#endif
-
-#ifndef SMOKINGUNS
-	// new stuff
-	qhandle_t patrolShader;
-	qhandle_t assaultShader;
-	qhandle_t campShader;
-	qhandle_t followShader;
-	qhandle_t defendShader;
-	qhandle_t teamLeaderShader;
-	qhandle_t retrieveShader;
-	qhandle_t escortShader;
-	qhandle_t flagShaders[3];
-	sfxHandle_t	countPrepareTeamSound;
-
-	sfxHandle_t ammoregenSound;
-	sfxHandle_t doublerSound;
-	sfxHandle_t guardSound;
-	sfxHandle_t scoutSound;
-#endif
 	qhandle_t cursor;
 	qhandle_t selectCursor;
 	qhandle_t sizeCursor;
 
-#ifndef SMOKINGUNS
-	sfxHandle_t	regenSound;
-	sfxHandle_t	protectSound;
-	sfxHandle_t	n_healthSound;
-	sfxHandle_t	hgrenb1aSound;
-	sfxHandle_t	hgrenb2aSound;
-	sfxHandle_t	wstbimplSound;
-	sfxHandle_t	wstbimpmSound;
-	sfxHandle_t	wstbimpdSound;
-	sfxHandle_t	wstbactvSound;
-#else
 	//Spoon Sounds
 	sfxHandle_t knifehit2;
 	sfxHandle_t	knifehit;
@@ -1496,8 +1192,6 @@ typedef struct {
 
 	// a quad model for bullet holes in breakables, etc.
 	qhandle_t	quad;
-#endif
-
 } cgMedia_t;
 
 
@@ -1522,12 +1216,8 @@ typedef struct {
 	int				dmflags;
 	int				teamflags;
 	int				fraglimit;
-#ifndef SMOKINGUNS
-	int				capturelimit;
-#else
 	int				scorelimit;
 	int				duellimit;
-#endif
 	int				timelimit;
 	int				maxclients;
 	char			mapname[MAX_QPATH];
@@ -1535,16 +1225,13 @@ typedef struct {
 	char			blueTeam[MAX_QPATH];
 
 
-#ifdef SMOKINGUNS
 	int				newShotgunPattern;
 //	char				availablePlaylist[MAX_INFO_STRING];
 	int				roundNoMoveTime;
 
 	qboolean		specsareflies;
 	qboolean		deathcam;
-#endif
-
-	int				voteTime;
+int				voteTime;
 	int				voteYes;
 	int				voteNo;
 	qboolean		voteModified;			// beep whenever changed
@@ -1603,12 +1290,10 @@ typedef struct {
 	// media
 	cgMedia_t		media;
 
-#ifdef SMOKINGUNS
 //unlagged - client options
 	// this will be set to the server's g_delagHitscan
 	int				delagHitscan;
 //unlagged - client options
-#endif
 } cgs_t;
 
 //==============================================================================
@@ -1619,7 +1304,6 @@ extern	centity_t		cg_entities[MAX_GENTITIES];
 extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
-#ifdef SMOKINGUNS
 extern	int				cg_burnTimes[MAX_CLIENTS];
 // Added by hika
 // Smokin' Guns specific
@@ -1628,7 +1312,6 @@ extern	cplane_t		cg_frustum[4];
 // duel
 extern	vec3_t		cg_intermission_origin[MAX_MAPPARTS];
 extern	vec3_t		cg_intermission_angles[MAX_MAPPARTS];
-#endif
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
@@ -1677,9 +1360,6 @@ extern	vmCvar_t		cg_viewsize;
 extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
-#ifndef SMOKINGUNS
-extern	vmCvar_t		cg_autoswitch;
-#endif
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
@@ -1702,9 +1382,7 @@ extern	vmCvar_t 		cg_teamModel;
 extern	vmCvar_t 		cg_forceModelTeamSkin;
 extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;
-#ifdef SMOKINGUNS
 extern	vmCvar_t		cg_menu;
-#endif
 extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
@@ -1715,9 +1393,6 @@ extern	vmCvar_t		cg_noVoiceText;
 extern  vmCvar_t		cg_scorePlum;
 //unlagged - smooth clients #2
 // this is done server-side now
-#ifndef SMOKINGUNS
-extern	vmCvar_t		cg_smoothClients;
-#endif
 //unlagged - smooth clients #2
 extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
@@ -1731,13 +1406,6 @@ extern	vmCvar_t		cg_cameraMode;
 extern  vmCvar_t		cg_smallFont;
 extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_noTaunt;
-#ifndef SMOKINGUNS
-extern	vmCvar_t		cg_noProjectileTrail;
-extern	vmCvar_t		cg_oldRail;
-extern	vmCvar_t		cg_oldRocket;
-extern	vmCvar_t		cg_oldPlasma;
-extern	vmCvar_t		cg_trueLightning;
-#else
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
 extern	vmCvar_t		cg_currentSelectedPlayer;
@@ -1749,10 +1417,8 @@ extern	vmCvar_t		cg_singlePlayerActive;
 extern  vmCvar_t		cg_recordSPDemo;
 extern  vmCvar_t		cg_recordSPDemoName;
 extern	vmCvar_t		cg_obeliskRespawnDelay;
-#endif
 
 //unlagged - client options
-#ifdef SMOKINGUNS
 extern	vmCvar_t		cg_delag;
 extern	vmCvar_t		cg_debugDelag;
 extern	vmCvar_t		cg_drawBBox;
@@ -1843,7 +1509,6 @@ void CG_PredictWeaponEffects( centity_t *cent );
 void CG_AddBoundingBox( centity_t *cent );
 qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max );
 //unlagged - cg_unlagged.c
-#endif
 
 //
 // cg_main.c
@@ -1854,12 +1519,8 @@ const char *CG_Argv( int arg );
 void QDECL CG_Printf( const char *msg, ... );
 void QDECL CG_Error( const char *msg, ... );
 
-#ifndef SMOKINGUNS
-void CG_StartMusic( void );
-#else
 void CG_SelectMusic( void );
 void CG_PlayMusic( void );
-#endif
 
 void CG_UpdateCvars( void );
 
@@ -1869,9 +1530,6 @@ void CG_LoadMenus(const char *menuFile);
 void CG_KeyEvent(int key, qboolean down);
 void CG_MouseEvent(int x, int y);
 void CG_EventHandling(int type);
-#ifndef SMOKINGUNS
-void CG_RankRunFrame( void );
-#endif
 void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore( void );
 void CG_BuildSpectatorString( void );
@@ -1909,9 +1567,7 @@ void CG_DrawBigString( int x, int y, const char *s, float alpha );
 void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color );
 void CG_DrawSmallString( int x, int y, const char *s, float alpha );
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color );
-#ifdef SMOKINGUNS
 void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset );
-#endif
 
 int CG_DrawStrlen( const char *str );
 
@@ -1946,13 +1602,9 @@ void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
 
-#ifndef SMOKINGUNS
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
-#else
 // Tequila: It needs itemDef_t type definition from ui_shared.h
 #include "../ui/ui_shared.h"
 void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
-#endif
 
 void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
 int CG_Text_Width(const char *text, float scale, int limit);
@@ -1970,9 +1622,7 @@ const char *CG_GetGameStatusText( void );
 const char *CG_GetKillerText( void );
 void CG_Draw3DModel(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles);
 void CG_Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader);
-#ifdef SMOKINGUNS
 void CG_Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
-#endif
 void CG_CheckOrderPending( void );
 const char *CG_GameTypeString( void );
 qboolean CG_YourTeamHasFlag( void );
@@ -1984,11 +1634,9 @@ qhandle_t CG_StatusHandle(int task);
 //
 // cg_player.c
 //
-#ifdef SMOKINGUNS
 float	CG_MachinegunSpinAngle( centity_t *cent/*, qboolean reloading*/ );
 void CG_Turret( centity_t *cent );
 void CG_Fly( centity_t *cent);
-#endif
 void CG_Player( centity_t *cent );
 void CG_ResetPlayerEntity( centity_t *cent );
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
@@ -1998,17 +1646,12 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
 //
 // cg_predict.c
 //
-#ifndef SMOKINGUNS
-void CG_BuildSolidList( void );
-#else
 void CG_BuildSolidList( qboolean light );
 void CG_BuildVisibleSolidList( qboolean light );
 int CG_PointContentsVisible( const vec3_t point, int passEntityNum );
-#endif
 int	CG_PointContents( const vec3_t point, int passEntityNum );
 void CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 					 int skipNumber, int mask );
-#ifdef SMOKINGUNS
 int CG_Trace_New( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 					 int skipNumber, int mask );
 void CG_Trace2( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
@@ -2019,7 +1662,6 @@ int CG_Trace_Flare( trace_t *result, const vec3_t start, const vec3_t mins, cons
 					 int skipNumber, int mask, vec_t max_distance );
 int CG_Trace_Fragment( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 					 int skipNumber, int mask );
-#endif
 void CG_PredictPlayerState( void );
 void CG_LoadDeferredPlayers( void );
 
@@ -2043,10 +1685,8 @@ void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int
 
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
-#ifdef SMOKINGUNS
 void CG_PositionViewWeaponOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
-#endif
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
 
@@ -2058,28 +1698,17 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
-#ifdef SMOKINGUNS
 void CG_LastUsedWeapon_f(void);
-#endif
 
 void CG_RegisterWeapon( int weaponNum );
 void CG_RegisterItemVisuals( int itemNum );
 
-#ifndef SMOKINGUNS
-void CG_FireWeapon( centity_t *cent );
-void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-#else
 void CG_FireWeapon( centity_t *cent, qboolean altfire, int weapon);
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType, int surfaceFlags, int shaderNum, qboolean fire, vec3_t dirs[ALC_COUNT], int entityNum);
-#endif
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 void CG_ShotgunFire( entityState_t *es );
-#ifndef SMOKINGUNS
-void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum );
-#else
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum , int weapon, int surfaceFlags, int shaderNum, int entityNum);
 void CG_MakeSmokePuff(entityState_t *ent);
-#endif
 
 void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
@@ -2099,11 +1728,7 @@ void	CG_ImpactMark( qhandle_t markShader,
 					float orientation,
 				    float r, float g, float b, float a,
 					qboolean alphaFade,
-#ifndef SMOKINGUNS
-					float radius, qboolean temporary );
-#else
 					float radius, qboolean temporary, int duration );
-#endif
 
 //
 // cg_localents.c
@@ -2111,10 +1736,8 @@ void	CG_ImpactMark( qhandle_t markShader,
 void	CG_InitLocalEntities( void );
 localEntity_t	*CG_AllocLocalEntity( void );
 void	CG_AddLocalEntities( void );
-#ifdef SMOKINGUNS
 void	CG_CreateFire(vec3_t origin, vec3_t normal);
 localEntity_t	*CG_GetActiveLocalEntities( void );
-#endif
 
 //
 // cg_effects.c
@@ -2130,14 +1753,6 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 				   qhandle_t hShader );
 void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing );
 void CG_SpawnEffect( vec3_t org );
-#ifndef SMOKINGUNS
-void CG_KamikazeEffect( vec3_t org );
-void CG_ObeliskExplode( vec3_t org, int entityNum );
-void CG_ObeliskPain( vec3_t org );
-void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles );
-void CG_InvulnerabilityJuiced( vec3_t org );
-void CG_LightningBoltBeam( vec3_t start, vec3_t end );
-#endif
 void CG_ScorePlum( int client, vec3_t org, int score );
 
 void CG_GibPlayer( vec3_t playerOrigin );
@@ -2147,21 +1762,15 @@ void CG_Bleed( vec3_t origin, int entityNum );
 
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int msec,
-#ifndef SMOKINGUNS
-								qboolean isSprite );
-#else
 								qboolean isSprite, float radius, qboolean smokeexp );
-#endif
 
 //
 // cg_snapshot.c
 //
 void CG_ProcessSnapshots( void );
-#ifdef SMOKINGUNS
 //unlagged - early transitioning
 void CG_TransitionEntity( centity_t *cent );
 //unlagged - early transitioning
-#endif
 
 //
 // cg_info.c
@@ -2171,9 +1780,7 @@ void CG_LoadingItem( int itemNum );
 void CG_LoadingClient( int clientNum );
 void CG_DrawInformation( void );
 
-#ifdef SMOKINGUNS
 void CG_LoadingStage( int amount);
-#endif
 
 //
 // cg_scoreboard.c
@@ -2186,9 +1793,7 @@ void CG_DrawOldTourneyScoreboard( void );
 //
 qboolean CG_ConsoleCommand( void );
 void CG_InitConsoleCommands( void );
-#ifdef SMOKINGUNS
 void CG_CloseBuyMenu( void );
-#endif
 
 //
 // cg_servercmds.c
@@ -2196,14 +1801,7 @@ void CG_CloseBuyMenu( void );
 void CG_ExecuteNewServerCommands( int latestSequence );
 void CG_ParseServerinfo( void );
 void CG_SetConfigValues( void );
-#ifndef SMOKINGUNS
-void CG_LoadVoiceChats( void );
-#endif
 void CG_ShaderStateChanged(void);
-#ifndef SMOKINGUNS
-void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd );
-void CG_PlayBufferedVoiceChats( void );
-#endif
 
 //
 // cg_playerstate.c
@@ -2382,7 +1980,6 @@ void		trap_Key_SetCatcher( int catcher );
 int			trap_Key_GetKey( const char *binding );
 
 //cg_sg_utils.c
-#ifdef SMOKINGUNS
 #define BOUNCE_LIGHT	0
 #define BOUNCE_MEDIUM	1
 #define BOUNCE_HEAVY	2
@@ -2408,7 +2005,6 @@ void CG_PlayReloadSound(int weapon, centity_t *cent, qboolean sec);
 localEntity_t *CG_AddSmokeParticle(vec3_t origin, int radius, int randomradius, int lifetime,
 								   int boost, int wind, vec3_t winddir);
 void CG_DeleteRoundEntities( void );
-#endif
 
 typedef enum {
   SYSTEM_PRINT,
@@ -2431,22 +2027,6 @@ qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 
-#ifndef SMOKINGUNS
-void	CG_ClearParticles (void);
-void	CG_AddParticles (void);
-void	CG_ParticleSnow (qhandle_t pshader, vec3_t origin, vec3_t origin2, int turb, float range, int snum);
-void	CG_ParticleSmoke (qhandle_t pshader, centity_t *cent);
-void	CG_AddParticleShrapnel (localEntity_t *le);
-void	CG_ParticleSnowFlurry (qhandle_t pshader, centity_t *cent);
-void	CG_ParticleBulletDebris (vec3_t	org, vec3_t vel, int duration);
-void	CG_ParticleSparks (vec3_t org, vec3_t vel, int duration, float x, float y, float speed);
-void	CG_ParticleDust (centity_t *cent, vec3_t origin, vec3_t dir);
-void	CG_ParticleMisc (qhandle_t pshader, vec3_t origin, int size, int duration, float alpha);
-void	CG_ParticleExplosion (char *animStr, vec3_t origin, vec3_t vel, int duration, int sizeStart, int sizeEnd);
-extern qboolean		initparticles;
-int CG_NewParticleArea ( int num );
-
-#else
 int			trap_R_CullBoundingBox( vec3_t box_vertex[8] );
 int			trap_R_CullPointAndRadius( vec3_t pt, float radius );
 int			trap_R_GetFrustumPlane( cplane_t frustum[4] );
@@ -2512,6 +2092,5 @@ qboolean CG_Farclip_Pyramid_Y( vec3_t , vec3_t , float , float ) ;
 
 extern qboolean ( * CG_Farclip_Tester[] )( vec3_t , vec3_t , float , float ) ;
 extern int CG_Farclip_Tester_Table_Size ;
-#endif
 
 

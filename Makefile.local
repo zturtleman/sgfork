@@ -33,7 +33,7 @@ SDK_GAMENAME_DED  = smokinguns_dedicated
 USE_MP_UIDIR      = 1
 # STANDALONE_CFLAGS should only contain -D options dedicated to the game to keep
 # it not compiler dependant. It will be used by cc but also q3lcc in any build.
-STANDALONE_CFLAGS = -DSMOKINGUNS -DSG_RELEASE=$(shell date +%Y%m%d)
+STANDALONE_CFLAGS = -DSG_RELEASE=$(shell date +%Y%m%d)
 ########################################################################
 # Official release options
 VERSION           = 1.1

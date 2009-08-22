@@ -117,7 +117,6 @@ Smokin' Guns specific function, made available for the mod.
 Returns CULL_IN, CULL_CLIP, or CULL_OUT
 =================
 */
-#ifdef SMOKINGUNS
 int R_CullBox (vec3_t transformedBounds[8]) {
 	int		i, j;
 	float	dists[8];
@@ -159,7 +158,6 @@ int R_CullBox (vec3_t transformedBounds[8]) {
 
 	return CULL_CLIP;		// partially clipped
 }
-#endif
 
 /*
 ** R_CullLocalPointAndRadius
@@ -641,11 +639,9 @@ R_GetFrustumPlane
 Smokin' Guns specific function, made available for the mod.
 =================
 */
-#ifdef SMOKINGUNS
 void R_GetFrustumPlane( cplane_t frustum[4] ) {
 	Com_Memcpy( frustum, tr.viewParms.frustum, sizeof(cplane_t) * 4 );
 }
-#endif
 
 /*
 =================
