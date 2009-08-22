@@ -68,15 +68,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define STAT_MINUS			10	// num frame for '-' stats digit
 
-#ifndef SMOKINGUNS
-#define	ICON_SIZE			48
-#define	CHAR_WIDTH			32
-#define	CHAR_HEIGHT			48
-#else
 #define	ICON_SIZE			32
 #define	CHAR_WIDTH			20
 #define	CHAR_HEIGHT			30
-#endif
 #define	TEXT_ICON_SPACE		4
 
 #define	TEAMCHAT_WIDTH		80
@@ -107,6 +101,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	DEFAULT_MODEL			"wq_male1"
 #define	DEFAULT_TEAM_MODEL		"wq_male1"
 #define	DEFAULT_TEAM_HEAD		"wq_male1"
+
+//Team skins
+#define DEFAULT_SKIN_REDTEAM	"red"
+#define DEFAULT_SKIN_BLUETEAM	"blue"
 
 // Added by hika
 // For frustum culling, used in CG_CullBoundingBox()
@@ -1699,6 +1697,9 @@ extern	vmCvar_t		cg_teamChatTime;
 extern	vmCvar_t		cg_teamChatHeight;
 extern	vmCvar_t		cg_stats;
 extern	vmCvar_t 		cg_forceModel;
+extern	vmCvar_t 		cg_enemyModel;
+extern	vmCvar_t 		cg_teamModel;
+extern	vmCvar_t 		cg_forceModelTeamSkin;
 extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;
 #ifdef SMOKINGUNS
@@ -1932,6 +1933,7 @@ void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 extern	int sortedTeamPlayers[TEAM_MAXOVERLAY];
 extern	int	numSortedTeamPlayers;
 extern	int drawTeamOverlayModificationCount;
+extern	int forceModelModificationCount;
 extern  char systemChat[256];
 extern  char teamChat1[256];
 extern  char teamChat2[256];

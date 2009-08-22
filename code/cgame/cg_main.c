@@ -156,6 +156,9 @@ vmCvar_t 	cg_teamChatHeight;
 vmCvar_t 	cg_stats;
 vmCvar_t 	cg_buildScript;
 vmCvar_t 	cg_forceModel;
+vmCvar_t 	cg_forceModelTeamSkin;
+vmCvar_t 	cg_teamModel;
+vmCvar_t 	cg_enemyModel;
 vmCvar_t	cg_paused;
 vmCvar_t	cg_menu;
 vmCvar_t	cg_blood;
@@ -346,6 +349,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
+	{ &cg_forceModelTeamSkin, "cg_forceModelTeamSkin", "1", CVAR_ARCHIVE  },
+	{ &cg_enemyModel, "cg_enemyModel", DEFAULT_MODEL, CVAR_ARCHIVE  },
+	{ &cg_teamModel, "cg_teamModel", DEFAULT_MODEL, CVAR_ARCHIVE  },
 	{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },
 	{ &cg_deferPlayers, "cg_deferPlayers", "1", CVAR_ARCHIVE },
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
