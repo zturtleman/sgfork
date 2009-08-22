@@ -310,7 +310,6 @@ typedef struct {
 	int			plOut;
 	usercmd_t	cmdqueue[MAX_LATENT_CMDS];
 	int			cmdhead;
-  qboolean ready;
 //unlagged - lag simulation #2
 //unlagged - true ping
 	int			realPing;
@@ -525,11 +524,6 @@ typedef struct {
 	int			voteYes;
 	int			voteNo;
 	int			numVotingClients;		// set by CalculateRanks
-
-	int			warmup;
-	qboolean	pauseWarmup;
-	int			prevTimeWarm; // In case player pauses
-  int     numPauses;
 
 	// team voting state
 	char		teamVoteString[2][MAX_STRING_CHARS];
@@ -905,8 +899,6 @@ extern	vmCvar_t	g_weaponRespawn;
 extern	vmCvar_t	g_weaponTeamRespawn;
 extern	vmCvar_t	g_synchronousClients;
 extern	vmCvar_t	g_motd;
-extern  vmCvar_t  g_tournament;
-extern  vmCvar_t  g_tourney_pauses_max;
 extern	vmCvar_t	g_warmup;
 extern	vmCvar_t	g_doWarmup;
 extern	vmCvar_t	g_blood;
