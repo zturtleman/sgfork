@@ -120,8 +120,6 @@ vmCvar_t	g_weaponRespawn;
 vmCvar_t	g_weaponTeamRespawn;
 vmCvar_t	g_motd;
 vmCvar_t	g_synchronousClients;
-vmCvar_t  g_tournament;
-vmCvar_t  g_tourney_pauses_max;
 vmCvar_t	g_warmup;
 vmCvar_t	g_doWarmup;
 vmCvar_t	g_restarted;
@@ -215,8 +213,6 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_teamAutoJoin, "g_teamAutoJoin", "0", CVAR_ARCHIVE  },
 	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE  },
 
-  { &g_tournament, "g_tournament", "0", CVAR_ARCHIVE, 0, qfalse },
-  { &g_tourney_pauses_max, "g_tourney_max_pauses", "3", CVAR_ARCHIVE, 0, qtrue },
 	{ &g_warmup, "g_warmup", "20", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_doWarmup, "g_doWarmup", "0", 0, 0, qtrue  },
 	{ &g_logfile, "g_log", "games.log", CVAR_ARCHIVE, 0, qfalse  },
@@ -720,9 +716,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// general initialization
 	G_FindTeams();
-
-  // Warmup
-  level.warmup = g_warmup.integer*1000;
 
 	// make sure we have flags for CTF, etc
 	SaveRegisteredItems();
@@ -3438,23 +3431,6 @@ static void G_UpdateTeamCount(void){
 
 /*
 ================
-CheckWarmup
-
-For tournaments
-================
-*/
-void CheckWarmup( )
-{
-  if( !g_tournament.integer && (!level.warmup || level.pauseWarmup) )
-    return;
-
-  level.warmup -= level.time - level.prevTimeWarm;
-
-  trap_SendServerCommand( -1, va( "cp \"Warmup: %i\"", level.warmup ) );
-}
-
-/*
-================
 G_RunFrame
 
 Advances the non-player objects in the world
@@ -3474,9 +3450,6 @@ void G_RunFrame( int levelTime ) {
 	level.previousTime = level.time;
 	level.time = levelTime;
 	msec = level.time - level.previousTime;
-
-  if( g_tournament.integer && !level.pauseWarmup )
-    level.prevTimeWarm = level.previousTime;
 
 	// get any cvar changes
 	G_UpdateCvars();
@@ -3590,9 +3563,6 @@ void G_RunFrame( int levelTime ) {
 			ClientEndFrame( ent );
 		}
 	}
-
-  CheckWarmup( );
-
 	// see if the round is finished
 	CheckRound();
 

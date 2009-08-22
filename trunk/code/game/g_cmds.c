@@ -2033,28 +2033,6 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 	ent->client->ps.stats[STAT_MONEY] -= prize;
 }
 
-void Cmd_Ready( gentity_t *ent, qboolean ready )
-{
-  if( !level.warmup )
-    return;
-
-    ent->client->pers.ready = ready;
-    trap_SendServerCommand( -1, va( "print \"%s is %s\"", 
-          ent->client->pers.netname, (ready) ? "ready" : "not ready" ) );
-}
-
-void Cmd_Pause( gentity_t *ent, qboolean pause )
-{
-   if( !level.warmup || ((level.numPauses > g_tourney_pauses_max.integer) 
-         && !pause) )
-     return;
-
-   level.pauseWarmup = pause;
-   level.numPauses++;
-   trap_SendServerCommand( -1, va( "print \"%s has %s the warmup\"",
-         ent->client->pers.netname, (pause) ? "paused" : "unpaused" ) );
-} 
-
 /*
 =================
 ClientCommand
@@ -2135,16 +2113,6 @@ void ClientCommand( int clientNum ) {
 		Cmd_Stats_f( ent );
 	else if (Q_stricmp (cmd, "dropweapon") == 0)
 		Cmd_DropWeapon_f( ent, 0 );
-  else if( !Q_stricmp( cmd, "ready" ) )
-    Cmd_Ready( ent, qtrue );
-  else if( !Q_stricmp( cmd, "unready" ) )
-    Cmd_Ready( ent, qfalse );
-  else if( !Q_stricmp( cmd, "pause" ) )
-    Cmd_Pause( ent, !level.pauseWarmup );
-  else if( !Q_stricmp( cmd, "timeout" ) )
-    Cmd_Pause( ent, qtrue );
-  else if( !Q_stricmp( cmd, "timein" ) )
-    Cmd_Pause( ent, qfalse );
 	else if (Q_stricmp(cmd, "buy" ) == 0)
 		Cmd_BuyItem_f (ent, qfalse);
 	else if (Q_stricmp(cmd, "cg_buy" ) == 0)
