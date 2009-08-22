@@ -690,20 +690,20 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 			strcpy(model, DEFAULT_MODEL);
 
 			if(ci->team == TEAM_BLUE || ci->team == TEAM_BLUE_SPECTATOR){
-				strcpy(skin, "blue");
+				strcpy(skin, DEFAULT_SKIN_BLUETEAM);
 			} else if(ci->team == TEAM_RED || ci->team == TEAM_RED_SPECTATOR ||
 				ci->team  == TEAM_SPECTATOR){
-				strcpy(skin, "red");
+				strcpy(skin, DEFAULT_SKIN_REDTEAM);
 			}
 
 
 			// keep skin name
 			if ( !CG_RegisterClientModelname( ci, model, ci->skinName ) ) {
-				if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "red" ) )
+				if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, DEFAULT_SKIN_REDTEAM ) )
 					CG_Error( "DEFAULT_MODEL (%s) failed to register", DEFAULT_MODEL );
 			}
 		} else {
-			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "red" ) ) {
+			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, DEFAULT_SKIN_REDTEAM ) ) {
 				CG_Error( "DEFAULT_MODEL (%s) failed to register", DEFAULT_MODEL );
 			}
 		}
@@ -946,6 +946,31 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "t" );
 	newInfo.team = atoi( v );
 
+	//Check if the player has changed his team
+	//Don't check everyone - only main one
+	if (cg_forceModel.integer && (cgs.gametype >= GT_TEAM) &&
+		(cg.clientNum == clientNum) && (newInfo.team != ci->team)) {
+		switch (ci->team) {
+			case TEAM_BLUE:
+			case TEAM_BLUE_SPECTATOR:
+				//We may use the following logic because TEAM_BLUE_SPECTATOR != TEAM_BLUE,
+				//otherwise don't use it!
+				if ((newInfo.team != TEAM_BLUE_SPECTATOR) && (newInfo.team != TEAM_BLUE))
+					//Player has switched teams (from one team to another or to spectator)
+					forceModelModificationCount--;
+				break;
+			case TEAM_RED:
+			case TEAM_RED_SPECTATOR:
+				if ((newInfo.team != TEAM_RED_SPECTATOR) && (newInfo.team != TEAM_RED))
+					//Player has switched teams (from one team to another or to spectator)
+					forceModelModificationCount--;
+				break;
+			default:
+				//Player has switched teams (from spectator to team)
+				forceModelModificationCount--;
+		}
+	}
+
 	// team task
 	v = Info_ValueForKey( configstring, "tt" );
 	newInfo.teamTask = atoi(v);
@@ -968,35 +993,67 @@ void CG_NewClientInfo( int clientNum ) {
 		char modelStr[MAX_QPATH];
 		char *skin;
 
-		if( cgs.gametype >= GT_TEAM ) {
-			Q_strncpyz( newInfo.modelName, DEFAULT_MODEL, sizeof( newInfo.modelName ) );
-			Q_strncpyz( newInfo.skinName, "red", sizeof( newInfo.skinName ) );
+		//Model section
+		if( cgs.gametype >= GT_TEAM && cg.clientNum != clientNum ) {
+			switch (cgs.clientinfo[cg.clientNum].team) {
+				case TEAM_BLUE:
+				case TEAM_BLUE_SPECTATOR:
+					if ((newInfo.team == TEAM_BLUE_SPECTATOR) ||
+						(newInfo.team == TEAM_BLUE)) {
+						trap_Cvar_VariableStringBuffer( "cg_teamModel", modelStr, sizeof( modelStr ) );
+					} else {
+						trap_Cvar_VariableStringBuffer( "cg_enemyModel", modelStr, sizeof( modelStr ) );
+					}
+					break;
+				case TEAM_RED:
+				case TEAM_RED_SPECTATOR:
+					if ((newInfo.team == TEAM_RED_SPECTATOR) ||
+						(newInfo.team == TEAM_RED)) {
+						trap_Cvar_VariableStringBuffer( "cg_teamModel", modelStr, sizeof( modelStr ) );
+					} else {
+						trap_Cvar_VariableStringBuffer( "cg_enemyModel", modelStr, sizeof( modelStr ) );
+					}
+					break;
+				default:
+					trap_Cvar_VariableStringBuffer( "cg_enemyModel", modelStr, sizeof( modelStr ) );
+			}
 		} else {
 			trap_Cvar_VariableStringBuffer( "model", modelStr, sizeof( modelStr ) );
-			if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
-				skin = "red";
-			} else {
-				*skin++ = 0;
-			}
-
-			Q_strncpyz( newInfo.skinName, skin, sizeof( newInfo.skinName ) );
-			Q_strncpyz( newInfo.modelName, modelStr, sizeof( newInfo.modelName ) );
 		}
-
-		if ( cgs.gametype >= GT_TEAM ) {
-			// keep skin name
-			slash = strchr( v, '/' );
-			if ( slash ) {
-				Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
+		//Skins section
+		if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
+			//model name doesn't include a skin name
+			skin = DEFAULT_SKIN_REDTEAM;
+		} else {
+			//Cutting off the skin name is required for force skins feature!
+			//Without it the model won't be taken
+			*skin++ = 0;
+		}
+		if (cgs.gametype >= GT_TEAM && (cg_forceModelTeamSkin.integer ||
+			(cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR))) {
+			//Force skins in team games
+			//Skins are forced if player is just spectating
+			switch (newInfo.team) {
+				case TEAM_BLUE:
+				case TEAM_BLUE_SPECTATOR:
+					skin = DEFAULT_SKIN_BLUETEAM;
+					break;
+				case TEAM_RED:
+				case TEAM_RED_SPECTATOR:
+				default:
+					skin = DEFAULT_SKIN_REDTEAM;
 			}
 		}
+		//Set skin&model
+		Q_strncpyz( newInfo.modelName, modelStr, sizeof( newInfo.modelName ) );
+		Q_strncpyz( newInfo.skinName, skin, sizeof( newInfo.skinName ) );
 	} else {
 		Q_strncpyz( newInfo.modelName, v, sizeof( newInfo.modelName ) );
 
 		slash = strchr( newInfo.modelName, '/' );
 		if ( !slash ) {
 			// modelName didn not include a skin name
-			Q_strncpyz( newInfo.skinName, "red", sizeof( newInfo.skinName ) );
+			Q_strncpyz( newInfo.skinName, DEFAULT_SKIN_REDTEAM, sizeof( newInfo.skinName ) );
 		} else {
 			Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
 			// truncate modelName
@@ -1014,11 +1071,11 @@ void CG_NewClientInfo( int clientNum ) {
 
 		if( cgs.gametype >= GT_TEAM ) {
 			Q_strncpyz( newInfo.headModelName, DEFAULT_MODEL, sizeof( newInfo.headModelName ) );
-			Q_strncpyz( newInfo.headSkinName, "red", sizeof( newInfo.headSkinName ) );
+			Q_strncpyz( newInfo.headSkinName, DEFAULT_SKIN_REDTEAM, sizeof( newInfo.headSkinName ) );
 		} else {
 			trap_Cvar_VariableStringBuffer( "headmodel", modelStr, sizeof( modelStr ) );
 			if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
-				skin = "red";
+				skin = DEFAULT_SKIN_REDTEAM;
 			} else {
 				*skin++ = 0;
 			}
@@ -1040,7 +1097,7 @@ void CG_NewClientInfo( int clientNum ) {
 		slash = strchr( newInfo.headModelName, '/' );
 		if ( !slash ) {
 			// modelName didn not include a skin name
-			Q_strncpyz( newInfo.headSkinName, "red", sizeof( newInfo.headSkinName ) );
+			Q_strncpyz( newInfo.headSkinName, DEFAULT_SKIN_REDTEAM, sizeof( newInfo.headSkinName ) );
 		} else {
 			Q_strncpyz( newInfo.headSkinName, slash + 1, sizeof( newInfo.headSkinName ) );
 			// truncate modelName

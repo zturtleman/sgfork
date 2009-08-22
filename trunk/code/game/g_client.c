@@ -1126,21 +1126,6 @@ void ClientUserinfoChanged( int clientNum ) {
 //		ForceClientSkin(client, headModel, "red");
 	}
 */
-
-	// team skin in Smokin' Guns
-	switch( team ) {
-	case TEAM_RED:
-	case TEAM_RED_SPECTATOR:
-		ForceClientSkin(client, model, "red");
-		ForceClientSkin(client, headModel, "red");
-		break;
-	case TEAM_BLUE:
-	case TEAM_BLUE_SPECTATOR:
-		ForceClientSkin(client, model, "blue");
-		ForceClientSkin(client, headModel, "blue");
-		break;
-	}
-
 	// teamInfo
 	s = Info_ValueForKey( userinfo, "teamoverlay" );
 	if ( ! *s || atoi( s ) != 0 ) {

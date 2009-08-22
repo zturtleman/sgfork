@@ -167,14 +167,14 @@ void CG_LoadingClient( int clientNum ) {
 		if ( skin ) {
 			*skin++ = '\0';
 		} else {
-			skin = "red";
+			skin = DEFAULT_SKIN_REDTEAM;
 		}
 
 		Com_sprintf( iconName, MAX_QPATH, "models/wq3_players/%s/icon_%s.tga", model, skin );
 
 		loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		if ( !loadingPlayerIcons[loadingPlayerIconCount] ) {
-			Com_sprintf( iconName, MAX_QPATH, "models/wq3_players/%s/icon_%s.tga", DEFAULT_MODEL, "red" );
+			Com_sprintf( iconName, MAX_QPATH, "models/wq3_players/%s/icon_%s.tga", DEFAULT_MODEL, DEFAULT_SKIN_REDTEAM );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		}
 		if ( loadingPlayerIcons[loadingPlayerIconCount] ) {
