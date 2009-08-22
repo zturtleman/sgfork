@@ -4761,7 +4761,7 @@ void _UI_Init( qboolean inGameLoad ) {
 	const char *menuSet;
 	int start;
 
-#if defined SMOKINGUNS && defined Q3_VERSION
+#if defined Q3_VERSION
 	Com_Printf( "UI version: %s, %d, %s\n", Q3_VERSION, SG_RELEASE, __TIME__ );
 #endif
 	//uiInfo.inGameLoad = inGameLoad;
@@ -4858,6 +4858,7 @@ void _UI_Init( qboolean inGameLoad ) {
 	if (menuSet == NULL || menuSet[0] == '\0') {
 		menuSet = "ui/menus.txt";
 	}
+#endif
 
 #if 0
 	if (uiInfo.inGameLoad) {
