@@ -980,6 +980,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	oldname[MAX_STRING_CHARS];
 	gclient_t	*client;
 	char	c1[MAX_INFO_STRING];
+	char	c2[MAX_INFO_STRING];
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
@@ -1163,7 +1164,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	teamLeader = client->sess.teamLeader;
 
 	// colors
-	strcpy(c1, Info_ValueForKey( userinfo, "color" ));
+	strcpy(c1, Info_ValueForKey( userinfo, "color1" ));
+	strcpy(c2, Info_ValueForKey( userinfo, "color2" ));
 	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
 	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));
 	strcpy(guid, Info_ValueForKey( userinfo, "cl_guid" ));

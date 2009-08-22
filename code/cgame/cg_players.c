@@ -921,7 +921,10 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// colors
 	v = Info_ValueForKey( configstring, "c1" );
-	CG_ColorFromString( v, newInfo.color );
+	CG_ColorFromString( v, newInfo.color1 );
+
+	v = Info_ValueForKey( configstring, "c2" );
+	CG_ColorFromString( v, newInfo.color2 );
 
 	// bot skill
 	v = Info_ValueForKey( configstring, "skill" );
