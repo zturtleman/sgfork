@@ -1313,17 +1313,11 @@ void CL_RequestMotd( void ) {
 
 	Com_sprintf( cls.updateChallenge, sizeof( cls.updateChallenge ), "%i", ((rand() << 16) ^ rand()) ^ Com_Milliseconds());
 
-#ifndef SMOKINGUNS
-	Info_SetValueForKey( info, "challenge", cls.updateChallenge );
-	Info_SetValueForKey( info, "renderer", cls.glconfig.renderer_string );
-	Info_SetValueForKey( info, "version", com_version->string );
-#else
 	Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
 	Info_SetValueForKey( info, "gl_version", cls.glconfig.version_string );
 	Info_SetValueForKey( info, "renderer", cls.glconfig.renderer_string );
 	Info_SetValueForKey( info, "challenge", cls.updateChallenge );
 	Info_SetValueForKey( info, "version", com_version->string );
-#endif
 
 	NET_OutOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
 }
@@ -1367,12 +1361,7 @@ in anyway.
 ===================
 */
 void CL_RequestAuthorization( void ) {
-#ifndef SMOKINGUNS
-	char	nums[64];
-	int		i, j, l;
-#else
 	char		info[MAX_INFO_STRING];
-#endif
 	cvar_t	*fs;
 
 	if ( !cls.authorizeServer.port ) {
@@ -1392,28 +1381,6 @@ void CL_RequestAuthorization( void ) {
 		return;
 	}
 
-#ifndef SMOKINGUNS
-	// only grab the alphanumeric values from the cdkey, to avoid any dashes or spaces
-	j = 0;
-	l = strlen( cl_cdkey );
-	if ( l > 32 ) {
-		l = 32;
-	}
-	for ( i = 0 ; i < l ; i++ ) {
-		if ( ( cl_cdkey[i] >= '0' && cl_cdkey[i] <= '9' )
-				|| ( cl_cdkey[i] >= 'a' && cl_cdkey[i] <= 'z' )
-				|| ( cl_cdkey[i] >= 'A' && cl_cdkey[i] <= 'Z' )
-			 ) {
-			nums[j] = cl_cdkey[i];
-			j++;
-		}
-	}
-	nums[j] = 0;
-
-	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
-
-	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums );
-#else
 	info[0] = 0;
 	Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
 	fs = Cvar_Get ("sa_engine_inuse", "0", CVAR_ROM );
@@ -1422,7 +1389,6 @@ void CL_RequestAuthorization( void ) {
 	SG_CvarMagic(cl_motd);
 
 	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getClientAuthorize %i \"%s\"", fs->integer, info );
-#endif
 }
 /*
 ======================================================================
@@ -2925,9 +2891,7 @@ void CL_InitRef( void ) {
 	}
 
 	re = *ret;
-#ifdef SMOKINGUNS
 	SG_CheckRef(&re);
-#endif
 
 	// unpause so the cgame definately gets a snapshot and renders a frame
 	Cvar_Set( "cl_paused", "0" );
@@ -3160,11 +3124,7 @@ void CL_Init( void ) {
 
 	cl_lanForcePackets = Cvar_Get ("cl_lanForcePackets", "1", CVAR_ARCHIVE);
 
-#ifndef SMOKINGUNS
-	cl_guidServerUniq = Cvar_Get ("cl_guidServerUniq", "1", CVAR_ARCHIVE);
-#else
 	cl_guidServerUniq = Cvar_Get ("cl_guidServerUniq", "0", CVAR_ARCHIVE);
-#endif
 
 	// ~ and `, as keys and characters
 	cl_consoleKeys = Cvar_Get( "cl_consoleKeys", "~ ` 0x7e 0x60", CVAR_ARCHIVE);
@@ -3184,11 +3144,7 @@ void CL_Init( void ) {
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifndef SMOKINGUNS
-	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
-#else
 	Cvar_Get ("cl_version", XSTRING(PRODUCT_VERSION) " " XSTRING(SG_RELEASE), CVAR_ROM | CVAR_USERINFO );
-#endif
 
 	Cvar_Get ("password", "", CVAR_USERINFO);
 	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );

@@ -740,7 +740,6 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 */
 	case CG_GET_ENTITY_TOKEN:
 		return re.GetEntityToken( VMA(1), args[2] );
-#ifdef SMOKINGUNS
 	case CG_R_CULL_BBOX:
 		return re.CullBox( VMA(1) );
 	case CG_R_CULL_SPHERE:
@@ -748,7 +747,6 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_R_FRUSTUM_PLANE:
 		re.GetFrustumPlane( VMA(1) );
 		return 0;
-#endif
 	case CG_R_INPVS:
 		return re.inPVS( VMA(1), VMA(2) );
 
