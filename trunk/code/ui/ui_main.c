@@ -30,9 +30,6 @@ USER INTERFACE MAIN
 =======================================================================
 */
 
-// use this to get a demo build without an explicit demo build, i.e. to get the demo ui files to build
-//#define PRE_RELEASE_TADEMO
-
 #include "ui_local.h"
 
 uiInfo_t uiInfo;
@@ -108,6 +105,9 @@ static char* netnames[] = {
 	"UDP",
 	NULL
 };
+
+static int gamecodetoui[] = {4,2,3,0,5,1,6};
+static int uitogamecode[] = {4,6,2,3,1,5,7};
 
 static void UI_StartServerRefresh(qboolean full);
 static void UI_StopServerRefresh( void );
@@ -1109,12 +1109,8 @@ void UI_Load(void) {
 
 	String_Init();
 
-#ifdef PRE_RELEASE_TADEMO
-	UI_ParseGameInfo("demogameinfo.txt");
-#else
 	UI_ParseGameInfo("gameinfo.txt");
 	UI_LoadArenas();
-#endif
 
 	UI_LoadMenus(menuSet, qtrue);
 	Menus_CloseAll();
@@ -1139,6 +1135,7 @@ static void UI_DrawClanName(rectDef_t *rect, float scale, vec4_t color, int text
 
 
 static void UI_SetCapFragLimits(qboolean uiVars) {
+	int score = 5;
 	int frag = 10;
 	int duel = 5;
 	int time = 0;
@@ -2437,6 +2434,27 @@ static qboolean UI_Handicap_HandleKey(int flags, float *special, int key) {
   return qfalse;
 }
 
+static qboolean UI_Effects_HandleKey(int flags, float *special, int key) {
+  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
+
+		if (key == K_MOUSE2) {
+	    uiInfo.effectsColor--;
+		} else {
+	    uiInfo.effectsColor++;
+		}
+
+    if( uiInfo.effectsColor > 6 ) {
+	  	uiInfo.effectsColor = 0;
+		} else if (uiInfo.effectsColor < 0) {
+	  	uiInfo.effectsColor = 6;
+		}
+
+	  trap_Cvar_SetValue( "color1", uitogamecode[uiInfo.effectsColor] );
+    return qtrue;
+  }
+  return qfalse;
+}
+
 static qboolean UI_ClanName_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
     int i;
@@ -3246,11 +3264,7 @@ static void UI_RunMenuScript(char **args) {
 		} else if (Q_stricmp(name, "clearError") == 0) {
 			trap_Cvar_Set("com_errorMessage", "");
 		} else if (Q_stricmp(name, "loadGameInfo") == 0) {
-#ifdef PRE_RELEASE_TADEMO
-			UI_ParseGameInfo("demogameinfo.txt");
-#else
 			UI_ParseGameInfo("gameinfo.txt");
-#endif
 			UI_LoadBestScores(uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum);
 		} else if (Q_stricmp(name, "resetScores") == 0) {
 			UI_ClearScores();
@@ -4834,14 +4848,10 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	start = trap_Milliseconds();
 
-  uiInfo.teamCount = 0;
-  uiInfo.characterCount = 0;
-  uiInfo.aliasCount = 0;
+	uiInfo.teamCount = 0;
+	uiInfo.characterCount = 0;
+	uiInfo.aliasCount = 0;
 
-#ifdef PRE_RELEASE_TADEMO
-	UI_ParseTeamInfo("demoteaminfo.txt");
-	UI_ParseGameInfo("demogameinfo.txt");
-#else
 	UI_ParseGameInfo("gameinfo.txt");
 
 	menuSet = UI_Cvar_VariableString("ui_menuFiles");
@@ -4868,7 +4878,9 @@ void _UI_Init( qboolean inGameLoad ) {
 	UI_LoadBots();
 
 	// sets defaults for ui temp cvars
-	uiInfo.effectsColor = gamecodetoui[(int)trap_Cvar_VariableValue("color1")-1];
+	// Effects color is commented because its unset
+	// Will be uncommnted when UI will be setted up for effect colors
+	//uiInfo.effectsColor = gamecodetoui[(int)trap_Cvar_VariableValue("color1")-1];
 	uiInfo.currentCrosshair = (int)trap_Cvar_VariableValue("cg_drawCrosshair");
 	trap_Cvar_Set("ui_mousePitch", (trap_Cvar_VariableValue("m_pitch") >= 0) ? "0" : "1");
 

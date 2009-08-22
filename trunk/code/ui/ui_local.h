@@ -839,6 +839,8 @@ typedef struct {
 	qhandle_t	q3HeadIcons[MAX_PLAYERMODELS];
 	int				q3SelectedHead;
 
+	int effectsColor;
+
 	qboolean inGameLoad;
 
 }	uiInfo_t;

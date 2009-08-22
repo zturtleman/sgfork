@@ -466,12 +466,8 @@ typedef struct {
 
 	int				botSkill;		// 0 = not bot, 1-5 = bot
 
-#ifndef SMOKINGUNS
 	vec3_t			color1;
 	vec3_t			color2;
-#else
-	vec3_t			color;
-#endif
 
 	int				score;			// updated by score servercmds
 	int				location;		// location index for team mode
