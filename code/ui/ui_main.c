@@ -4858,7 +4858,6 @@ void _UI_Init( qboolean inGameLoad ) {
 	if (menuSet == NULL || menuSet[0] == '\0') {
 		menuSet = "ui/menus.txt";
 	}
-#endif
 
 #if 0
 	if (uiInfo.inGameLoad) {
