@@ -338,6 +338,7 @@ void Send_KeyBindings(void){
 }
 
 void AssetCache( void ) {
+	int n;
 	//if (Assets.textFont == NULL) {
 	//}
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
@@ -355,7 +356,10 @@ void AssetCache( void ) {
 
 	uiInfo.uiDC.Assets.menu_width = trap_R_RegisterShaderNoMip( ASSET_MENU_WIDTH);
 	uiInfo.uiDC.Assets.menu_height = trap_R_RegisterShaderNoMip (ASSET_MENU_HEIGHT);
-	uiInfo.uiDC.Assets.crosshairShader = trap_R_RegisterShaderNoMip( "hud/crosshair" );
+	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {
+ 		uiInfo.uiDC.Assets.crosshairShader1[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair1%c", 'a' + n ) );
+		uiInfo.uiDC.Assets.crosshairShader2[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair2%c", 'a' + n ) );
+ 	}
 }
 
 void _UI_DrawSides(float x, float y, float w, float h, float size) {
@@ -1878,9 +1882,15 @@ static void UI_DrawRedBlue(rectDef_t *rect, float scale, vec4_t color, int textS
 	Text_Paint(rect->x, rect->y, scale, color, (uiInfo.redBlue == 0) ? "Red" : "Blue", 0, 0, textStyle);
 }
 
-static void UI_DrawCrosshair(rectDef_t *rect, float scale, vec4_t color) {
- 	trap_R_SetColor( color );
-	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader);
+static void UI_DrawCrosshair1(rectDef_t *rect, float scale) {
+ 	trap_R_SetColor( g_color_table[uiInfo.crosshair1Color & Q_COLORS_COUNT ]  );
+	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader1[uiInfo.currentCrosshair1]);
+ 	trap_R_SetColor( NULL );
+}
+
+static void UI_DrawCrosshair2(rectDef_t *rect, float scale) {
+	trap_R_SetColor( g_color_table[uiInfo.crosshair2Color & Q_COLORS_COUNT ] );
+	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader2[uiInfo.currentCrosshair2]);
  	trap_R_SetColor( NULL );
 }
 
@@ -2271,8 +2281,11 @@ static void UI_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, fl
 		case UI_REDBLUE:
 			UI_DrawRedBlue(&rect, scale, color, textStyle);
 			break;
-		case UI_CROSSHAIR:
-			UI_DrawCrosshair(&rect, scale, color);
+		case UI_CROSSHAIR1:
+			UI_DrawCrosshair1(&rect, scale);
+			break;
+		case UI_CROSSHAIR2:
+			UI_DrawCrosshair2(&rect, scale);
 			break;
 		case UI_SELECTEDPLAYER:
 			UI_DrawSelectedPlayer(&rect, scale, color, textStyle);
@@ -2754,26 +2767,81 @@ static qboolean UI_RedBlue_HandleKey(int flags, float *special, int key) {
 	return qfalse;
 }
 
-static qboolean UI_Crosshair_HandleKey(int flags, float *special, int key) {
+static qboolean UI_Crosshair1_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		if (key == K_MOUSE2) {
-			uiInfo.currentCrosshair--;
+			uiInfo.currentCrosshair1--;
 		} else {
-			uiInfo.currentCrosshair++;
+			uiInfo.currentCrosshair1++;
 		}
 
-		if (uiInfo.currentCrosshair >= NUM_CROSSHAIRS) {
-			uiInfo.currentCrosshair = 0;
-		} else if (uiInfo.currentCrosshair < 0) {
-			uiInfo.currentCrosshair = NUM_CROSSHAIRS - 1;
+		if (uiInfo.currentCrosshair1 >= NUM_CROSSHAIRS) {
+			uiInfo.currentCrosshair1 = 0;
+		} else if (uiInfo.currentCrosshair1 < 0) {
+			uiInfo.currentCrosshair1 = NUM_CROSSHAIRS - 1;
 		}
-		trap_Cvar_Set("cg_drawCrosshair", va("%d", uiInfo.currentCrosshair));
+		trap_Cvar_Set("cg_drawCrosshair1", va("%d", uiInfo.currentCrosshair1));
 		return qtrue;
 	}
 	return qfalse;
 }
 
+static qboolean UI_Crosshair1Color_HandleKey(int flags, float *special, int key) {
+  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
+		if (key == K_MOUSE2) {
+			uiInfo.crosshair1Color--;
+		} else {
+			uiInfo.crosshair1Color++;
+		}
 
+		if (uiInfo.crosshair1Color >= Q_COLORS_COUNT) {
+			uiInfo.crosshair1Color = 0;
+		} else if (uiInfo.crosshair1Color < 0) {
+			uiInfo.crosshair1Color = Q_COLORS_COUNT - 1;
+		}
+		trap_Cvar_Set("cg_crosshair1Color", va("%d", uiInfo.crosshair1Color));
+		return qtrue;
+	}
+	return qfalse;
+}
+
+static qboolean UI_Crosshair2_HandleKey(int flags, float *special, int key) {
+  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
+		if (key == K_MOUSE2) {
+			uiInfo.currentCrosshair2--;
+		} else {
+			uiInfo.currentCrosshair2++;
+		}
+
+		if (uiInfo.currentCrosshair2 >= NUM_CROSSHAIRS) {
+			uiInfo.currentCrosshair2 = 0;
+		} else if (uiInfo.currentCrosshair2 < 0) {
+			uiInfo.currentCrosshair2 = NUM_CROSSHAIRS - 1;
+		}
+		trap_Cvar_Set("cg_drawCrosshair2", va("%d", uiInfo.currentCrosshair2));
+		return qtrue;
+	}
+	return qfalse;
+}
+
+static qboolean UI_Crosshair2Color_HandleKey(int flags, float *special, int key) {
+  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
+		if (key == K_MOUSE2) {
+			uiInfo.crosshair2Color--;
+		} else {
+			uiInfo.crosshair2Color++;
+		}
+
+		if (uiInfo.crosshair2Color >= Q_COLORS_COUNT) {
+			uiInfo.crosshair2Color = 0;
+		} else if (uiInfo.crosshair2Color < 0) {
+			uiInfo.crosshair2Color = Q_COLORS_COUNT - 1;
+		}
+		trap_Cvar_Set("cg_crosshair2Color", va("%d", uiInfo.crosshair2Color));
+		return qtrue;
+	}
+	return qfalse;
+}
 
 static qboolean UI_SelectedPlayer_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
@@ -2868,8 +2936,17 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
 		case UI_REDBLUE:
 			UI_RedBlue_HandleKey(flags, special, key);
 			break;
-		case UI_CROSSHAIR:
-			UI_Crosshair_HandleKey(flags, special, key);
+		case UI_CROSSHAIR1:
+			UI_Crosshair1_HandleKey(flags, special, key);
+			break;
+		case UI_CROSSHAIR2:
+			UI_Crosshair2_HandleKey(flags, special, key);
+			break;
+		case UI_CROSSHAIR1COLOR:
+			UI_Crosshair1Color_HandleKey(flags, special, key);
+			break;
+		case UI_CROSSHAIR2COLOR:
+			UI_Crosshair2Color_HandleKey(flags, special, key);
 			break;
 		case UI_SELECTEDPLAYER:
 			UI_SelectedPlayer_HandleKey(flags, special, key);
@@ -4881,7 +4958,10 @@ void _UI_Init( qboolean inGameLoad ) {
 	// Effects color is commented because its unset
 	// Will be uncommnted when UI will be setted up for effect colors
 	//uiInfo.effectsColor = gamecodetoui[(int)trap_Cvar_VariableValue("color1")-1];
-	uiInfo.currentCrosshair = (int)trap_Cvar_VariableValue("cg_drawCrosshair");
+	uiInfo.currentCrosshair1 = (int)trap_Cvar_VariableValue("cg_drawCrosshair1");
+	uiInfo.currentCrosshair2 = (int)trap_Cvar_VariableValue("cg_drawCrosshair2");
+	uiInfo.crosshair1Color = (int)trap_Cvar_VariableValue("cg_crosshair1Color");
+	uiInfo.crosshair2Color = (int)trap_Cvar_VariableValue("cg_crosshair2Color");
 	trap_Cvar_Set("ui_mousePitch", (trap_Cvar_VariableValue("m_pitch") >= 0) ? "0" : "1");
 
 	uiInfo.serverStatus.currentServerCinematic = -1;
@@ -5479,7 +5559,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
-	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
+	{ &ui_drawCrosshair, "cg_drawCrosshair1", "4", CVAR_ARCHIVE },
+	{ &ui_drawCrosshair, "cg_drawCrosshair2", "1", CVAR_ARCHIVE },
 	{ &ui_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
