@@ -28,12 +28,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-// Tequila: Smokin' Guns defines update
-// MISSIONPACK must be kept out, we are STANDALONE now
-#ifdef MISSIONPACK
-#undef MISSIONPACK
-#endif
-
 #define PRODUCT_NAME				"Smokin' Guns"
 #define BASEGAME					"base"
 #define CLIENT_WINDOW_TITLE     	"SmokinGuns"
