@@ -99,6 +99,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CULL_CLIP			1	// clipped by one or more planes
 #define	CULL_OUT			2	// completely outside the clipping planes
 
+//Crosshair change flags
+#define CHANGE_CROSSHAIR_ACTIVATE  1
+#define CHANGE_CROSSHAIR_TEAMMATE  2
+#define CHANGE_CROSSHAIR_OPPONENT  4
+
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -1005,7 +1010,8 @@ typedef struct {
 	qhandle_t	selectShader;
 	qhandle_t	viewBloodShader;
 	qhandle_t	tracerShader;
-	qhandle_t	crosshairShader;
+	qhandle_t	crosshairShader1[NUM_CROSSHAIRS];
+	qhandle_t	crosshairShader2[NUM_CROSSHAIRS];
 	qhandle_t	crosshairFriendShader;
 	qhandle_t	lagometerShader;
 	qhandle_t	backTileShader;
@@ -1328,15 +1334,39 @@ extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
 extern	vmCvar_t		cg_drawAmmoWarning;
-extern	vmCvar_t		cg_drawCrosshair;
+extern	vmCvar_t		cg_crosshairDrawFriend;
+extern	vmCvar_t		cg_crosshair1FriendColor;
+extern	vmCvar_t		cg_crosshair1ActivateColor;
+extern	vmCvar_t		cg_crosshair1OpponentColor;
+extern	vmCvar_t		cg_crosshair1Color;
+extern	vmCvar_t		cg_drawCrosshair1;
+extern	vmCvar_t		cg_crosshair1PickUpPulse;
+extern	vmCvar_t		cg_crosshair1WidthRatio;
+extern	vmCvar_t		cg_crosshair1Transparency;
+extern	vmCvar_t		cg_crosshair2Color;
+extern	vmCvar_t		cg_drawCrosshair2;
+extern	vmCvar_t		cg_crosshair2FriendColor;
+extern	vmCvar_t		cg_crosshair2ActivateColor;
+extern	vmCvar_t		cg_crosshair2OpponentColor;
+extern	vmCvar_t		cg_crosshair2PickUpPulse;
+extern	vmCvar_t		cg_crosshair2WidthRatio;
+extern	vmCvar_t		cg_crosshair2Transparency;
+extern	vmCvar_t		cg_crosshair1X;
+extern	vmCvar_t		cg_crosshair1Y;
+extern	vmCvar_t		cg_crosshair1Size;
+extern	vmCvar_t		cg_crosshair1Health;
+extern	vmCvar_t		cg_crosshair1HealthColor1;
+extern	vmCvar_t		cg_crosshair1HealthColor2;
+extern	vmCvar_t		cg_crosshair2X;
+extern	vmCvar_t		cg_crosshair2Y;
+extern	vmCvar_t		cg_crosshair2Size;
+extern	vmCvar_t		cg_crosshair2Health;
+extern	vmCvar_t		cg_crosshair2HealthColor1;
+extern	vmCvar_t		cg_crosshair2HealthColor2;
 extern	vmCvar_t		cg_drawCrosshairNames;
 extern	vmCvar_t		cg_drawRewards;
 extern	vmCvar_t		cg_drawTeamOverlay;
 extern	vmCvar_t		cg_teamOverlayUserinfo;
-extern	vmCvar_t		cg_crosshairX;
-extern	vmCvar_t		cg_crosshairY;
-extern	vmCvar_t		cg_crosshairSize;
-extern	vmCvar_t		cg_crosshairHealth;
 extern	vmCvar_t		cg_drawStatus;
 extern	vmCvar_t		cg_draw2D;
 extern	vmCvar_t		cg_animSpeed;
@@ -1574,8 +1604,6 @@ int CG_DrawStrlen( const char *str );
 float	*CG_FadeColor( int startMsec, int totalMsec );
 float *CG_TeamColor( int team );
 void CG_TileClear( void );
-void CG_ColorForHealth( vec4_t hcolor );
-void CG_GetColorForHealth( int health, int armor, vec4_t hcolor );
 
 void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
 void CG_DrawRect( float x, float y, float width, float height, float size, const float *color );

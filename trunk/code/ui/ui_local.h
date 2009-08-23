@@ -70,8 +70,11 @@ extern vmCvar_t	ui_browserShowFull;
 extern vmCvar_t	ui_browserShowEmpty;
 
 extern vmCvar_t	ui_brassTime;
-extern vmCvar_t	ui_drawCrosshair;
 extern vmCvar_t	ui_drawCrosshairNames;
+
+extern vmCvar_t	ui_drawCrosshair1;
+extern vmCvar_t	ui_drawCrosshair2;
+
 extern vmCvar_t	ui_marks;
 
 extern vmCvar_t	ui_server1;
@@ -830,7 +833,11 @@ typedef struct {
 	int numFoundPlayerServers;
 	int nextFindPlayerRefresh;
 
-	int currentCrosshair;
+	int currentCrosshair1;
+	int currentCrosshair2;
+	int crosshair1Color;
+	int crosshair2Color;
+
 	int startPostGameTime;
 	sfxHandle_t newHighScoreSound;
 

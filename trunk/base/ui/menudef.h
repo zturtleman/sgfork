@@ -270,7 +270,6 @@
 #define UI_BOTNAME 239
 #define UI_BOTSKILL 240
 #define UI_REDBLUE 241
-#define UI_CROSSHAIR 242
 #define UI_SELECTEDPLAYER 243
 #define UI_MAPCINEMATIC 244
 #define UI_NETGAMETYPE 245
@@ -298,6 +297,11 @@
 #define UI_INGAME_RECT 265
 #define	UI_JOIN_RED	266
 #define UI_JOIN_BLUE 267
+
+#define UI_CROSSHAIR1 242
+#define UI_CROSSHAIR2 269
+#define UI_CROSSHAIR1COLOR 270
+#define UI_CROSSHAIR2COLOR 271
 
 #define VOICECHAT_GETFLAG			"getflag"				// command someone to get the flag
 #define VOICECHAT_OFFENSE			"offense"				// command someone to go on offense

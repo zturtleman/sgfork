@@ -305,8 +305,9 @@ typedef struct {
 
   // player settings
 	qhandle_t fxBasePic;
-  qhandle_t fxPic[7];
-	qhandle_t	crosshairShader;
+	qhandle_t fxPic[7];
+	qhandle_t crosshairShader1[NUM_CROSSHAIRS];
+	qhandle_t crosshairShader2[NUM_CROSSHAIRS];
 
 } cachedAssets_t;
 

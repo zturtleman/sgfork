@@ -109,13 +109,37 @@ vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
 vmCvar_t	cg_drawAmmoWarning;
-vmCvar_t	cg_drawCrosshair;
 vmCvar_t	cg_drawCrosshairNames;
+vmCvar_t	cg_crosshairDrawFriend;
+vmCvar_t	cg_crosshair1ActivateColor;
+vmCvar_t	cg_crosshair1OpponentColor;
+vmCvar_t	cg_crosshair1FriendColor;
+vmCvar_t	cg_crosshair1Color;
+vmCvar_t	cg_drawCrosshair1;
+vmCvar_t	cg_crosshair1PickUpPulse;
+vmCvar_t	cg_crosshair1WidthRatio;
+vmCvar_t	cg_crosshair1Transparency;
+vmCvar_t	cg_crosshair2Color;
+vmCvar_t	cg_drawCrosshair2;
+vmCvar_t	cg_crosshair2ActivateColor;
+vmCvar_t	cg_crosshair2OpponentColor;
+vmCvar_t	cg_crosshair2FriendColor;
+vmCvar_t	cg_crosshair2PickUpPulse;
+vmCvar_t	cg_crosshair2WidthRatio;
+vmCvar_t	cg_crosshair2Transparency;
+vmCvar_t	cg_crosshair1X;
+vmCvar_t	cg_crosshair1Y;
+vmCvar_t	cg_crosshair1Size;
+vmCvar_t	cg_crosshair1Health;
+vmCvar_t	cg_crosshair1HealthColor1;
+vmCvar_t	cg_crosshair1HealthColor2;
+vmCvar_t	cg_crosshair2X;
+vmCvar_t	cg_crosshair2Y;
+vmCvar_t	cg_crosshair2Size;
+vmCvar_t	cg_crosshair2Health;
+vmCvar_t	cg_crosshair2HealthColor1;
+vmCvar_t	cg_crosshair2HealthColor2;
 vmCvar_t	cg_drawRewards;
-vmCvar_t	cg_crosshairSize;
-vmCvar_t	cg_crosshairX;
-vmCvar_t	cg_crosshairY;
-vmCvar_t	cg_crosshairHealth;
 vmCvar_t	cg_draw2D;
 vmCvar_t	cg_drawStatus;
 vmCvar_t	cg_animSpeed;
@@ -312,13 +336,37 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
-	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
+	{ &cg_crosshairDrawFriend, "cg_crosshairDrawFriend", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1FriendColor, "cg_crosshair1FriendColor", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1ActivateColor, "cg_crosshair1ActivateColor", "3", CVAR_ARCHIVE },
+	{ &cg_crosshair1OpponentColor, "cg_crosshair1OpponentColor", "2", CVAR_ARCHIVE },
+	{ &cg_crosshair1Color, "cg_crosshair1Color", "7", CVAR_ARCHIVE },
+	{ &cg_drawCrosshair1, "cg_drawCrosshair1", "4", CVAR_ARCHIVE },
+	{ &cg_crosshair1PickUpPulse, "cg_crosshair1PickUpPulse", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1WidthRatio, "cg_crosshair1WidthRatio", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1Transparency, "cg_crosshair1Transparency", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshair2Color, "cg_crosshair2Color", "2", CVAR_ARCHIVE },
+	{ &cg_drawCrosshair2, "cg_drawCrosshair2", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2FriendColor, "cg_crosshair2FriendColor", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair2ActivateColor, "cg_crosshair2ActivateColor", "3", CVAR_ARCHIVE },
+	{ &cg_crosshair2OpponentColor, "cg_crosshair2OpponentColor", "2", CVAR_ARCHIVE },
+	{ &cg_crosshair2PickUpPulse, "cg_crosshair2PickUpPulse", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2WidthRatio, "cg_crosshair2WidthRatio", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair2Transparency, "cg_crosshair2Transparency", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshair1X, "cg_crosshair1X", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair1Y, "cg_crosshair1Y", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair1Size, "cg_crosshair1Size", "24", CVAR_ARCHIVE },
+	{ &cg_crosshair1Health, "cg_crosshair1Health", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair1HealthColor1, "cg_crosshair1HealthColor1", "8", CVAR_ARCHIVE },
+	{ &cg_crosshair1HealthColor2, "cg_crosshair1HealthColor2", "25", CVAR_ARCHIVE },
+	{ &cg_crosshair2X, "cg_crosshair2X", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2Y, "cg_crosshair2Y", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2Size, "cg_crosshair2Size", "24", CVAR_ARCHIVE },
+	{ &cg_crosshair2Health, "cg_crosshair2Health", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair2HealthColor1, "cg_crosshair2HealthColor1", "8", CVAR_ARCHIVE },
+	{ &cg_crosshair2HealthColor2, "cg_crosshair2HealthColor2", "25", CVAR_ARCHIVE },
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
-	{ &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
-	{ &cg_crosshairHealth, "cg_crosshairHealth", "1", CVAR_ARCHIVE },
-	{ &cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE },
-	{ &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE },
 	{ &cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
@@ -1055,8 +1103,13 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.tracerShader = trap_R_RegisterShader( "gfx/misc/tracer" );
 	cgs.media.selectShader = trap_R_RegisterShader( "gfx/2d/select" );
 
-	cgs.media.crosshairShader = trap_R_RegisterShader( "hud/crosshair");
-	cgs.media.crosshairFriendShader = trap_R_RegisterShader( "hud/crosshair_friend");
+	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
+		cgs.media.crosshairShader1[i] = trap_R_RegisterShader(va("gfx/2d/crosshair1%c", 'a'+i) );
+	}
+	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
+		cgs.media.crosshairShader2[i] = trap_R_RegisterShader(va("gfx/2d/crosshair2%c", 'a'+i) );
+	}
+	cgs.media.crosshairFriendShader = trap_R_RegisterShader( "gfx/2d/crosshair_friend");
 
 	CG_LoadingStage(1);
 
