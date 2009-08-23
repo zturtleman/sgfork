@@ -2182,7 +2182,7 @@ static void UI_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, fl
 		if(atoi(Info_ValueForKey(info, "g_gametype")) < GT_TEAM)
 			s = va("Join Game");
 		else
-			s = va("%s", Info_ValueForKey(info, "g_redteamname") );
+			s = va("%s", Info_ValueForKey(info, "g_redteam") );
 
 		Text_Paint(rect.x, rect.y, scale, color,
 			s, 0, 0, textStyle);
@@ -2192,7 +2192,7 @@ static void UI_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, fl
 		if(atoi(Info_ValueForKey(info, "g_gametype")) < GT_TEAM){
 
 		} else {
-			s = va("%s", Info_ValueForKey(info, "g_blueteamname") );
+			s = va("%s", Info_ValueForKey(info, "g_blueteam") );
 			Text_Paint(rect.x, rect.y, scale, color,
 				s, 0, 0, textStyle);
 		}
