@@ -89,7 +89,7 @@ endif
 export CROSS_COMPILING
 
 ifndef COPYDIR
-COPYDIR="/usr/local/games/quake3"
+COPYDIR="/usr/local/games/sgfork"
 endif
 
 ifndef MOUNT_DIR
