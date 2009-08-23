@@ -84,7 +84,8 @@ static qboolean Menu_OverActiveItem(menuDef_t *menu, float x, float y);
 
 static char		memoryPool[MEM_POOL_SIZE];
 static int		allocPoint, outOfMemory;
-
+static char   UI_hudmemoryPool[MEM_POOL_SIZE];
+static int    hudallocPoint, hudoutOfMemory;
 
 /*
 ===============
@@ -108,6 +109,40 @@ void *UI_Alloc( int size ) {
 	allocPoint += ( size + 15 ) & ~15;
 
 	return p;
+}
+
+/*
+===============
+UI_ResetHUDMemory
+===============
+*/
+void UI_ResetHUDMemory( void )
+{
+  hudallocPoint = 0;
+  hudoutOfMemory = qfalse;
+}
+
+/*
+===============
+UI_HUDAlloc
+===============
+*/
+void *UI_HUDAlloc( int size )
+{
+  char  *p;
+
+  if( hudallocPoint + size > MEM_POOL_SIZE )
+  {
+  DC->Print( "UI_HUDAlloc: Out of memory! Reinititing hud Memory!!\n" );
+    hudoutOfMemory = qtrue;
+    UI_ResetHUDMemory();
+  }
+
+  p = &UI_hudmemoryPool[ hudallocPoint ];
+
+  hudallocPoint += ( size + 15 ) & ~15;
+
+  return p;
 }
 
 /*

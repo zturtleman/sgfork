@@ -185,6 +185,9 @@ vmCvar_t	cg_smallFont;
 vmCvar_t	cg_bigFont;
 vmCvar_t	cg_noTaunt;
 
+vmCvar_t  cg_hudFiles;
+vmCvar_t  cg_hudFilesEnable;
+
 vmCvar_t 	cg_redTeamName;
 vmCvar_t 	cg_blueTeamName;
 vmCvar_t	cg_currentSelectedPlayer;
@@ -395,6 +398,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_scorePlum, "cg_scorePlums", "1", CVAR_USERINFO | CVAR_ARCHIVE},
 	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
 
+  { &cg_hudFiles, "cg_hudFiles", "ui/hud.txt", CVAR_ARCHIVE },
+  { &cg_hudFilesEnable, "cg_hudFilesEnable", "0", CVAR_ARCHIVE },
 	{ &pmove_fixed, "pmove_fixed", "0", 0},
 	{ &pmove_msec, "pmove_msec", "8", 0},
 	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
@@ -2007,6 +2012,7 @@ CG_LoadHudMenu();
 */
 void CG_LoadHudMenu( void ) {
 	const char *hudSet;
+  char buff[1024];
 
 	cgDC.registerShaderNoMip = &trap_R_RegisterShaderNoMip;
 	cgDC.setColor = &trap_R_SetColor;
@@ -2057,14 +2063,20 @@ void CG_LoadHudMenu( void ) {
 	cgDC.stopCinematic = &CG_StopCinematic;
 	cgDC.drawCinematic = &CG_DrawCinematic;
 	cgDC.runCinematicFrame = &CG_RunCinematicFrame;
+  cgDC.hudloading = qtrue;
 
 	Init_Display(&cgDC);
 
 	Menu_Reset();
 
-	hudSet = "ui/hud.txt";
+  trap_Cvar_VariableStringBuffer( "cg_hudFiles", buff, sizeof( buff ) );
+  hudSet = buff;
+
+  if( !cg_hudFilesEnable.integer || hudSet[ 0 ] == '\0' )
+    hudSet = "ui/hud.txt";
 
 	CG_LoadMenus(hudSet);
+  cgDC.hudloading = qfalse;
 }
 
 void CG_AssetCache( void ) {

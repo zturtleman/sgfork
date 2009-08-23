@@ -382,7 +382,7 @@ typedef struct {
   qhandle_t gradientImage;
   qhandle_t cursor;
 	float FPS;
-
+  qboolean  hudloading;
 } displayContextDef_t;
 
 const char *String_Alloc(const char *p);
