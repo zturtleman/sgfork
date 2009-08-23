@@ -1224,6 +1224,43 @@ static void CG_RegisterGraphics( void ) {
 			CG_LoadingStage(1);
 	}
 
+       //2d graphic of item bound
+       //cgs.media.itembound = trap_R_RegisterShaderNoMip("gfx/2d/itembound.tga");
+
+       //gatling gun models
+       cgs.media.g_tripod = trap_R_RegisterModel( "models/weapons2/gatling/g_tripod.md3");
+       cgs.media.g_middle = trap_R_RegisterModel( "models/weapons2/gatling/g_middle.md3");
+       cgs.media.g_gatling = trap_R_RegisterModel( "models/weapons2/gatling/g_gatling.md3");
+       cgs.media.g_barrel = trap_R_RegisterModel( "models/weapons2/gatling/g_barrel.md3");
+       cgs.media.g_crank = trap_R_RegisterModel( "models/weapons2/gatling/g_crank.md3");
+       cgs.media.g_hand = trap_R_RegisterModel( "models/weapons2/gatling/g_hand.md3");
+       cgs.media.g_mag = trap_R_RegisterModel("models/weapons2/gatling/g_mag.md3");
+       cgs.media.g_mag_v = trap_R_RegisterModel("models/weapons2/gatling/g_mag_v.md3");
+
+       // duel
+       // medal
+       cgs.media.du_medal = trap_R_RegisterModel("models/misc/medal.md3");
+       // ai_node
+       cgs.media.ai_node = trap_R_RegisterModel("models/misc/ai_node.md3");
+       // spectatorfly
+       cgs.media.fly = trap_R_RegisterModel("models/misc/fly.md3");
+       cgs.media.bpoint = trap_R_RegisterShader("wqfx/blackpoint");
+       cgs.media.fly_sound = trap_S_RegisterSound("sound/misc/fly.wav", qfalse);
+       // other money-models
+       cgs.media.coins = trap_R_RegisterModel("models/items/coins.md3");
+       cgs.media.bills = trap_R_RegisterModel("models/items/bills.md3");
+       cgs.media.coins_pic = trap_R_RegisterShader("hud/weapons/coins");
+       cgs.media.bills_pic = trap_R_RegisterShader("hud/weapons/bills");
+       // indicate escape point
+       cgs.media.indicate_lf = trap_R_RegisterShader("gfx/misc/indicator_lf");
+       cgs.media.indicate_fw = trap_R_RegisterShader("gfx/misc/indicator_fw");
+       cgs.media.indicate_rt = trap_R_RegisterShader("gfx/misc/indicator_rt");
+       cgs.media.indicate_bk = trap_R_RegisterShader("gfx/misc/indicator_bk");
+
+       cgs.media.quad = trap_R_RegisterModel("models/misc/quad.md3");
+       // not quad damage, but a model consisting of a simple square
+       // (needed for bullet holes in breakables
+
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
 		const char		*modelName;
