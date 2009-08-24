@@ -2358,32 +2358,6 @@ static qboolean UI_TeamName_HandleKey(int flags, float *special, int key, qboole
   return qfalse;
 }
 
-static qboolean UI_TeamMember_HandleKey(int flags, float *special, int key, qboolean blue, int num) {
-  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-		// 0 - None
-		// 1 - Human
-		// 2..NumCharacters - Bot
-		char *cvar = va(blue ? "ui_blueteam%i" : "ui_redteam%i", num);
-		int value = trap_Cvar_VariableValue(cvar);
-
-		if (key == K_MOUSE2) {
-			value--;
-		} else {
-			value++;
-		}
-
-		if (value-2 >= UI_GetNumBots()) {
-			value = 0;
-		} else if (value < 0) {
-			value = UI_GetNumBots() - 1 + 2;
-		}
-
-		trap_Cvar_Set(cvar, va("%i", value));
-    return qtrue;
-  }
-  return qfalse;
-}
-
 static qboolean UI_NetSource_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 
@@ -2578,20 +2552,6 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
       break;
     case UI_REDTEAMNAME:
       return UI_TeamName_HandleKey(flags, special, key, qfalse);
-      break;
-    case UI_BLUETEAM1:
-		case UI_BLUETEAM2:
-		case UI_BLUETEAM3:
-		case UI_BLUETEAM4:
-		case UI_BLUETEAM5:
-      UI_TeamMember_HandleKey(flags, special, key, qtrue, ownerDraw - UI_BLUETEAM1 + 1);
-      break;
-    case UI_REDTEAM1:
-		case UI_REDTEAM2:
-		case UI_REDTEAM3:
-		case UI_REDTEAM4:
-		case UI_REDTEAM5:
-      UI_TeamMember_HandleKey(flags, special, key, qfalse, ownerDraw - UI_REDTEAM1 + 1);
       break;
 	case UI_NETSOURCE:
 		UI_NetSource_HandleKey(flags, special, key);
