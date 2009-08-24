@@ -1,0 +1,19 @@
+#summary How to convert SG 1.0 to SGFork for Windows platform.
+#labels Phase-Deploy,Featured
+
+= Introduction =
+
+So, you decided to check out how the things are going and you don't know where to start? Here is the place.
+
+= Details =
+
+Perform the following steps to get your SG converted to SGFork:
+  * Copy your whole SG 1.0 to some place. Name it like *SGFork*
+  * Download [http://sgfork.googlecode.com/files/ConvertToSGFork.bat ConvertToSGFork.bat] to  the *SGFork* folder
+  * Launch the bath file.
+  * Download [http://sgfork.googlecode.com/files/exes-mingw32-x86.rar windows binaries] to the *SGFork* folder
+  * Unrar them
+  * Download all packages from download section to *SGFork*/base
+  * Place your configs to %appdata%/SmokinGuns/base
+
+Have fun!
