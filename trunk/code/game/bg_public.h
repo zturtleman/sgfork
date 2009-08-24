@@ -24,112 +24,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // bg_public.h -- definitions shared by both the server game and client game modules
 
+#include "smokinguns.h"
+
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 #define	GAME_VERSION		"smokinguns-fork"
-
-#define ACTIVATE_RANGE 45
-
-#define	DEFAULT_GRAVITY		900
-#define	GIB_HEALTH			-40
-#define	ARMOR_PROTECTION	0.66
-
-#define	MAX_ITEMS			256
-
-#define	RANK_TIED_FLAG		0x4000
-
-//dynamite
-#define DYN_SPLASH_DAM			150
-#define DYN_SPLASH_RAD			200
-#define DYN_DAM					200
-
-// scope
-#define	SCOPE_TIME				400
-
-//molotov
-#define	MOLOTOV_BURNTIME		30000  // burning in hand
-#define	WHISKEY_BURNTIME		15000  // whiskey pool
-#define WHISKEY_SICKERTIME		60000  // time till whiskey sinks into the ground
-#define ALC_COUNT				8 // number of "sprotzs" of alcohol
-
-#define	MAX_DEATH_MESSAGES		4
-
-//boiler plate
-#define BOILER_PLATE 60
-
-#define	MAX_BULLET_DISTANCE		800
-
-#define DEFAULT_SHOTGUN_SPREAD	700
-#define DEFAULT_SHOTGUN_COUNT	11
-
-//gatling gun
-#define TRIPOD_TIME			750
-#define	STAGE_TIME			500
-
-#define GATLING_RANGE	20
-#define	GATLING_DOWN	23.0
-#define	GATLING_UP		23.0
-#define GATLING_SIDE	70.0
-
-// duel stats
-#define DU_INTRO_CAM		7000.0f
-#define DU_INTRO_DRAW		3000.0f
-#define	DU_CROSSHAIR_START	1500.0f
-#define DU_CROSSHAIR_FADE	4500.0f
-
-#define MEDAL_TIME 3000
-
-#define DU_WP_STEP			2
-
-#define DEFAULT_REDTEAM_NAME		"Lawmen"
-#define DEFAULT_BLUETEAM_NAME		"Outlaws"
-
-#define	FALLOFF_RANGE	150
-
-// total intro time of 10000
-
-/*
------------------------
-MONEY_SYSTEM-VALUES
-by Spoon
------------------------
-*/
-#define	START_MONEY				20.00
-#define MAX_MONEY				200.00
-#define	MIN_MONEY				20.00
-#define DU_MIN_MONEY			20.00
-#define SOCIAL_MONEY			28.00
-
-#define MAX_REWARD				"20"
-#define	LOSE_MONEY				7.00
-
-#define	ROUND_WIN_MONEY			"16"
-#define	ROUND_LOSE_MONEY		"10"
-
-//buy properties
-#define	BUY_TIME				60000
-
-//money-system end
-
-// Reward for player who rob the bank (added by Joe Kari)
-#define MAX_POINT_ROBBER_REWARD			5
-#define MIN_POINT_ROBBER_REWARD			0
-
-
-#define	ITEM_RADIUS			15		// item sizes are needed for client side pickup detection
-
-#define	LIGHTNING_RANGE		768
-
-#define	SCORE_NOT_PRESENT	-9999	// for the CS_SCORES[12] when only one player is present
-
-#define	VOTE_TIME			30000	// 30 seconds before vote times out
-
-#define	MINS_Z				-24
-#define MAXS_Z_HIT			38
-#define MAXS_Z				28
-#define	DEFAULT_VIEWHEIGHT	26
-#define CROUCH_VIEWHEIGHT	12
-#define	DEAD_VIEWHEIGHT		-16
 
 //
 // config strings are a general means of communicating variable length strings

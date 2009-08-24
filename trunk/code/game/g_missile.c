@@ -145,9 +145,9 @@ void G_InstantExplode(vec3_t orig, gentity_t *attacker) {
 	dynamite->r.ownerNum = attacker->s.number;
 	dynamite->parent = attacker;
 	//dynamite damage
-	dynamite->damage = 900 + rand()%200;
-	dynamite->splashDamage = 600 + rand()%200;
-	dynamite->splashRadius = 200 + rand()%50;
+	dynamite->damage = DYNA_DAMAGE;
+	dynamite->splashDamage = DYNA_SPLASHDAMAGE;
+	dynamite->splashRadius = DYNA_SPLASHRADIUS;
 	dynamite->methodOfDeath = MOD_DYNAMITE;
 	dynamite->splashMethodOfDeath = MOD_DYNAMITE;
 	dynamite->clipmask = MASK_SHOT;
@@ -733,7 +733,7 @@ gentity_t *fire_dynamite (gentity_t *self, vec3_t start, vec3_t dir, int speed) 
 		}
 
 		// Spoon
-		bolt->health = 5;
+		bolt->health = DYNA_HEALTH;
 		bolt->takedamage = qtrue;
         bolt->die = G_DynamiteDie;
 		bolt->r.contents = CONTENTS_CORPSE;
@@ -764,9 +764,9 @@ gentity_t *fire_dynamite (gentity_t *self, vec3_t start, vec3_t dir, int speed) 
 	bolt->s.otherEntityNum = self->s.number;
 //unlagged - projectile nudge
 	bolt->parent = self;
-	bolt->damage = 900 + rand()%200;
-	bolt->splashDamage = 600 + rand()%200;
-	bolt->splashRadius = 200 + rand()%50;
+	bolt->damage = DYNA_DAMAGE;
+	bolt->splashDamage = DYNA_SPLASHDAMAGE;
+	bolt->splashRadius = DYNA_SPLASHRADIUS;
 	bolt->methodOfDeath = MOD_DYNAMITE;
 	bolt->splashMethodOfDeath = MOD_DYNAMITE;
 	bolt->clipmask = MASK_SHOT;
@@ -800,9 +800,9 @@ gentity_t *fire_molotov (gentity_t *self, vec3_t start, vec3_t dir, int speed) {
 	bolt->s.otherEntityNum = self->s.number;
 //unlagged - projectile nudge
 	bolt->parent = self;
-	bolt->damage = 7;
-	bolt->splashDamage = 0;
-	bolt->splashRadius = 0;
+	bolt->damage = MOLOTOV_DAMAGE;
+	bolt->splashDamage = MOLOTOV_SPLASHDAMAGE;
+	bolt->splashRadius = MOLOTOV_SPLASHRADIUS;
 	bolt->methodOfDeath = MOD_MOLOTOV;
 	bolt->splashMethodOfDeath = MOD_MOLOTOV;
 	bolt->clipmask = MASK_SHOT;

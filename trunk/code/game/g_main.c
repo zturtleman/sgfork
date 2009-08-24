@@ -223,8 +223,8 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_dedicated, "dedicated", "0", 0, 0, qfalse  },
 
-	{ &g_speed, "g_speed", "200", 0, 0, qtrue  },
-	{ &g_gravity, "g_gravity", "900", 0, 0, qtrue  },
+	{ &g_speed, "g_speed", G_SPEED_DEF, 0, 0, qtrue  },
+	{ &g_gravity, "g_gravity", G_GRAVITY_DEF, 0, 0, qtrue  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue  },
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
 	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, 0, qtrue  },

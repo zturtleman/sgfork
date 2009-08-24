@@ -1073,12 +1073,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		case MOD_SAWEDOFF:
 		case MOD_WINCH97:
 			if(targ->health-take <= 0)
-				knockbackvalue = 500;
+				knockbackvalue = WINCH97_1_KSCALE;
 			else
-				knockbackvalue = 300;
+				knockbackvalue = WINCH97_2_KSCALE;
 			break;
 		case MOD_DYNAMITE:
-			knockbackvalue = 300;
+			knockbackvalue = DYNA_KSCALE;
 			break;
 		}
 
