@@ -2033,6 +2033,28 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 	ent->client->ps.stats[STAT_MONEY] -= prize;
 }
 
+void Cmd_Timeout( gentity_t *ent, qboolean timeout )
+{
+  level_team_t *team = FindLevelTeam( ent->client->sess.sessionTeam );
+
+  if( !team )
+  {
+    trap_SendServerCommand( ent->client->ps.clientNum, 
+        "print \"You can't execute this command in that team.\n\"" );
+    return;
+  }
+
+  if( team->numTimeouts > g_Timeouts.integer )
+    trap_SendServerCommand( ent->client->ps.clientNum, 
+        "print \"Your team has reached max usage of /timeout command.\n\"" ); 
+  else
+  {
+    level.paused = qtrue;
+    level.timeTimeout = level.time;
+    team->numTimeouts++;
+  }
+}
+
 /*
 =================
 ClientCommand
@@ -2113,6 +2135,10 @@ void ClientCommand( int clientNum ) {
 		Cmd_Stats_f( ent );
 	else if (Q_stricmp (cmd, "dropweapon") == 0)
 		Cmd_DropWeapon_f( ent, 0 );
+  else if( !Q_stricmp( cmd, "timeout" ) )
+    Cmd_Timeout( ent, qtrue );
+  else if( !Q_stricmp( cmd, "timein" ) )
+    Cmd_Timeout( ent, qfalse );
 	else if (Q_stricmp(cmd, "buy" ) == 0)
 		Cmd_BuyItem_f (ent, qfalse);
 	else if (Q_stricmp(cmd, "cg_buy" ) == 0)
