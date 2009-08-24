@@ -27,18 +27,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_public.h"
 
-vec3_t	playerMins = {-14, -14, MINS_Z};
-vec3_t	playerMaxs = {14, 14, MAXS_Z};
+vec3_t playerMins = {PLAYER_MIN_PITCH, PLAYER_MIN_YAW, MINS_Z};
+vec3_t playerMaxs = {PLAYER_MAX_PITCH, PLAYER_MAX_YAW, MAXS_Z};
 
-vec3_t	playerMins_hit = {-25, -25, MINS_Z};
-vec3_t	playerMaxs_hit = {25, 25, MAXS_Z_HIT};
+vec3_t playerMins_hit = {PLAYER_MIN_HIT_PITCH, PLAYER_MIN_HIT_YAW, MINS_Z};
+vec3_t playerMaxs_hit = {PLAYER_MAX_HIT_PITCH, PLAYER_MAX_HIT_YAW, MAXS_Z_HIT};
 
-vec3_t gatling_mins = {-3, -3, 0.0};
-vec3_t gatling_maxs = {3, 3, 35};
+vec3_t gatling_mins = {GATLING_MINS_PITCH, GATLING_MINS_YAW, GATLING_MINS_ROLL};
+vec3_t gatling_maxs = {GATLING_MAXS_PITCH, GATLING_MAXS_YAW, GATLING_MAXS_ROLL};
+
 // Tequila comment: mins2/max2 are now used to check player is not trying to
 // build the gatling too near a solid or another entity (like gatlings ;))
-vec3_t gatling_mins2 = {-20, -20, 0.0};
-vec3_t gatling_maxs2 = {20, 20, 35};
+vec3_t gatling_mins2 = {GATLING_MINS2_PITCH, GATLING_MINS2_YAW, GATLING_MINS2_ROLL};
+vec3_t gatling_maxs2 = {GATLING_MAXS2_PITCH, GATLING_MAXS2_YAW, GATLING_MAXS2_ROLL};
 
 //weapon informations
 wpinfo_t bg_weaponlist[] =
@@ -240,14 +241,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		0, //spread
-		50, //damage
-		2000, //range
-		-7*20, //addTime
-		(52-42)*40, //count
-		-1, //clipAmmo
-		0, //clip
-		10, //maxAmmo
+    KNIFE_SPREAD, //spread
+    KNIFE_DAMAGE, //damage
+    KNIFE_RANGE, //range
+    KNIFE_ADDTIME, //addTime
+    KNIFE_COUNT, //count
+    KNIFE_CLIPAMMO, //clipAmmo
+    KNIFE_CLIP, //clip
+    KNIFE_MAXAMMO, //maxAmmo
 
 		"models/weapons2/knife/v_knife.md3", //v_model
 		0, //v_barrel
@@ -347,14 +348,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		300.0f, //spread
-		23.0f, //damage
-		600, //range
-		-6*30, //addTime
-		0, //count
-		6, //clipAmmo
-		WP_BULLETS_CLIP, //clip
-		24, //maxAmmo
+		REM58_SPREAD, //spread
+		REM58_DAMAGE, //damage
+		REM58_RANGE, //range
+		REM58_ADDTIME, //addTime
+		REM58_COUNT, //count
+		REM58_CLIPAMMO, //clipAmmo
+		REM58_CLIP, //clip
+		REM58_MAXAMMO, //maxAmmo
 
 		"models/weapons2/remington58/v_remington58.md3", //v_model
 		0, //v_barrel
@@ -454,14 +455,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		350.0f, //spread
-		30.0f, //damage
-		600, //range
-		-7*30, //addTime
-		0, //count
-		6, //clipAmmo
-		WP_BULLETS_CLIP, //clip
-		24, //maxAmmo
+		SCHOFIELD_SPREAD, //spread
+		SCHOFIELD_DAMAGE, //damage
+		SCHOFIELD_RANGE, //range
+		SCHOFIELD_ADDTIME, //addTime
+		SCHOFIELD_COUNT, //count
+		SCHOFIELD_CLIPAMMO, //clipAmmo
+		SCHOFIELD_CLIP, //clip
+		SCHOFIELD_MAXAMMO, //maxAmmo
 
 		"models/weapons2/schofield/v_schofield.md3", //v_model
 		0, //v_barrel
@@ -561,14 +562,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		300.0f, //spread
-		38.0f, //damage
-		750, //range
-		-6*30, //addTime
-		0, //count
-		6, //clipAmmo
-		WP_BULLETS_CLIP, //clip
-		24, //maxAmmo
+		PEACEMAKER_SPREAD, //spread
+		PEACEMAKER_DAMAGE, //damage
+		PEACEMAKER_RANGE, //range
+		PEACEMAKER_ADDTIME, //addTime
+		PEACEMAKER_COUNT, //count
+		PEACEMAKER_CLIPAMMO, //clipAmmo
+		PEACEMAKER_CLIP, //clip
+		PEACEMAKER_MAXAMMO, //maxAmmo
 
 		"models/weapons2/peacemaker/v_peacemaker.md3", //v_model
 		0, //v_barrel
@@ -668,14 +669,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		250.0f, //spread
-		44.0f, //damage
-		1050, //range
-		0, //addTime
-		0, //count
-		12, //clipAmmo
-		WP_CART_CLIP, //clip
-		12, //maxAmmo
+		WINCHESTER66_SPREAD, //spread
+		WINCHESTER66_DAMAGE, //damage
+		WINCHESTER66_RANGE, //range
+		WINCHESTER66_ADDTIME, //addTime
+		WINCHESTER66_COUNT, //count
+		WINCHESTER66_CLIPAMMO, //clipAmmo
+		WINCHESTER66_CLIP, //clip
+		WINCHESTER66_MAXAMMO, //maxAmmo
 
 		"models/weapons2/winch66/v_winchester66.md3", //v_model
 		0, //v_barrel
@@ -775,14 +776,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		275.0f, //spread
-		44.0f, //damage
-		1050, //range
-		0, //addTime
-		0, //count
-		12, //clipAmmo
-		WP_CART_CLIP, //clip
-		12, //maxAmmo
+		LIGHTNING_SPREAD, //spread
+		LIGHTNING_DAMAGE, //damage
+		_LIGHTNING_RANGE, //range
+		LIGHTNING_ADDTIME, //addTime
+		LIGHTNING_COUNT, //count
+		LIGHTNING_CLIPAMMO, //clipAmmo
+		LIGHTNING_CLIP, //clip
+		LIGHTNING_MAXAMMO, //maxAmmo
 
 		"models/weapons2/colt_light/v_lightning.md3", //v_model
 		0, //v_barrel
@@ -883,14 +884,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			},
 		},
-		100, //spread
-		65.0f, //damage
-		1500, //range
-		0, //addTime
-		0, //count
-		1, //clipAmmo
-		WP_SHARPS_CLIP, //clip
-		12, //maxAmmo
+		SHARP_SPREAD, //spread
+		SHARP_DAMAGE, //damage
+		SHARP_RANGE, //range
+		SHARP_ADDTIME, //addTime
+		SHARP_COUNT, //count
+		SHARP_CLIPAMMO, //clipAmmo
+		SHARP_CLIP, //clip
+		SHARP_MAXAMMO, //maxAmmo
 
 		"models/weapons2/sharps/v_sharps.md3", //v_model
 		0, //v_barrel
@@ -990,14 +991,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		450.0f, //spread
-		17.0f, //damage
-		800, //range
-		200, //addTime
-		6, //count
-		2, //clipAmmo
-		WP_SHELLS_CLIP, //clip
-		12, //maxAmmo
+		REMINGTON_GAUGE_SPREAD, //spread
+		REMINGTON_GAUGE_DAMAGE, //damage
+		REMINGTON_GAUGE_RANGE, //range
+		REMINGTON_GAUGE_ADDTIME, //addTime
+		REMINGTON_GAUGE_COUNT, //count
+		REMINGTON_GAUGE_CLIPAMMO, //clipAmmo
+		REMINGTON_GAUGE_CLIP, //clip
+		REMINGTON_GAUGE_MAXAMMO, //maxAmmo
 
 		"models/weapons2/remgauge/v_remgauge.md3", //v_model
 		0, //v_barrel
@@ -1097,14 +1098,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		1300.0f, //spread
-		15.3f, //damage
-		600, //range
-		0, //addTime
-		14, //count
-		2, //clipAmmo
-		WP_SHELLS_CLIP, //clip
-		12, //maxAmmo
+		SAWEDOFF_SPREAD, //spread
+		SAWEDOFF_DAMAGE, //damage
+		SAWEDOFF_RANGE, //range
+		SAWEDOFF_ADDTIME, //addTime
+		SAWEDOFF_COUNT, //count
+		SAWEDOFF_CLIPAMMO, //clipAmmo
+		SAWEDOFF_CLIP, //clip
+		SAWEDOFF_MAXAMMO, //maxAmmo
 
 		"models/weapons2/sawedoff/v_sawedoff.md3", //v_model
 		0, //v_barrel
@@ -1205,14 +1206,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		300.0f, //spread
-		11.25f, //damage
-		800, //range
-		0, //addTime
-		6, //count
-		5, //clipAmmo
-		WP_SHELLS_CLIP, //clip
-		12, //maxAmmo
+		WINCH97_SPREAD, //spread
+		WINCH97_DAMAGE, //damage
+		WINCH97_RANGE, //range
+		WINCH97_ADDTIME, //addTime
+		WINCH97_COUNT, //count
+		WINCH97_CLIPAMMO, //clipAmmo
+		WINCH97_CLIP, //clip
+		WINCH97_MAXAMMO, //maxAmmo
 
 		"models/weapons2/winch97/v_winch97.md3", //v_model
 		0, //v_barrel
@@ -1313,14 +1314,14 @@ wpinfo_t bg_weaponlist[] =
 				0 //flipflop
 			}
 		},
-		125, //spread
-		44, //damage
-		1350, //range
-		200, //addTime
-		0, //count
-		25, //clipAmmo
-		WP_GATLING_CLIP, //clip
-		2, //maxAmmo
+		GATLING_SPREAD, //spread
+		GATLING_DAMAGE, //damage
+		_GATLING_RANGE, //range
+		GATLING_ADDTIME, //addTime
+		GATLING_COUNT, //count
+		GATLING_CLIPAMMO, //clipAmmo
+		GATLING_CLIP, //clip
+		GATLING_MAXAMMO, //maxAmmo
 
 		"models/weapons2/gatling/v_gatling.md3", //v_model
 		0, //v_barrel

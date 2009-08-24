@@ -953,7 +953,7 @@ void weapon_grenadelauncher_fire (gentity_t *ent) {
 
 	} while(tr.startsolid);
 
-	m = fire_dynamite (ent, muzzle, forward, 700);
+	m = fire_dynamite (ent, muzzle, forward, DYNA_SPEED);
 }
 
 /*
@@ -987,7 +987,7 @@ void weapon_molotov_fire (gentity_t *ent) {
 
 	} while(tr.startsolid);
 
-	m = fire_molotov (ent, muzzle, forward, 700);
+	m = fire_molotov (ent, muzzle, forward, MOLOTOV_SPEED);
 }
 
 //======================================================================
