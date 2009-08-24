@@ -50,13 +50,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // Prototypes
 
-int OtherTeam(int team);
-const char *TeamName(int team);
-const char *OtherTeamName(int team);
-const char *TeamColorString(int team);
-void AddTeamScore(vec3_t origin, int team, int score);
-
-void Team_InitGame(void);
 void Team_FreeEntity(gentity_t *ent);
 gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, int mappart );
 gentity_t *Team_GetLocation(gentity_t *ent);

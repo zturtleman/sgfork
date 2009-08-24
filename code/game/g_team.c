@@ -40,57 +40,6 @@ typedef struct teamgame_s {
 
 teamgame_t teamgame;
 
-gentity_t	*neutralObelisk;
-
-void Team_SetFlagStatus( int team, flagStatus_t status );
-
-void Team_InitGame( void ) {
-	memset(&teamgame, 0, sizeof teamgame);
-
-	switch( g_gametype.integer ) {
-	default:
-		break;
-	}
-}
-
-int OtherTeam(int team) {
-	if (team==TEAM_RED)
-		return TEAM_BLUE;
-	else if (team==TEAM_BLUE)
-		return TEAM_RED;
-	return team;
-}
-
-const char *TeamName(int team)  {
-	if (team==TEAM_RED)
-		return g_redteam.string;
-	else if (team==TEAM_BLUE)
-		return g_blueteam.string;
-	else if (team>=TEAM_SPECTATOR)
-		return "SPECTATOR";
-	return "FREE";
-}
-
-const char *OtherTeamName(int team) {
-	if (team==TEAM_RED)
-		return g_blueteam.string;
-	else if (team==TEAM_BLUE)
-		return g_redteam.string;
-	else if (team>=TEAM_SPECTATOR)
-		return "SPECTATOR";
-	return "FREE";
-}
-
-const char *TeamColorString(int team) {
-	if (team==TEAM_RED)
-		return S_COLOR_RED;
-	else if (team==TEAM_BLUE)
-		return S_COLOR_BLUE;
-	else if (team==TEAM_SPECTATOR)
-		return S_COLOR_YELLOW;
-	return S_COLOR_WHITE;
-}
-
 // NULL for everyone
 void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 	char		msg[1024];
@@ -108,53 +57,6 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 		*p = '\'';
 
 	trap_SendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
-}
-
-/*
-==============
-AddTeamScore
-
- used for gametype > GT_TEAM
- for gametype GT_TEAM the level.teamScores is updated in AddScore in g_combat.c
-==============
-*/
-void AddTeamScore(vec3_t origin, int team, int score) {
-	gentity_t	*te;
-
-	te = G_TempEntity(origin, EV_GLOBAL_TEAM_SOUND );
-	te->r.svFlags |= SVF_BROADCAST;
-
-	if ( team == TEAM_RED ) {
-		if ( level.teamScores[ TEAM_RED ] + score == level.teamScores[ TEAM_BLUE ] ) {
-			//teams are tied sound
-			te->s.eventParm = GTS_TEAMS_ARE_TIED;
-		}
-		else if ( level.teamScores[ TEAM_RED ] <= level.teamScores[ TEAM_BLUE ] &&
-					level.teamScores[ TEAM_RED ] + score > level.teamScores[ TEAM_BLUE ]) {
-			// red took the lead sound
-			te->s.eventParm = GTS_REDTEAM_TOOK_LEAD;
-		}
-		else {
-			// red scored sound
-			te->s.eventParm = GTS_REDTEAM_SCORED;
-		}
-	}
-	else {
-		if ( level.teamScores[ TEAM_BLUE ] + score == level.teamScores[ TEAM_RED ] ) {
-			//teams are tied sound
-			te->s.eventParm = GTS_TEAMS_ARE_TIED;
-		}
-		else if ( level.teamScores[ TEAM_BLUE ] <= level.teamScores[ TEAM_RED ] &&
-					level.teamScores[ TEAM_BLUE ] + score > level.teamScores[ TEAM_RED ]) {
-			// blue took the lead sound
-			te->s.eventParm = GTS_BLUETEAM_TOOK_LEAD;
-		}
-		else {
-			// blue scored sound
-			te->s.eventParm = GTS_BLUETEAM_SCORED;
-		}
-	}
-	level.teamScores[ team ] += score;
 }
 
 /*

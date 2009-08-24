@@ -106,7 +106,6 @@ extern vmCvar_t	ui_joinGameType;
 extern vmCvar_t	ui_netSource;
 extern vmCvar_t	ui_serverFilterType;
 extern vmCvar_t	ui_dedicated;
-extern vmCvar_t	ui_opponentName;
 extern vmCvar_t	ui_menuFiles;
 extern vmCvar_t	ui_currentTier;
 extern vmCvar_t	ui_currentMap;
