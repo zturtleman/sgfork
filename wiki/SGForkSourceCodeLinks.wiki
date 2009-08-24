@@ -8,7 +8,7 @@ Here you may found some useful links to look at when you develop improvements fo
 
 So, here they are:
   * *The biggest Q3 source coding tutorials repository* [http://www.quake3hut.co.uk/q3coding/ Repository]
-  * *IdStuff FTP* [ftp://ftp.idsoftware.com/idstuff/ Id stuff]
+  * *IdStuff* FTP [ftp://ftp.idsoftware.com/idstuff/ Id stuff]
   * *ioQuake3* [http://ioquake.org/ ioQuake3]
   * [http://www.quaketweaks.com/files.html quaketweaks]
   * [https://opensvn.csie.org/wopcompmod/ World of Packman competition mod]
