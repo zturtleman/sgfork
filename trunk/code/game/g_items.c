@@ -600,17 +600,6 @@ void FinishSpawningItem( gentity_t *ent ) {
 qboolean	itemRegistered[MAX_ITEMS];
 
 /*
-==================
-G_CheckTeamItems
-==================
-*/
-void G_CheckTeamItems( void ) {
-
-	// Set up team stuff
-	Team_InitGame();
-}
-
-/*
 ==============
 ClearRegisteredItems
 ==============

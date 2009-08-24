@@ -591,7 +591,6 @@ void ChaseCam_Change( gentity_t *ent );
 //
 // g_items.c
 //
-void G_CheckTeamItems( void );
 void G_RunItem( gentity_t *ent );
 void RespawnItem( gentity_t *ent );
 
