@@ -53,10 +53,6 @@ int			g_roundstarttime;
 
 int			g_session;
 
-
-
-int		g_humancount;	// human connected (playing or spectating)
-
 vmCvar_t	g_moneyRespawn;
 
 // bank robbery
@@ -1013,7 +1009,6 @@ void CalculateRanks( void ) {
 	int		rank;
 	int		score;
 	int		newScore;
-	int		humancount;
 	gclient_t	*cl;
 
 	level.follow1 = -1;
@@ -1022,7 +1017,6 @@ void CalculateRanks( void ) {
 	level.numNonSpectatorClients = 0;
 	level.numPlayingClients = 0;
 	level.numVotingClients = 0;		// don't count bots
-	humancount = 0;
 	for ( i = 0; i < TEAM_NUM_TEAMS; i++ ) {
 		level.numteamVotingClients[i] = 0;
 	}
@@ -1030,8 +1024,6 @@ void CalculateRanks( void ) {
 		if ( level.clients[i].pers.connected != CON_DISCONNECTED ) {
 			level.sortedClients[level.numConnectedClients] = i;
 			level.numConnectedClients++;
-
-			if ( !(g_entities[i].r.svFlags & SVF_BOT) )  humancount ++;
 
 			if ( level.clients[i].sess.sessionTeam != TEAM_SPECTATOR ||
 				(level.clients[i].sess.sessionTeam == TEAM_SPECTATOR &&
@@ -1120,7 +1112,6 @@ void CalculateRanks( void ) {
 	if ( level.intermissiontime ) {
 		SendScoreboardMessageToAllClients();
 	}
-	g_humancount = humancount ;
 }
 
 
