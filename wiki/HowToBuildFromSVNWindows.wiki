@@ -1,0 +1,46 @@
+#summary How to build SGFork from SVN under Windows platform.
+
+= Introduction =
+
+So you want to get latest SGFork without waiting developers to put it on download section (or you are a tester ;)).
+*Be aware that latest SVN version could be possible broken! Don't create new issues about it. If you want to ask developers about it - use IRC channel.*
+
+= Getting source code =
+
+So, you need to do the following to get the latest source code from SVN:
+  * Download and install [http://tortoisesvn.net/downloads TortoiseSVN] (it will require reboot, don't forget to do it)
+  * Create a folder and name it like *sgfork_source*
+  * Right click on *sgfork_source* and choose _"SVN Checkout"_ from context menu
+  * Go to our [http://code.google.com/p/sgfork/source/checkout checkout page]. Find our address to for checkout (http://sgfork.googlecode.com/svn/trunk/) and copy it to Tortoise checkout window.
+  * Wait while whole source code will be downloaded to you.
+
+= Updating source code =
+
+Now each time when there are some updates to code, you'll have to do only _"SVN Update"_ from context menu on your *sgfork_source* folder.
+
+= Building source code with MinGW =
+
+  * Download and install [http://downloads.sourceforge.net/mingw/MinGW-5.1.4.exe MinGW]
+  * Download and install [http://downloads.sourceforge.net/mingw/MSYS-1.0.10.exe Msys]
+  * MinGW is your compiler and linker. Msys is command line tool.
+ 
+= Building source code with MinGW =
+
+  * To build source code you use Msys
+  * Launch Msys
+  * cd to your *sgfork_source* folder
+  * type: make
+  * In your *sgfork_source*/build/release-mingw32-x86 will be put all output.
+  * Binaries will be put here: *sgfork_source*/build/release-mingw32-x86
+  * QVMs will be put here: *sgfork_source*/build/release-mingw32-x86/smokinguns/vm
+
+= Building source code with MS Visual Studio Express 2008 =
+  * Get MS Visual Studio Express from Microsoft site [http://www.microsoft.com/express/download/]
+  * Install it.
+  * Launch and open the project solution file: *sgfork_source*\misc\msvc\sg.sln
+  * Build it with MSVC
+  * Binaries will be put here: *sgfork_source*\build\sg_release
+  * There won't be any QVMs. Only DLLs.
+  * To build QVMs manually use the bath tool: *sgfork_source*\misc\win32\buildvm.bat
+
+Have fun!
