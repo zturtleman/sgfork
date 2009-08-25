@@ -15,5 +15,6 @@ Perform the following steps to get your SG converted to SGFork:
   * Unrar them
   * Download all packages from download section to *SGFork*/base
   * Place your configs to %appdata%/SmokinGuns/base
+  * Download [http://sgfork.googlecode.com/files/SDL.dll Fixed SDL] to the *SGFork* folder
 
 Have fun!
