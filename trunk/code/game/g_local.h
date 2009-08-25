@@ -256,11 +256,6 @@ typedef struct {
 	float		lastfraggedcarrier;
 } playerTeamState_t;
 
-typedef struct level_team_s {
-  int numTimeouts;
-  int numPlayers;
-} level_team_t;
-
 // the auto following clients don't follow a specific client
 // number, but instead follow the first two active players
 #define	FOLLOW_ACTIVE1	-1
@@ -544,12 +539,6 @@ typedef struct {
 	int			numSpawnVarChars;
 	char		spawnVarChars[MAX_SPAWN_VARS_CHARS];
 
-  level_team_t  team_r; //red
-  level_team_t  team_b; //blue
-
-  qboolean   paused;
-  int     timeTimeout;
-
 	// intermission state
 	int			intermissionQueued;		// intermission was qualified, but
 										// wait INTERMISSION_DELAY_TIME before
@@ -808,7 +797,6 @@ int G_AnimLength( int anim, int weapon);
 //
 // g_team.c
 //
-level_team_t *FindLevelTeam( team_t team );
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 void Team_CheckDroppedItem( gentity_t *dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
@@ -910,9 +898,6 @@ extern	vmCvar_t	g_weaponRespawn;
 extern	vmCvar_t	g_weaponTeamRespawn;
 extern	vmCvar_t	g_synchronousClients;
 extern	vmCvar_t	g_motd;
-extern  vmCvar_t  g_Timeouts;
-extern  vmCvar_t  g_timeout_time;
-extern  vmCvar_t  g_timeout_timeinDelay;
 extern	vmCvar_t	g_warmup;
 extern	vmCvar_t	g_doWarmup;
 extern	vmCvar_t	g_blood;
