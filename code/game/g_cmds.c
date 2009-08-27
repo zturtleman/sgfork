@@ -2033,6 +2033,31 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 	ent->client->ps.stats[STAT_MONEY] -= prize;
 }
 
+void Cmd_PrivateMessage( gentity_t *ent )
+{
+  gentity_t *dest;
+  int argc = trap_Argc( );
+  char buf[30];
+  char args[255];
+  int i;
+
+  trap_Argv( 1, buf, sizeof(buf) );
+  dest = &g_entities[ atoi(buf) ];
+  Com_sprintf( buf, sizeof(buf), "" );
+
+  for( i=2; i <= trap_Argc( ); i++ )
+  {
+    trap_Argv( i, buf, sizeof( buf ) );
+    Q_strcat( args, sizeof(args), " " );
+    Q_strcat( args, sizeof(args), buf );
+  }
+
+  trap_SendServerCommand( dest->client->ps.clientNum,
+      va( "print \"%s (prv): ^6%s\n\"", ent->client->pers.netname, args ) );
+  G_LogPrintf( "Private Message: %s to %s: %s", ent->client->pers.netname,
+      dest->client->pers.netname, args );
+}
+
 /*
 =================
 ClientCommand
@@ -2113,6 +2138,8 @@ void ClientCommand( int clientNum ) {
 		Cmd_Stats_f( ent );
 	else if (Q_stricmp (cmd, "dropweapon") == 0)
 		Cmd_DropWeapon_f( ent, 0 );
+  else if( !Q_stricmp( cmd, "mp" ) )
+    Cmd_PrivateMessage( ent );
 	else if (Q_stricmp(cmd, "buy" ) == 0)
 		Cmd_BuyItem_f (ent, qfalse);
 	else if (Q_stricmp(cmd, "cg_buy" ) == 0)
