@@ -1206,7 +1206,26 @@ static void UI_DrawPreviewCinematic(rectDef_t *rect, float scale, vec4_t color) 
 
 }
 
+static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboolean blue, int num, int textStyle) {
+	// 0 - None
+	// 1 - Human
+	// 2..NumCharacters - Bot
+	int value = trap_Cvar_VariableValue(va(blue ? "ui_blueteam%i" : "ui_redteam%i", num));
+	const char *text;
+	if (value <= 0) {
+		text = "Closed";
+	} else if (value == 1) {
+		text = "Human";
+	} else {
+		value -= 2;
 
+		if (value >= UI_GetNumBots()) {
+			value = 0;
+		}
+		text = UI_GetBotNameByNumber(value);
+	}
+  Text_Paint(rect->x, rect->y, scale, color, text, 0, 0, textStyle);
+}
 
 static void UI_DrawSkill(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
   int i;
@@ -1986,6 +2005,20 @@ static void UI_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, fl
 		case UI_TIER_MAPNAME:
 			UI_DrawTierMapName(&rect, scale, color, textStyle);
 			break;
+		case UI_BLUETEAM1:
+			case UI_BLUETEAM2:
+			case UI_BLUETEAM3:
+			case UI_BLUETEAM4:
+			case UI_BLUETEAM5:
+		  UI_DrawTeamMember(&rect, scale, color, qtrue, ownerDraw - UI_BLUETEAM1 + 1, textStyle);
+		  break;
+		case UI_REDTEAM1:
+			case UI_REDTEAM2:
+			case UI_REDTEAM3:
+			case UI_REDTEAM4:
+			case UI_REDTEAM5:
+		  UI_DrawTeamMember(&rect, scale, color, qfalse, ownerDraw - UI_REDTEAM1 + 1, textStyle);
+		  break;
 		case UI_ALLMAPS_SELECTION:
 			UI_DrawAllMapsSelection(&rect, scale, color, textStyle, qtrue);
 			break;
@@ -2358,6 +2391,32 @@ static qboolean UI_TeamName_HandleKey(int flags, float *special, int key, qboole
   return qfalse;
 }
 
+static qboolean UI_TeamMember_HandleKey(int flags, float *special, int key, qboolean blue, int num) {		
+	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {		
+		// 0 - None		
+		// 1 - Human		
+		// 2..NumCharacters - Bot		
+		char *cvar = va(blue ? "ui_blueteam%i" : "ui_redteam%i", num);		
+		int value = trap_Cvar_VariableValue(cvar);		
+		
+		if (key == K_MOUSE2) {		
+			value--;		
+		} else {		
+			value++;		
+		}		
+		
+		if (value-2 >= UI_GetNumBots()) {		
+			value = 0;		
+		} else if (value < 0) {		
+			value = UI_GetNumBots() - 1 + 2;		
+		}		
+	
+		trap_Cvar_Set(cvar, va("%i", value));		
+		return qtrue;		
+	  }		
+	return qfalse;		
+}
+
 static qboolean UI_NetSource_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 
@@ -2553,6 +2612,20 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
     case UI_REDTEAMNAME:
       return UI_TeamName_HandleKey(flags, special, key, qfalse);
       break;
+    case UI_BLUETEAM1:		
+		case UI_BLUETEAM2:		
+		case UI_BLUETEAM3:		
+		case UI_BLUETEAM4:		
+		case UI_BLUETEAM5:		
+		  UI_TeamMember_HandleKey(flags, special, key, qtrue, ownerDraw - UI_BLUETEAM1 + 1);		
+		  break;		
+    case UI_REDTEAM1:		
+		case UI_REDTEAM2:		
+		case UI_REDTEAM3:		
+		case UI_REDTEAM4:		
+		case UI_REDTEAM5:		
+	      UI_TeamMember_HandleKey(flags, special, key, qfalse, ownerDraw - UI_REDTEAM1 + 1);		
+	      break;
 	case UI_NETSOURCE:
 		UI_NetSource_HandleKey(flags, special, key);
 		break;
