@@ -1175,37 +1175,6 @@ static void UI_DrawJoinGameType(rectDef_t *rect, float scale, vec4_t color, int 
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.joinGameTypes[ui_joinGameType.integer].gameType , 0, 0, textStyle);
 }
 
-
-
-static int UI_TeamIndexFromName(const char *name) {
-  int i;
-
-  if (name && *name) {
-    for (i = 0; i < uiInfo.teamCount; i++) {
-      if (Q_stricmp(name, uiInfo.teamList[i].teamName) == 0) {
-        return i;
-      }
-    }
-  }
-
-  return 0;
-
-}
-
-static void UI_DrawPreviewCinematic(rectDef_t *rect, float scale, vec4_t color) {
-	if (uiInfo.previewMovie > -2) {
-		uiInfo.previewMovie = trap_CIN_PlayCinematic(va("%s.roq", uiInfo.movieList[uiInfo.movieIndex]), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
-		if (uiInfo.previewMovie >= 0) {
-		  trap_CIN_RunCinematic(uiInfo.previewMovie);
-			trap_CIN_SetExtents(uiInfo.previewMovie, rect->x, rect->y, rect->w, rect->h);
- 			trap_CIN_DrawCinematic(uiInfo.previewMovie);
-		} else {
-			uiInfo.previewMovie = -2;
-		}
-	}
-
-}
-
 static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboolean blue, int num, int textStyle) {
 	// 0 - None
 	// 1 - Human
@@ -1259,56 +1228,6 @@ static void UI_DrawMapPreview(rectDef_t *rect, float scale, vec4_t color, qboole
 		UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, trap_R_RegisterShaderNoMip("ui/bg/main"));
 	}
 }
-
-
-static void UI_DrawMapTimeToBeat(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
-	int minutes, seconds, time;
-	if (ui_currentMap.integer < 0 || ui_currentMap.integer > uiInfo.mapCount) {
-		ui_currentMap.integer = 0;
-		trap_Cvar_Set("ui_currentMap", "0");
-	}
-
-	time = uiInfo.mapList[ui_currentMap.integer].timeToBeat[uiInfo.gameTypes[ui_gameType.integer].gtEnum];
-
-	minutes = time / 60;
-	seconds = time % 60;
-
-  Text_Paint(rect->x, rect->y, scale, color, va("%02i:%02i", minutes, seconds), 0, 0, textStyle);
-}
-
-
-
-static void UI_DrawMapCinematic(rectDef_t *rect, float scale, vec4_t color, qboolean net) {
-
-	int map = (net) ? ui_currentNetMap.integer : ui_currentMap.integer;
-	if (map < 0 || map > uiInfo.mapCount) {
-		if (net) {
-			ui_currentNetMap.integer = 0;
-			trap_Cvar_Set("ui_currentNetMap", "0");
-		} else {
-			ui_currentMap.integer = 0;
-			trap_Cvar_Set("ui_currentMap", "0");
-		}
-		map = 0;
-	}
-
-	if (uiInfo.mapList[map].cinematic >= -1) {
-		if (uiInfo.mapList[map].cinematic == -1) {
-			uiInfo.mapList[map].cinematic = trap_CIN_PlayCinematic(va("%s.roq", uiInfo.mapList[map].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
-		}
-		if (uiInfo.mapList[map].cinematic >= 0) {
-		  trap_CIN_RunCinematic(uiInfo.mapList[map].cinematic);
-		  trap_CIN_SetExtents(uiInfo.mapList[map].cinematic, rect->x, rect->y, rect->w, rect->h);
- 			trap_CIN_DrawCinematic(uiInfo.mapList[map].cinematic);
-		} else {
-			uiInfo.mapList[map].cinematic = -2;
-		}
-	} else {
-		UI_DrawMapPreview(rect, scale, color, net);
-	}
-}
-
-
 
 static qboolean updateModel = qtrue;
 static qboolean q3Model = qfalse;
@@ -1540,18 +1459,6 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 				}
 			  s = skillLevels[i-1];
       break;
-    case UI_BLUETEAMNAME:
-			  i = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_blueTeam"));
-			  if (i >= 0 && i < uiInfo.teamCount) {
-			    s = va("%s: %s", "Blue", uiInfo.teamList[i].teamName);
-			  }
-      break;
-    case UI_REDTEAMNAME:
-			  i = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_redTeam"));
-			  if (i >= 0 && i < uiInfo.teamCount) {
-			    s = va("%s: %s", "Red", uiInfo.teamList[i].teamName);
-			  }
-      break;
     case UI_BLUETEAM1:
 		case UI_BLUETEAM2:
 		case UI_BLUETEAM3:
@@ -1629,8 +1536,6 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 		case UI_TIER_MAPNAME:
 			break;
 		case UI_ALLMAPS_SELECTION:
-			break;
-		case UI_OPPONENT_NAME:
 			break;
 		case UI_KEYBINDSTATUS:
 			if (Display_KeyBindPending()) {
@@ -1913,9 +1818,6 @@ static void UI_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, fl
     case UI_CLANNAME:
       UI_DrawClanName(&rect, scale, color, textStyle);
       break;
-    case UI_PREVIEWCINEMATIC:
-      UI_DrawPreviewCinematic(&rect, scale, color);
-      break;
     case UI_GAMETYPE:
       UI_DrawGameType(&rect, scale, color, textStyle);
       break;
@@ -1927,15 +1829,6 @@ static void UI_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, fl
 	  break;
     case UI_MAPPREVIEW:
       UI_DrawMapPreview(&rect, scale, color, qtrue);
-      break;
-    case UI_MAP_TIMETOBEAT:
-      UI_DrawMapTimeToBeat(&rect, scale, color, textStyle);
-      break;
-    case UI_MAPCINEMATIC:
-      UI_DrawMapCinematic(&rect, scale, color, qfalse);
-      break;
-    case UI_STARTMAPCINEMATIC:
-      UI_DrawMapCinematic(&rect, scale, color, qtrue);
       break;
     case UI_SKILL:
       UI_DrawSkill(&rect, scale, color, textStyle);
@@ -2221,31 +2114,6 @@ static qboolean UI_Effects_HandleKey(int flags, float *special, int key) {
   return qfalse;
 }
 
-static qboolean UI_ClanName_HandleKey(int flags, float *special, int key) {
-  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-    int i;
-    i = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_teamName"));
-		if (uiInfo.teamList[i].cinematic >= 0) {
-		  trap_CIN_StopCinematic(uiInfo.teamList[i].cinematic);
-			uiInfo.teamList[i].cinematic = -1;
-		}
-		if (key == K_MOUSE2) {
-	    i--;
-		} else {
-	    i++;
-		}
-    if (i >= uiInfo.teamCount) {
-      i = 0;
-    } else if (i < 0) {
-			i = uiInfo.teamCount - 1;
-		}
-  	trap_Cvar_Set( "ui_teamName", uiInfo.teamList[i].teamName);
-	updateModel = qtrue;
-    return qtrue;
-  }
-  return qfalse;
-}
-
 static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboolean resetMap) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
@@ -2362,30 +2230,6 @@ static qboolean UI_Skill_HandleKey(int flags, float *special, int key) {
     }
 
     trap_Cvar_Set("g_spSkill", va("%i", i));
-    return qtrue;
-  }
-  return qfalse;
-}
-
-static qboolean UI_TeamName_HandleKey(int flags, float *special, int key, qboolean blue) {
-  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-    int i;
-    i = UI_TeamIndexFromName(UI_Cvar_VariableString((blue) ? "ui_blueTeam" : "ui_redTeam"));
-
-		if (key == K_MOUSE2) {
-	    i--;
-		} else {
-	    i++;
-		}
-
-    if (i >= uiInfo.teamCount) {
-      i = 0;
-    } else if (i < 0) {
-			i = uiInfo.teamCount - 1;
-		}
-
-    trap_Cvar_Set( (blue) ? "ui_blueTeam" : "ui_redTeam", uiInfo.teamList[i].teamName);
-
     return qtrue;
   }
   return qfalse;
@@ -2592,7 +2436,6 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
     case UI_EFFECTS:
       break;
     case UI_CLANNAME:
-      return UI_ClanName_HandleKey(flags, special, key);
       break;
     case UI_GAMETYPE:
       return UI_GameType_HandleKey(flags, special, key, qtrue);
@@ -2605,12 +2448,6 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
       break;
     case UI_SKILL:
       return UI_Skill_HandleKey(flags, special, key);
-      break;
-    case UI_BLUETEAMNAME:
-      return UI_TeamName_HandleKey(flags, special, key, qtrue);
-      break;
-    case UI_REDTEAMNAME:
-      return UI_TeamName_HandleKey(flags, special, key, qfalse);
       break;
     case UI_BLUETEAM1:		
 		case UI_BLUETEAM2:		
@@ -4392,31 +4229,23 @@ static int UI_PlayCinematic(const char *name, float x, float y, float w, float h
   return trap_CIN_PlayCinematic(name, x, y, w, h, (CIN_loop | CIN_silent));
 }
 
-static void UI_StopCinematic(int handle) {
-	if (handle >= 0) {
-	  trap_CIN_StopCinematic(handle);
-	} else {
-		handle = abs(handle);
-		if (handle == UI_MAPCINEMATIC) {
-			if (uiInfo.mapList[ui_currentMap.integer].cinematic >= 0) {
-			  trap_CIN_StopCinematic(uiInfo.mapList[ui_currentMap.integer].cinematic);
-			  uiInfo.mapList[ui_currentMap.integer].cinematic = -1;
-			}
-		} else if (handle == UI_NETMAPCINEMATIC) {
-			if (uiInfo.serverStatus.currentServerCinematic >= 0) {
-			  trap_CIN_StopCinematic(uiInfo.serverStatus.currentServerCinematic);
-				uiInfo.serverStatus.currentServerCinematic = -1;
-			}
-		} else if (handle == UI_CLANCINEMATIC) {
-		  int i = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_teamName"));
-		  if (i >= 0 && i < uiInfo.teamCount) {
-				if (uiInfo.teamList[i].cinematic >= 0) {
-				  trap_CIN_StopCinematic(uiInfo.teamList[i].cinematic);
-					uiInfo.teamList[i].cinematic = -1;
-				}
-			}
-		}
-	}
+static void UI_StopCinematic( int handle )
+{
+  if( handle >= 0 )
+    trap_CIN_StopCinematic( handle );
+  else
+  {
+    handle = abs( handle );
+
+    if( handle == UI_NETMAPCINEMATIC )
+    {
+      if( uiInfo.serverStatus.currentServerCinematic >= 0 )
+      {
+        trap_CIN_StopCinematic( uiInfo.serverStatus.currentServerCinematic );
+        uiInfo.serverStatus.currentServerCinematic = -1;
+      }
+    }
+  }
 }
 
 static void UI_DrawCinematic(int handle, float x, float y, float w, float h) {
@@ -4587,7 +4416,6 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	start = trap_Milliseconds();
 
-	uiInfo.teamCount = 0;
 	uiInfo.characterCount = 0;
 	uiInfo.aliasCount = 0;
 

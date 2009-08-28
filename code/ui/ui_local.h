@@ -773,9 +773,6 @@ typedef struct {
 	int aliasCount;
 	aliasInfo aliasList[MAX_ALIASES];
 
-	int teamCount;
-	teamInfo teamList[MAX_TEAMS];
-
 	int numGameTypes;
 	gameTypeInfo gameTypes[MAX_GAMETYPES];
 
