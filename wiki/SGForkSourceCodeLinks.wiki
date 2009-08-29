@@ -15,9 +15,10 @@ So, here they are:
   * [http://rfactory.org/ The reaction factory]
   * [http://www.moddb.com/forum ModDB forum]
   * [http://www.quake3forum.com/forum/ Quake3 World forum]
+  * [http://www.quakeunity.com Quake unity] (Freeze tag source code is here)
   * *Id ftp stuff* [ftp://ftp.idsoftware.com/idstuff/ Id stuff]
   * *ioQuake3* [http://ioquake.org/ ioQuake3]
-  * [http://www.quaketweaks.com/files.html quaketweaks]
+  * [http://www.quaketweaks.com/files.html Quake tweaks]
   * [https://opensvn.csie.org/wopcompmod/ World of Packman competition mod]
 
 = Some useful utils =
