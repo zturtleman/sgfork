@@ -1325,6 +1325,8 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	} else if ( !Q_stricmp( arg1, "map" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_gametype" ) ) {
 	} else if ( !Q_stricmp( arg1, "kick" ) ) {
+	} else if ( !Q_stricmp( arg1, "g_redteam" ) ) {
+	} else if ( !Q_stricmp( arg1, "g_blueteam" ) ) {
 	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
 	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
@@ -2156,3 +2158,4 @@ void ClientCommand( int clientNum ) {
 	else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }
+
