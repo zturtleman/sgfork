@@ -411,6 +411,8 @@ struct gclient_s {
 
 	char		*areabits;
 
+  float     maxAmmo;
+
 //unlagged - backward reconciliation #1
 	// the serverTime the button was pressed
 	// (stored before pmove_fixed changes serverTime)

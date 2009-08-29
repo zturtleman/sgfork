@@ -1008,21 +1008,11 @@ G_Say
 */
 
 static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
-	if (!other) {
+	if (!other || !other->inuse || !other->client || 
+      other->client->pers.connected != CON_CONNECTED ||
+      mode == SAY_TEAM  && !OnSameTeam(ent, other ) )
 		return;
-	}
-	if (!other->inuse) {
-		return;
-	}
-	if (!other->client) {
-		return;
-	}
-	if ( other->client->pers.connected != CON_CONNECTED ) {
-		return;
-	}
-	if ( mode == SAY_TEAM  && !OnSameTeam(ent, other) ) {
-		return;
-	}
+
 	trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"",
 		mode == SAY_TEAM ? "tchat" : "chat",
 		name, Q_COLOR_ESCAPE, color, message));
@@ -1040,9 +1030,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	char		text[MAX_SAY_TEXT];
 	char		location[64];
 
-	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM ) {
+	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM )
 		mode = SAY_ALL;
-	}
 
 	switch ( mode ) {
 	default:
@@ -1079,8 +1068,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		return;
 	}
 
-	if(ent->client->sess.sessionTeam == TEAM_SPECTATOR){
-
+	if(ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		if(!ent->client->realspec && g_gametype.integer == GT_DUEL)
 			Com_sprintf(endname, sizeof(endname), "[DEAD]%s", name);
 		else
@@ -1974,7 +1962,7 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 		}
 
 		//give ammo to player
-		if(bg_weaponlist[item->giTag].clip && ps->ammo[bg_weaponlist[item->giTag].clip] < bg_weaponlist[item->giTag].maxAmmo){
+		if(bg_weaponlist[item->giTag].clip && ps->ammo[bg_weaponlist[item->giTag].clip] < (bg_weaponlist[item->giTag].maxAmmo*ent->client->maxAmmo)){
 			ps->ammo[bg_weaponlist[item->giTag].clip] = bg_weaponlist[item->giTag].maxAmmo;
 		}
 		break;
@@ -1992,7 +1980,7 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 			else
 				return;
 		}
-		if(ps->ammo[item->giTag] >= belt*bg_weaponlist[i].maxAmmo){
+		if(ps->ammo[item->giTag] >= bg_weaponlist[i].maxAmmo*ent->client->maxAmmo){
 			if(!cgame)
 				trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
 			return;
@@ -2043,15 +2031,9 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 	}
 
 	// give full ammo to all weapon-clips
-	if(item->giType == IT_POWERUP && item->giTag == PW_BELT){
-		belt = 2;
+	if(item->giType == IT_POWERUP && item->giTag == PW_BELT)
+    ent->client->maxAmmo *= (int)BELT_MAXAMMO*belt;
 
-		ent->client->ps.ammo[WP_BULLETS_CLIP] = bg_weaponlist[WP_REM58].maxAmmo*belt;
-		ent->client->ps.ammo[WP_SHELLS_CLIP] = bg_weaponlist[WP_REMINGTON_GAUGE].maxAmmo*belt;
-		ent->client->ps.ammo[WP_CART_CLIP] = bg_weaponlist[WP_WINCHESTER66].maxAmmo*belt;
-		ent->client->ps.ammo[WP_GATLING_CLIP] = bg_weaponlist[WP_GATLING].maxAmmo*belt;
-		ent->client->ps.ammo[WP_SHARPS_CLIP] = bg_weaponlist[WP_SHARPS].maxAmmo*belt;
-	}
 	ent->client->ps.stats[STAT_MONEY] -= prize;
 }
 

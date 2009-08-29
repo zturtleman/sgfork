@@ -866,7 +866,7 @@ typedef struct wpinfo_s {
 	const	int		count;
 	const	int		clipAmmo;	//ammo that fits in the weapon
 	const	int		clip;
-	const	int		maxAmmo;	// maximum of holdable ammo
+	const int		maxAmmo;	// maximum of holdable ammo
 	const	char	*v_model;
 	const	char	*v_barrel;
 	const	char	*snd_fire;

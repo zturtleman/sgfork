@@ -185,6 +185,8 @@ Weapon part
 #define DYN_SPLASH_RAD			200
 #define DYN_DAM					200
 
+#define BELT_MAXAMMO 1.25f
+
 #define MOLOTOV_DAMAGE 7
 #define MOLOTOV_SPLASHDAMAGE 0
 #define MOLOTOV_SPLASHRADIUS 0

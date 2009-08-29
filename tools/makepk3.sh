@@ -1,7 +1,9 @@
 #!/bin/sh
 
 PLATFORM=`uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]'`
-PAKNAME="pak2.pk3"
+VMPAKNAME="sgfork-vms.pk3"
+CONFPAKNAME="sgfork-configs.pk3"
+CONFDIR="configs"
 PWD=`pwd`
 PREF=
 
@@ -19,14 +21,17 @@ fi
 
 if [ `basename $PWD` = "tools" ]
 then
-  cd ..
+  PREF=..
+else
+  PREF=.
 fi
 
 make clean
 make BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1 $*
 
-cd $BDIR/smokinguns/
-zip -r $PAKNAME vm/
-mv $PAKNAME $HDIR
-cd $PWD
+cd $PREF/$BDIR/smokinguns/
+zip -r $VMPAKNAME vm/
+mv $VMPAKNAME $HDIR
+#cd $PWD
+cd ../../..
 
