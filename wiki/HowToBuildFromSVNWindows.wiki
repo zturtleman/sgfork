@@ -1,4 +1,5 @@
 #summary How to build SGFork from SVN under Windows platform.
+#labels Featured,Phase-Deploy
 
 = Introduction =
 
@@ -12,13 +13,13 @@ So, you need to do the following to get the latest source code from SVN:
   * Create a folder and name it like *sgfork_source*
   * Right click on *sgfork_source* and choose _"SVN Checkout"_ from context menu
   * Go to our [http://code.google.com/p/sgfork/source/checkout checkout page]. Find our address to for checkout (http://sgfork.googlecode.com/svn/trunk/) and copy it to Tortoise checkout window.
-  * Wait while whole source code will be downloaded to you.
+  * Wait while whole source code will be downloaded.
 
 = Updating source code =
 
 Now each time when there are some updates to code, you'll have to do only _"SVN Update"_ from context menu on your *sgfork_source* folder.
 
-= Building source code with MinGW =
+= Getting MinGW&Msys =
 
   * Download and install [http://downloads.sourceforge.net/mingw/MinGW-5.1.4.exe MinGW]
   * Download and install [http://downloads.sourceforge.net/mingw/MSYS-1.0.10.exe Msys]
@@ -34,7 +35,15 @@ Now each time when there are some updates to code, you'll have to do only _"SVN 
   * Binaries will be put here: *sgfork_source*/build/release-mingw32-x86
   * QVMs will be put here: *sgfork_source*/build/release-mingw32-x86/smokinguns/vm
 
+= Deploying SGFork with MinGW =
+  * Get info-zip tool. [ftp://tug.ctan.org/tex-archive/tools/zip/info-zip/WIN32/]. Grab the zip232xN.zip file. And put zip.exe from it to your MinGW/bin directory.
+  * Download ba.sh script from download page: [http://code.google.com/p/sgfork/downloads/detail?name=ba.sh&can=2&q=]
+  * Place it to *sgfork_source*
+  * Open it with notepad and replace "/c/Smokin' Guns/base" path to your game path (including base directory). Double quotes are required if your path have spaces in it.
+
 = Building source code with MS Visual Studio Express 2008 =
+_You don't need Express Visual Studio if you want only to build the game_
+_Visual Studio will be helpful only if you want to work with SGFork code_
   * Get MS Visual Studio Express from Microsoft site [http://www.microsoft.com/express/download/]
   * Install it.
   * Launch and open the project solution file: *sgfork_source*\misc\msvc\sg.sln
@@ -42,5 +51,10 @@ Now each time when there are some updates to code, you'll have to do only _"SVN 
   * Binaries will be put here: *sgfork_source*\build\sg_release
   * There won't be any QVMs. Only DLLs.
   * To build QVMs manually use the bath tool: *sgfork_source*\misc\win32\buildvm.bat
+
+= Deploying SGFork manually =
+  * Place binaries to your game directory.
+  * Zip VMS and place them to your game/base directory. It should be named "sgfork-qvms.pk3" and consist of vm/*.qvm files inside.
+  * Zip Other files from base directory and place them to your game/base directory. They  should be named like "sgfork-<directory name from source base directory>.pk3" and consist of <directory name from source base directory>/* files on the inside.
 
 Have fun!
