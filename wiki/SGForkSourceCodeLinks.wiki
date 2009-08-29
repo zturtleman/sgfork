@@ -12,3 +12,7 @@ So, here they are:
   * *ioQuake3* [http://ioquake.org/ ioQuake3]
   * [http://www.quaketweaks.com/files.html quaketweaks]
   * [https://opensvn.csie.org/wopcompmod/ World of Packman competition mod]
+
+= Some useful utils =
+
+  * Info-zip/unzip for Windows: [ftp://tug.ctan.org/tex-archive/tools/zip/info-zip/WIN32/]
