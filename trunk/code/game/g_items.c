@@ -57,11 +57,7 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	} else if(ent->item->giTag == PW_BELT ) {
 		// Added by Joe Kari: collecting an ammo belt give you full ammo just like when you buy it
 		// so Breli will be happy :O)
-		other->client->ps.ammo[WP_BULLETS_CLIP] = bg_weaponlist[WP_REM58].maxAmmo*2;
-		other->client->ps.ammo[WP_SHELLS_CLIP] = bg_weaponlist[WP_REMINGTON_GAUGE].maxAmmo*2;
-		other->client->ps.ammo[WP_CART_CLIP] = bg_weaponlist[WP_WINCHESTER66].maxAmmo*2;
-		other->client->ps.ammo[WP_GATLING_CLIP] = bg_weaponlist[WP_GATLING].maxAmmo*2;
-		other->client->ps.ammo[WP_SHARPS_CLIP] = bg_weaponlist[WP_SHARPS].maxAmmo*2;
+    other->client->maxAmmo *= BELT_MAXAMMO*2;
 		other->client->ps.powerups[ent->item->giTag] = 1;
 	} else {
 		other->client->ps.powerups[ent->item->giTag] = 1;
@@ -122,8 +118,8 @@ void Add_Ammo (gentity_t *ent, int clip, int count)
 
 	if(clip != WP_AKIMBO ){
 		if(weapon){
-			if ( ent->client->ps.ammo[clip] > bg_weaponlist[weapon].maxAmmo*belt ) {
-				ent->client->ps.ammo[clip] = bg_weaponlist[weapon].maxAmmo*belt;
+			if ( ent->client->ps.ammo[clip] > bg_weaponlist[weapon].maxAmmo*ent->client->maxAmmo ) {
+				ent->client->ps.ammo[clip] = bg_weaponlist[weapon].maxAmmo*ent->client->maxAmmo;
 			}
 		} else if(!bg_weaponlist[clip].clip){
 			if ( ent->client->ps.ammo[clip] > bg_weaponlist[clip].maxAmmo ) {
