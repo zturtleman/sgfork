@@ -1320,27 +1320,47 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		}
 	}
 
-	if ( !Q_stricmp( arg1, "map_restart" ) ) {
-	} else if ( !Q_stricmp( arg1, "nextmap" ) ) {
-	} else if ( !Q_stricmp( arg1, "map" ) ) {
-	} else if ( !Q_stricmp( arg1, "g_gametype" ) ) {
-	} else if ( !Q_stricmp( arg1, "kick" ) ) {
-	} else if ( !Q_stricmp( arg1, "g_redteam" ) ) {
-	} else if ( !Q_stricmp( arg1, "g_blueteam" ) ) {
-	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
-	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
-	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
-	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
-	} else if ( !Q_stricmp( arg1, "mapcycle" ) ) {
+	if        ( !Q_stricmp( arg1, "kick")		&& g_allowVote_kick.integer) {
+	} else if ( !Q_stricmp( arg1, "map_restart")&& g_allowVote_map_restart.integer) {
+	} else if ( !Q_stricmp( arg1, "nextmap")	&& g_allowVote_nextmap.integer) {
+	} else if ( !Q_stricmp( arg1, "map")		&& g_allowVote_map.integer) {
+	} else if ( !Q_stricmp( arg1, "g_gametype")	&& g_allowVote_g_gametype.integer) {
+	} else if ( !Q_stricmp( arg1, "g_redteam")	&& g_allowVote_g_redteam.integer) {
+	} else if ( !Q_stricmp( arg1, "g_blueteam")	&& g_allowVote_g_blueteam.integer) {
+	} else if ( !Q_stricmp( arg1, "clientkick")	&& g_allowVote_kick.integer) {
+	} else if ( !Q_stricmp( arg1, "g_doWarmup")	&& g_allowVote_g_doWarmup.integer) {
+	} else if ( !Q_stricmp( arg1, "timelimit")	&& g_allowVote_timelimit.integer) {
+	} else if ( !Q_stricmp( arg1, "fraglimit")	&& g_allowVote_fraglimit.integer) {
+	} else if ( !Q_stricmp( arg1, "mapcycle")	&& g_allowVote_mapcycle.integer) {
 	} else {
 		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>, mapcycle <mapcyclename>.\n\"" );
-		return;
-	}
-
-	if ( ( !Q_stricmp( arg1, "kick" ) || !Q_stricmp( arg1, "clientkick" ) )
-	&& !g_allowVoteKick.integer ) {
-		trap_SendServerCommand( ent-g_entities, "print \"Not allowed to vote kick here.\n\"" );
+		trap_SendServerCommand( ent-g_entities, va("print \"Allowed vote commands are:\n"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+			"\"",
+			(g_allowVote_kick.integer)?"  kick <player>\n":"",
+			(g_allowVote_map_restart.integer)?"  map_restart\n":"",
+			(g_allowVote_nextmap.integer)?"  nextmap\n":"",
+			(g_allowVote_map.integer)?"  map <mapname>\n":"",
+			(g_allowVote_g_gametype.integer)?"  g_gametype <n>\n":"",
+			(g_allowVote_g_redteam.integer)?"  g_redteam <name>\n":"",
+			(g_allowVote_g_blueteam.integer)?"  g_blueteam <name>\n":"",
+			(g_allowVote_kick.integer)?"  clientkick <clientnum>\n":"",
+			(g_allowVote_g_doWarmup.integer)?"  g_doWarmup\n":"",
+			(g_allowVote_timelimit.integer)?"  timelimit <time>\n":"",
+			(g_allowVote_fraglimit.integer)?"  fraglimit <frags>\n":"",
+			(g_allowVote_mapcycle.integer)?"  mapcycle <mapcyclename>\n":""
+			));
 		return;
 	}
 

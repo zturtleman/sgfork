@@ -1874,7 +1874,7 @@ static void CG_DrawCrosshair3D(void)
 CG_ScanForCrosshairEntity
 =================
 */
-static CG_ScanForCrosshairEntity(int *changeCrosshairFlags) {
+static void CG_ScanForCrosshairEntity(int *changeCrosshairFlags) {
 	trace_t		trace;
 	vec3_t		start, end;
 	int			content;
