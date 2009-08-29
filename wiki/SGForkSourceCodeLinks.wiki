@@ -8,6 +8,13 @@ Here you may found some useful links to look at when you develop improvements fo
 
 So, here they are:
   * *The biggest Q3 source coding tutorials repository* [http://www.quake3hut.co.uk/q3coding/ Repository]
+  * [http://www.soclose.de/q3doc/index.htm Quake3 code explanation]
+  * [http://www.icculus.org/~phaethon/q3mc/q3mc.html baseq3 source code documentary]
+  * [http://rfactory.org/MenuDef/q3tamenu.html Team Arena menu files]
+  * [http://quakestyle.telefragged.com/tuts.shtml Quake style tutorials]
+  * [http://rfactory.org/ The reaction factory]
+  * [http://www.moddb.com/forum ModDB forum]
+  * [http://www.quake3forum.com/forum/ Quake3 World forum]
   * *Id ftp stuff* [ftp://ftp.idsoftware.com/idstuff/ Id stuff]
   * *ioQuake3* [http://ioquake.org/ ioQuake3]
   * [http://www.quaketweaks.com/files.html quaketweaks]
