@@ -3,7 +3,7 @@
 
 = Introduction =
 
-So, you decided to check out how things are going and you don't know where to start? Here is the place.
+Here you may find steps required to convert your SG game to SGFork.
 
 = Details =
 
