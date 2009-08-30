@@ -615,6 +615,8 @@ void SaveRegisteredItems( void );
 //
 // g_utils.c
 //
+gentity_t *G_EntNumForName( const char *name );
+char *G_DecolorString( const char *str );
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
 void	G_TeamCommand( team_t team, char *cmd );
@@ -904,6 +906,7 @@ extern	vmCvar_t	g_warmup;
 extern	vmCvar_t	g_doWarmup;
 extern	vmCvar_t	g_blood;
 extern	vmCvar_t	g_allowVote;
+extern  vmCvar_t  g_allowSpecVote;
 extern	vmCvar_t	g_allowVote_kick;
 extern	vmCvar_t	g_allowVote_map_restart;
 extern	vmCvar_t	g_allowVote_nextmap;

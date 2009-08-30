@@ -238,6 +238,8 @@ System
 #define	MAX_DEATH_MESSAGES		4
 #define	VOTE_TIME			30000	// 30 seconds before vote times out
 
+#define MAX_VOTE_ARGS 20
+
 /*
 =============================
 Money system

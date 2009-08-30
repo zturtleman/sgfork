@@ -1268,11 +1268,25 @@ static const char *gameNames[] = {
 Cmd_CallVote_f
 ==================
 */
+
+#define Vote_Cat_Number() Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", args[1], atoi( args[2] ) ); \
+    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", args[1], args[2] ); \
+
+#define Vote_Cat_String() Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", args[1], atoi( args[2] ) ); \
+    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", args[1], args[2] ); \
+
 void Cmd_CallVote_f( gentity_t *ent ) {
 	char*	c;
 	int		i;
-	char	arg1[MAX_STRING_TOKENS];
-	char	arg2[MAX_STRING_TOKENS];
+	char	buf[MAX_STRING_TOKENS];
+  char  args[MAX_VOTE_ARGS][MAX_STRING_TOKENS];
+  int   argc = trap_Argc( );
+
+  for( i=0; i <= argc; i++ )
+  {
+    Com_sprintf( args[i], sizeof(args[i]), "" );
+	  trap_Argv( i, args[i], sizeof(args[i]) );
+  }
 
 	if ( !g_allowVote.integer ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Voting not allowed here.\n\"" );
@@ -1283,101 +1297,80 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		trap_SendServerCommand( ent-g_entities, "print \"A vote is already in progress.\n\"" );
 		return;
 	}
+
 	if ( ent->client->pers.voteCount >= MAX_VOTE_COUNT ) {
 		trap_SendServerCommand( ent-g_entities, "print \"You have called the maximum number of votes.\n\"" );
 		return;
 	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR && (g_gametype.integer != GT_DUEL || ent->client->realspec)) {
+
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR && (g_gametype.integer != GT_DUEL || ent->client->realspec) && g_allowSpecVote.integer ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Not allowed to call a vote as spectator.\n\"" );
 		return;
 	}
 
-	// make sure it is a valid command to vote on
-	trap_Argv( 1, arg1, sizeof( arg1 ) );
-	trap_Argv( 2, arg2, sizeof( arg2 ) );
+	// check for command separators in args[2]
+  for( i = 2; i <= argc; i++ ) {
+    for( c = args[i]; *c; ++c) {
+      switch(*c) {
+        case '\n':
+        case '\r':
+        case ';':
+          trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
+          return;
+          break;
+      }
+    }
+  }
 
-	// check for command separators in arg2
-	for( c = arg2; *c; ++c) {
-		switch(*c) {
-			case '\n':
-			case '\r':
-			case ';':
-				trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-				return;
-			break;
-		}
-	}
+  if( !Q_stricmp( args[1], "kick" ) && g_allowVote_kick.integer ) {
+    Vote_Cat_String();
+  }
+  else if ( !Q_stricmp( args[1], "map_restart") && g_allowVote_map_restart.integer) {
+  }
+  else if ( !Q_stricmp( args[1], "nextmap") && g_allowVote_nextmap.integer) {
+		char	s[MAX_STRING_CHARS];
 
-	if        ( !Q_stricmp( arg1, "kick")		&& g_allowVote_kick.integer) {
-	} else if ( !Q_stricmp( arg1, "map_restart")&& g_allowVote_map_restart.integer) {
-	} else if ( !Q_stricmp( arg1, "nextmap")	&& g_allowVote_nextmap.integer) {
-	} else if ( !Q_stricmp( arg1, "map")		&& g_allowVote_map.integer) {
-	} else if ( !Q_stricmp( arg1, "g_gametype")	&& g_allowVote_g_gametype.integer) {
-	} else if ( !Q_stricmp( arg1, "g_redteam")	&& g_allowVote_g_redteam.integer) {
-	} else if ( !Q_stricmp( arg1, "g_blueteam")	&& g_allowVote_g_blueteam.integer) {
-	} else if ( !Q_stricmp( arg1, "clientkick")	&& g_allowVote_kick.integer) {
-	} else if ( !Q_stricmp( arg1, "g_doWarmup")	&& g_allowVote_g_doWarmup.integer) {
-	} else if ( !Q_stricmp( arg1, "timelimit")	&& g_allowVote_timelimit.integer) {
-	} else if ( !Q_stricmp( arg1, "fraglimit")	&& g_allowVote_fraglimit.integer) {
-	} else if ( !Q_stricmp( arg1, "mapcycle")	&& g_allowVote_mapcycle.integer) {
-	} else {
-		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-		trap_SendServerCommand( ent-g_entities, va("print \"Allowed vote commands are:\n"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"%s"
-			"\"",
-			(g_allowVote_kick.integer)?"  kick <player>\n":"",
-			(g_allowVote_map_restart.integer)?"  map_restart\n":"",
-			(g_allowVote_nextmap.integer)?"  nextmap\n":"",
-			(g_allowVote_map.integer)?"  map <mapname>\n":"",
-			(g_allowVote_g_gametype.integer)?"  g_gametype <n>\n":"",
-			(g_allowVote_g_redteam.integer)?"  g_redteam <name>\n":"",
-			(g_allowVote_g_blueteam.integer)?"  g_blueteam <name>\n":"",
-			(g_allowVote_kick.integer)?"  clientkick <clientnum>\n":"",
-			(g_allowVote_g_doWarmup.integer)?"  g_doWarmup\n":"",
-			(g_allowVote_timelimit.integer)?"  timelimit <time>\n":"",
-			(g_allowVote_fraglimit.integer)?"  fraglimit <frags>\n":"",
-			(g_allowVote_mapcycle.integer)?"  mapcycle <mapcyclename>\n":""
-			));
-		return;
-	}
-
-	// if there is still a vote to be executed
-	if ( level.voteExecuteTime ) {
-		level.voteExecuteTime = 0;
-		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
-	}
-
-	// special case for g_gametype, check for bad values
-	if ( !Q_stricmp( arg1, "g_gametype" ) ) {
-		i = atoi( arg2 );
-		if( i == GT_SINGLE_PLAYER || i < GT_FFA || i > GT_RTP) {
-			trap_SendServerCommand( ent-g_entities, "print \"Invalid gametype.\n\"" );
+		trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
+		if (!*s) {
+			trap_SendServerCommand( ent-g_entities, "print \"nextmap not set.\n\"" );
 			return;
 		}
-
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", arg1, i );
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", arg1, gameNames[i] );
-	} else if ( !Q_stricmp( arg1, "map" ) ) {
-		// special case for map changes, we want to reset the nextmap setting
-		// this allows a player to change maps, but not upset the map rotation
-		// Joe Kari : calling a vote for a /map command is not supposed to change 'nextmap' cvar
-		// We removed this code, this is not usefull anymore since I have modified server/sv_init.c to never
-		// turn 'nextmap' to 'map_restart 0'
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s", arg1, arg2 );
+		Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr nextmap");
 		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
-	} else if ( !Q_stricmp( arg1, "mapcycle" ) ) {	// Joe Kari: allow player to vote for a mapcycle
+  }
+  else if ( !Q_stricmp( args[1], "map")   && g_allowVote_map.integer) {
+		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s", args[1], args[2] );
+		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
 
+  }
+  else if ( !Q_stricmp( args[1], "g_gametype")  && g_allowVote_g_gametype.integer) {
+    i = atoi( args[2] );
+    if( i == GT_SINGLE_PLAYER || i < GT_FFA || i > GT_RTP) {
+      trap_SendServerCommand( ent-g_entities, "print \"Invalid gametype.\n\"" );
+      return;
+    }
+
+    Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", args[1], i );
+    Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", args[1], gameNames[i] );
+  }
+  else if ( !Q_stricmp( args[1], "g_redteam") && g_allowVote_g_redteam.integer) {
+    Vote_Cat_Number( );
+  }
+  else if ( !Q_stricmp( args[1], "g_blueteam")  && g_allowVote_g_blueteam.integer) {
+    Vote_Cat_Number( );
+  }
+  else if ( !Q_stricmp( args[1], "clientkick")  && g_allowVote_kick.integer) {
+    Vote_Cat_String( );
+  }
+  else if ( !Q_stricmp( args[1], "g_doWarmup")  && g_allowVote_g_doWarmup.integer) {
+  }
+  else if ( !Q_stricmp( args[1], "timelimit") && g_allowVote_timelimit.integer) {
+    Vote_Cat_String( );
+  }
+  else if ( !Q_stricmp( args[1], "fraglimit") && g_allowVote_fraglimit.integer) {
+    Vote_Cat_String( );
+  }
+  else if ( !Q_stricmp( args[1], "mapcycle")  && g_allowVote_mapcycle.integer) {
 		char mapcycles[ MAX_STRING_CHARS ];
 		char buf[ 100 ];
 		char *token, *p;
@@ -1387,7 +1380,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 
 		p = mapcycles;
 		while ( !match && *( token = COM_Parse( &p ) ) ) {
-			if ( !Q_stricmp( arg2 , token ) )
+			if ( !Q_stricmp( args[2] , token ) )
 				match = qtrue;
 		}
 
@@ -1403,20 +1396,32 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr %s", token );
 		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "mapcycle %s", token);
+  }
+  else
+  {
+    trap_SendServerCommand( ent-g_entities,
+        va( "print \"Invalid vote string.\nAllowed vote commands are:\n"
+          "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s" "%s",
+          (g_allowVote_kick.integer)?"  kick <player>\n":"",
+          (g_allowVote_map_restart.integer)?"  map_restart\n":"",
+          (g_allowVote_nextmap.integer)?"  nextmap\n":"",
+          (g_allowVote_map.integer)?"  map <mapname>\n":"",
+          (g_allowVote_mute.integer) ? "  mute <player>\n":"",
+          (g_allowVote_unmute.integer) ? "  unmute <player>\n":"",
+          (g_allowVote_g_gametype.integer)?"  g_gametype <n>\n":"",
+          (g_allowVote_g_redteam.integer)?"  g_redteam <name>\n":"",
+          (g_allowVote_g_blueteam.integer)?"  g_blueteam <name>\n":"",
+          (g_allowVote_kick.integer)?"  clientkick <clientnum>\n":"",
+          (g_allowVote_g_doWarmup.integer)?"  g_doWarmup\n":"",
+          (g_allowVote_timelimit.integer)?"  timelimit <time>\n":"",
+          (g_allowVote_fraglimit.integer)?"  fraglimit <frags>\n":"",
+          (g_allowVote_mapcycle.integer)?"  mapcycle <mapcyclename>\n":"" ) );
+  }
 
-	} else if ( !Q_stricmp( arg1, "nextmap" ) ) {
-		char	s[MAX_STRING_CHARS];
-
-		trap_Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
-		if (!*s) {
-			trap_SendServerCommand( ent-g_entities, "print \"nextmap not set.\n\"" );
-			return;
-		}
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr nextmap");
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
-	} else {
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+	// if there is still a vote to be executed
+	if ( level.voteExecuteTime ) {
+		level.voteExecuteTime = 0;
+		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
 	}
 
 	trap_SendServerCommand( -1, va("print \"%s called a vote.\n\"", ent->client->pers.netname ) );

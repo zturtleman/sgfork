@@ -128,6 +128,7 @@ vmCvar_t	g_blood;
 vmCvar_t	g_podiumDist;
 vmCvar_t	g_podiumDrop;
 vmCvar_t	g_allowVote;
+vmCvar_t  g_allowSpecVote;
 vmCvar_t	g_allowVote_kick;
 vmCvar_t	g_allowVote_map_restart;
 vmCvar_t	g_allowVote_nextmap;
@@ -255,6 +256,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_podiumDrop, "g_podiumDrop", "70", 0, 0, qfalse },
 
 	{ &g_allowVote, "g_allowVote", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
+  { &g_allowSpecVote, "g_allowSpecVote", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_kick, "g_allowVote_kick", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_nextmap, "g_allowVote_nextmap", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_map, "g_allowVote_map", "1", CVAR_ARCHIVE, 0, qfalse },
