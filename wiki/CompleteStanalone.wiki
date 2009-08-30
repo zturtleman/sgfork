@@ -1,0 +1,20 @@
+#summary Description of SGFork mechanics concerning standalone feature.
+#labels Phase-Implementation,Phase-Design,Featured
+
+= Introduction =
+
+Since its beginning SGFork became completely standalone game.
+The game still uses Quake3 engine inside. But some features are now going to be only the game ones.
+
+= Details =
+
+So, here they are:
+  * The game identifies itself as whole separate game.
+  * The game acts like vanilla quake3 for server listeners.
+  * Each time when you try to get info from/to main quake3 server listeners you'll get the game as main one and not as mod as it was before.
+  * UI filter for game chooses between ALL and the game modifications. ALL means all games based on SGFork and not on Quake3 (at the moment we have no one, so it is ALL only).
+  * We have to use our own "quake3master.com" server from now on.
+  * When someone decides to do a mod, hes mod will be stored near the main game directory which is base/.
+  * All players configs are also stored in home path in base directory and not in smokinguns /as it was before.
+
+In conclusion, treat this game as completely separate game based on Quake3 engine.
