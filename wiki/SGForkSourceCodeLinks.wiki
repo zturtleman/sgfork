@@ -20,6 +20,7 @@ So, here they are:
   * *ioQuake3* [http://ioquake.org/ ioQuake3]
   * [http://www.quaketweaks.com/files.html Quake tweaks]
   * [https://opensvn.csie.org/wopcompmod/ World of Packman competition mod]
+  * [http://synapse.vgfort.com/quake3.php Quake3 released source codes]
 
 = Some useful utils =
 
