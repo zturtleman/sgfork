@@ -1406,8 +1406,6 @@ void Cmd_CallVote_f( gentity_t *ent ) {
           (g_allowVote_map_restart.integer)?"  map_restart\n":"",
           (g_allowVote_nextmap.integer)?"  nextmap\n":"",
           (g_allowVote_map.integer)?"  map <mapname>\n":"",
-          (g_allowVote_mute.integer) ? "  mute <player>\n":"",
-          (g_allowVote_unmute.integer) ? "  unmute <player>\n":"",
           (g_allowVote_g_gametype.integer)?"  g_gametype <n>\n":"",
           (g_allowVote_g_redteam.integer)?"  g_redteam <name>\n":"",
           (g_allowVote_g_blueteam.integer)?"  g_blueteam <name>\n":"",
