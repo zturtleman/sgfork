@@ -4,6 +4,7 @@ PLATFORM=`uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]'`
 VMPAKNAME="sgfork-qvms.pk3"
 CONFPAKNAME="sgfork-configs.pk3"
 UIPAKNAME="sgfork-ui.pk3"
+SCRIPTSPAKNAME="sgfork-scripts.pk3"
 GFXPAKNAME="sgfork-gfx.pk3"
 CONFDIR="configs"
 PWD=`pwd`
@@ -43,6 +44,12 @@ if [ "$1" = "-buildall" ]
 then
   shift
   make
+  if [ $? -eq 0 ] ; then
+    echo "<<<The game is successfully built!>>>"
+  else
+    echo "<<<ERROR: Failed to build the game!>>>"
+    exit 1
+  fi
   cd $BDIR
   mv $MAINBINARY "$HDIR/../"
   mv $DEDIBINARY "$HDIR/../"
@@ -56,8 +63,10 @@ zip -r $VMPAKNAME vm/
 mv $VMPAKNAME "$HDIR"
 cd ../../..
 cd base
+sed "s/SGFORK_RELEASE/SGFork release at `date`/" ui/main.menu.template > ui/main.menu
 zip -r $UIPAKNAME ui/
 zip -r $GFXPAKNAME gfx/
-mv $UIPAKNAME $GFXPAKNAME "$HDIR"
+zip -r $SCRIPTSPAKNAME scripts/
+mv $UIPAKNAME $GFXPAKNAME $SCRIPTSPAKNAME "$HDIR"
 cd ../
 cd $PWD
