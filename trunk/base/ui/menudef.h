@@ -1,4 +1,3 @@
-
 #define ITEM_TYPE_TEXT 0                  // simple text
 #define ITEM_TYPE_BUTTON 1                // button, basically text with a border 
 #define ITEM_TYPE_RADIOBUTTON 2           // toggle button, may be grouped 
@@ -25,7 +24,8 @@
 #define ITEM_TEXTSTYLE_OUTLINED 4         // drop shadow ( need a color for this )
 #define ITEM_TEXTSTYLE_OUTLINESHADOWED 5  // drop shadow ( need a color for this )
 #define ITEM_TEXTSTYLE_SHADOWEDMORE 6         // drop shadow ( need a color for this )
-                          
+#define ITEM_TEXTSTYLE_NEON 7
+
 #define WINDOW_BORDER_NONE 0              // no border
 #define WINDOW_BORDER_FULL 1              // full border based on border color ( single pixel )
 #define WINDOW_BORDER_HORZ 2              // horizontal borders only
@@ -66,6 +66,9 @@
 #define FEEDER_SERVERSTATUS					0x0d			// server status
 #define FEEDER_FINDPLAYER					0x0e			// find player
 #define FEEDER_CINEMATICS					0x0f			// cinematics
+#define BIND_BOTH							0x00
+#define BIND_PRIMARY						0x01
+#define BIND_ALTERNATE						0x02
 
 // display flags
 #define CG_SHOW_BLUE_TEAM_HAS_REDFLAG     0x00000001
@@ -108,7 +111,7 @@
 #define UI_SHOW_NOTFAVORITESERVERS				0x00001000
 // Smokin'Guns
 #define UI_SHOW_NETANYDUELGAME					0x00002000
-
+#define UI_BIND2CLICK							0x01000000
 
 
 
@@ -192,6 +195,33 @@
 #define CG_1STPLACE 67
 #define CG_2NDPLACE 68
 #define CG_CAPTURES 69
+
+// HUD extensions
+#define CG_LOAD_LEVELSHOT         75
+#define CG_LOAD_MEDIA             76
+#define CG_LOAD_MEDIA_LABEL       77
+#define CG_LOAD_LEVELNAME         78
+#define CG_LOAD_MOTD              79
+#define CG_LOAD_HOSTNAME          80
+#define CG_LOAD_SOUND             81
+#define CG_LOAD_SOUND_LABEL       82
+#define CG_LOAD_GRAPHIC           83
+#define CG_LOAD_GRAPHIC_LABEL     84
+// end HUD extensions
+
+// Hud groups
+#define CG_CENTERPRINT            89
+#define CG_PLAYER_CROSSHAIRNAMES  90
+#define CG_FPS                    91
+#define CG_FPS_FIXED              92
+#define CG_TIMER                  93
+#define CG_TIMER_MINS             94
+#define CG_TIMER_SECS             95
+#define CG_SNAPSHOT               96
+#define CG_LAGOMETER              97
+#define CG_CONSOLE                98
+#define CG_WEAPONSELECT           99
+// end Hud groups
 
 // Smokin'Guns hud
 #define CG_FIELD_HEALTH	100

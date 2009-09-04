@@ -150,7 +150,7 @@ extern vmCvar_t ui_serverStatusTimeOut;
 #define	MAX_EDIT_LINE			256
 
 #define MAX_MENUDEPTH			8
-#define MAX_MENUITEMS			96
+#define MAX_MENUITEMS			128
 
 #define MTYPE_NULL				0
 #define MTYPE_SLIDER			1
@@ -776,6 +776,9 @@ typedef struct {
 	int numGameTypes;
 	gameTypeInfo gameTypes[MAX_GAMETYPES];
 
+	int maskGameTypes[MAX_GAMETYPES];
+	qboolean dorefresh;
+
 	int numJoinGameTypes;
 	gameTypeInfo joinGameTypes[MAX_GAMETYPES];
 
@@ -845,6 +848,8 @@ typedef struct {
 	int effectsColor;
 
 	qboolean inGameLoad;
+
+	playerInfo_t info;
 
 }	uiInfo_t;
 

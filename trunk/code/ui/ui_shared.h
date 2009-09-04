@@ -37,7 +37,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_MENUDEFFILE 4096
 #define MAX_MENUFILE 32768
 #define MAX_MENUS 64
-#define MAX_MENUITEMS 96
+#define MAX_MENUITEMS 128
+#define MAX_SCRIPTSIZE 4096
 #define MAX_COLOR_RANGES 10
 #define MAX_OPEN_MENUS 16
 
@@ -65,8 +66,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WINDOW_POPUP				0x00200000	// popup
 #define WINDOW_BACKCOLORSET			0x00400000	// backcolor was explicitly set
 #define WINDOW_TIMEDVISIBLE			0x00800000	// visibility timing ( NOT implemented )
-#define WINDOW_NOFOCUS				0x01000000
-
+#define WINDOW_ENDTRANSITION		0x01000000
+#define WINDOW_NOTRANSITION			0x02000000
+#define WINDOW_FOCUSDISABLE			0x04000000
+#define WINDOW_NOFOCUS				0x08000000
 
 // CGAME cursor type bits
 #define CURSOR_NONE					0x00000001
@@ -83,24 +86,32 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_SCRIPT_ARGS 12
 #define MAX_EDITFIELD 256
 
-#define ASSET_GRADIENTBAR "ui/assets/gradientbar2.tga"
-#define ASSET_SCROLLBAR             "ui/wq3_assets/scrollbar.tga"
-#define ASSET_SCROLLBAR_HORZ		"ui/wq3_assets/scrollbar_horz.tga"
-#define ASSET_SCROLLBAR_ARROWDOWN   "ui/wq3_assets/scrollbar_arrow_dwn_a.tga"
-#define ASSET_SCROLLBAR_ARROWUP     "ui/wq3_assets/scrollbar_arrow_up_a.tga"
-#define ASSET_SCROLLBAR_ARROWLEFT   "ui/wq3_assets/scrollbar_arrow_left.tga"
-#define ASSET_SCROLLBAR_ARROWRIGHT  "ui/wq3_assets/scrollbar_arrow_right.tga"
-#define ASSET_SCROLL_THUMB          "ui/wq3_assets/scrollbar_thumb.tga"
-#define ASSET_SLIDER_BAR			"ui/wq3_assets/slider.tga"
-#define ASSET_SLIDER_THUMB			"ui/wq3_assets/slider_thumb.tga"
-#define ASSET_MENU_WIDTH			"ui/wq3_assets/menu_width.tga"
-#define ASSET_MENU_HEIGHT			"ui/wq3_assets/menu_height.tga"
-#define SCROLLBAR_SIZE 16.0
-#define SLIDER_WIDTH 96.0
-#define SLIDER_HEIGHT 12.0
-#define SLIDER_THUMB_WIDTH 14.0
-#define SLIDER_THUMB_HEIGHT 14.0
-#define	NUM_CROSSHAIRS			10
+#define ASSET_GRADIENTBAR			"ui/assets/gradientbar2.tga"
+#define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
+#define ASSET_SCROLLBAR_ARROWDOWN   "ui/assets/scrollbar_arrow_dwn_a.tga"
+#define ASSET_SCROLLBAR_ARROWUP     "ui/assets/scrollbar_arrow_up_a.tga"
+#define ASSET_SCROLLBAR_ARROWLEFT   "ui/assets/scrollbar_arrow_left.tga"
+#define ASSET_SCROLLBAR_ARROWRIGHT  "ui/assets/scrollbar_arrow_right.tga"
+#define ASSET_SCROLL_THUMB          "ui/assets/scrollbar_thumb.tga"
+#define ASSET_SLIDER_BAR			"ui/assets/slider2.tga"
+#define ASSET_SLIDER_THUMB			"ui/assets/sliderbutt_1.tga"
+#define ASSET_MENU_WIDTH			"ui/assets/menu_width.tga"
+#define ASSET_MENU_HEIGHT			"ui/assets/menu_height.tga"
+#define ASSET_SLIDER_THUMB_SEL		"ui/assets/sliderbutt_1.tga"
+#define ASSET_CHECKBOX				"ui/assets/checkbox_unchecked.tga"
+#define ASSET_CHECKBOX_SEL			"ui/assets/checkbox_checked.tga"
+#define CHECKBOX_WIDTH				16.0
+#define CHECKBOX_HEIGHT				16.0
+#define ASSET_COMBO					"ui/assets/pulldownarrow.tga"
+#define ASSET_COMBO_SEL				"ui/assets/pulldownarrow_sel.tga"
+#define COMBO_WIDTH					16.0
+#define COMBO_HEIGHT				16.0
+#define SCROLLBAR_SIZE				16.0
+#define SLIDER_WIDTH				96.0
+#define SLIDER_HEIGHT				16.0
+#define SLIDER_THUMB_WIDTH			12.0
+#define SLIDER_THUMB_HEIGHT			20.0
+#define	NUM_CROSSHAIRS				10
 
 typedef struct {
   const char *command;
@@ -208,7 +219,31 @@ typedef struct modelDef_s {
 	float fov_x;
 	float fov_y;
 	int rotationSpeed;
+	int		animated;
+	int		startframe;
+	int		numframes;
+	int		fps;
+	
+	int		frame;
+	int		oldframe;
+	float	backlerp;
+	int		frameTime;
 } modelDef_t;
+
+typedef struct comboDef_s {
+	qboolean combopen;
+	Rectangle ComboBox;
+	int comboItem;
+	vec4_t boxtextcolor;
+	vec4_t boxcolor;
+	float boxtextscale;
+	float maxheight;
+	float offsetx;
+	float offsety;
+} comboDef_t;
+
+#define BOXTEXTSTEP  4
+#define BOXTEXTOFFSET  4
 
 #define CVAR_ENABLE		0x00000001
 #define CVAR_DISABLE	0x00000002
@@ -235,6 +270,7 @@ typedef struct itemDef_s {
   const char *action;            // select script
   const char *onFocus;           // select script
   const char *leaveFocus;        // select script
+  const char *transitionEnd;     // select script
   const char *cvar;              // associated cvar
   const char *cvarTest;          // associated cvar for enable actions
 	const char *enableCvar;			   // enable, disable, show, or hide based on value, this can contain a list
@@ -245,6 +281,13 @@ typedef struct itemDef_s {
 	float special;								 // used for feeder id's etc.. diff per type
   int cursorPos;                 // cursor position in characters
 	void *typeData;              // type specific data ptr's
+	void *multiData;
+	void *comboData;
+	int bindtype;
+	int bind2click;
+	qboolean clickstatus;
+	int nofocuscolor;
+	vec4_t fadeColor;
 } itemDef_t;
 
 typedef struct {
@@ -260,6 +303,8 @@ typedef struct {
   const char *onOpen;								// run when the menu is first opened
   const char *onClose;							// run when the menu is closed
   const char *onESC;								// run when the menu is closed
+  const char *opentransitionEnd;				// select script
+  const char *esctransitionEnd;
 	const char *soundName;						// background loop sound for menu
 
   vec4_t focusColor;								// focus color for items
@@ -268,40 +313,59 @@ typedef struct {
 } menuDef_t;
 
 typedef struct {
-  const char *fontStr;
-  const char *cursorStr;
-  const char *gradientStr;
-  fontInfo_t textFont;
-  fontInfo_t smallFont;
-  fontInfo_t bigFont;
-  qhandle_t cursor;
-  qhandle_t gradientBar;
-  qhandle_t scrollBarArrowUp;
-  qhandle_t scrollBarArrowDown;
-  qhandle_t scrollBarArrowLeft;
-  qhandle_t scrollBarArrowRight;
-  qhandle_t scrollBar;
-  qhandle_t	scrollBar_horz;
-  qhandle_t scrollBarThumb;
-  qhandle_t buttonMiddle;
-  qhandle_t buttonInside;
-  qhandle_t solidBox;
-  qhandle_t sliderBar;
-  qhandle_t sliderThumb;
-  qhandle_t	menu_width;
-  qhandle_t menu_height;
-  sfxHandle_t menuEnterSound;
-  sfxHandle_t menuExitSound;
-  sfxHandle_t menuBuzzSound;
-  sfxHandle_t itemFocusSound;
-  float fadeClamp;
-  int fadeCycle;
-  float fadeAmount;
-  float shadowX;
-  float shadowY;
-  vec4_t shadowColor;
-  float shadowFadeClamp;
-  qboolean fontRegistered;
+	const char *cursorStr;
+	const char *mainname;
+	const char *ingamename;
+	fontInfo_t textFont;
+	fontInfo_t smallFont;
+	fontInfo_t bigFont;
+	qhandle_t cursor;
+	qhandle_t gradientBar;
+	qhandle_t scrollBarArrowUp;
+	qhandle_t scrollBarArrowDown;
+	qhandle_t scrollBarArrowLeft;
+	qhandle_t scrollBarArrowRight;
+	qhandle_t scrollBarHorz;
+	qhandle_t scrollBarVert;
+	sfxHandle_t menuBuzzSound;
+	sfxHandle_t itemFocusSound;
+	float fadeClamp;
+	int fadeCycle;
+	float fadeAmount;
+	float shadowX;
+	float shadowY;
+	vec4_t shadowColor;
+	float shadowFadeClamp;
+	qboolean fontRegistered;
+
+	const char *errorname;
+	const char *connectname;
+	const char *endname;
+	const char *teamname;
+	float scrollbarsize;
+	float sliderwidth;
+	float sliderheight;
+	float sliderthumbwidth;
+	float sliderthumbheight;
+	qhandle_t scrollBarThumb;
+	qhandle_t buttonMiddle;
+	qhandle_t buttonInside;
+	qhandle_t solidBox;
+	qhandle_t sliderBar;
+	qhandle_t sliderThumb;
+	qhandle_t sliderThumb_sel;
+	qhandle_t checkbox;
+	qhandle_t checkbox_sel;
+	float checkboxwidth;
+	float checkboxheight;
+    qhandle_t menu_width;
+    qhandle_t menu_height;
+	qhandle_t combo;
+	qhandle_t combo_sel;
+	float combowidth;
+	float comboheight;
+	sfxHandle_t menuEnterSound;
+	sfxHandle_t menuExitSound;
 
   // player settings
 	qhandle_t fxBasePic;
@@ -447,5 +511,7 @@ int			trap_PC_LoadSource( const char *filename );
 int			trap_PC_FreeSource( int handle );
 int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
 int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
+
+void Item_Text_AutoWrapped_Paint( itemDef_t *item );
 
 #endif
