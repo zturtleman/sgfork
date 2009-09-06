@@ -1,0 +1,57 @@
+#summary SGFork testing guidelines.
+#labels Phase-QA
+
+= Introduction =
+
+This guidelines are only for internal usage by SGFork testers and QA people.
+
+= Details =
+
+== Know where you are ==
+First of all you have to dermine at which code revision you are.
+To do this you have to open your SVN client and check the current reviosion.
+
+=== What is the revision? ===
+You always have local copy of the sgfork source code. It is snapshot from a previous moment.
+When someone of developers commit changes to source code it means that now where is new revision avalaible. So it is time to check and test it.
+When you want to do a link to revision (in bug report, for example) you just write r<revision number>, like this:
+Bug found at r70.
+Backtracking is the process of setting source code to previous revision to check if problem can be reproduced at this revision.
+If you want to make a link to issue do it like that:
+The revision isn't fixes the issue 30.
+
+=== Windows Tortoise help ===
+To do it under windows with Tortoise you have to right click (context menu) on *sgfork_source* folder (the folder where sgfork code is stored at) and choose TortoiseSVN->show log.
+The bold string is your current revision.
+To update current revision to last you have to right click on *sgfork_source* folder and choose "SVN Update".
+To set revision to previous one you have to right click on *sgfork_source* folder (the folder where sgfork code is stored at) and choose TortoiseSVN->show log. In opened window select the string with revision you want to switch to and choose from context menu "Update to this revision".
+_Nota bene_:
+The main deployment script is changing also when you backtrack to previous revisions. That means that you may get situation when there is no such script (below r42) or it is not consistant.
+So, if you want to deploy previous revision be aware about that and better to ask someone of developers to help you to deploy it after.
+
+----
+
+== Know what you are testing ==
+Read the comment about last commit and read the issue comments which were maded due to last commit.
+Determine what additional tests may be required to test these changes.
+
+== What should be tested anyway? ==
+There is list of steps that you have to perform at each revision:
+  # Is package can be deployed? (you can build it and the game launchs)
+  # Can you start and play all supported game types? (be aware that in team games you have to play at least one match with 2 rounds)
+  # Is UI is consistant and working?
+  # Are you testing current release? (after r70 after each build there is string at lower right corener with current date of game build at the main game menu - it should point to time you have build the game)
+_Nota bene_: Under windows with MinGW you probably get GMT time.
+
+----
+
+== Bugs aren't found ==
+Congratualtions!
+Go to issues corresponding to changes you have checked and write there that you have performed tests to check them.
+
+== Bugs are found ==
+The follwoings steps to be performed by you:
+  # Go to IRC and find at least one developer to inform him about it. Maybe the trouble is known and fix is already have been made.
+  # If developer told you to create an issue, go to issue section and create corresponding issue. Be very detailed. The more details the faster issue will be solved.
+
+Thank you for help and have fun! That is why you are here ;)
