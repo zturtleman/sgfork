@@ -381,6 +381,37 @@ float *CG_TeamColor( int team ) {
 
 /*
 =================
+CG_GetColorForHealth
+=================
+*/
+void CG_GetColorForHealth( int health, vec4_t hcolor ) {
+	if ( health < HEALTH_USUAL) {
+		if (health > HEALTH_INJURED) {
+			//Injuried
+			hcolor[0] = g_color_table[cg_healthInjuredColor.integer & Q_COLORS_COUNT][0];
+			hcolor[1] = g_color_table[cg_healthInjuredColor.integer & Q_COLORS_COUNT][1];
+			hcolor[2] = g_color_table[cg_healthInjuredColor.integer & Q_COLORS_COUNT][2];
+		} else if (cg.snap->ps.stats[STAT_HEALTH] > 0) {
+			//Badly injuried
+			hcolor[0] = g_color_table[cg_healthBadColor.integer & Q_COLORS_COUNT][0];
+			hcolor[1] = g_color_table[cg_healthBadColor.integer & Q_COLORS_COUNT][1];
+			hcolor[2] = g_color_table[cg_healthBadColor.integer & Q_COLORS_COUNT][2];
+		} else {
+			//Dead
+			hcolor[0] = g_color_table[cg_healthDeadColor.integer & Q_COLORS_COUNT][0];
+			hcolor[1] = g_color_table[cg_healthDeadColor.integer & Q_COLORS_COUNT][1];
+			hcolor[2] = g_color_table[cg_healthDeadColor.integer & Q_COLORS_COUNT][2];
+		}
+	} else {
+		//Usual color
+		hcolor[0] = g_color_table[cg_healthUsualColor.integer & Q_COLORS_COUNT][0];
+		hcolor[1] = g_color_table[cg_healthUsualColor.integer & Q_COLORS_COUNT][1];
+		hcolor[2] = g_color_table[cg_healthUsualColor.integer & Q_COLORS_COUNT][2];
+	}
+}
+
+/*
+=================
 UI_DrawProportionalString2
 =================
 */
@@ -699,7 +730,7 @@ UI_ProportionalSizeScale
 float UI_ProportionalSizeScale( int style ) {
 	if(  style & UI_SMALLFONT ) {
 // Tequila comment: Adjusted the scale for small ui font
-		return 0.45;
+		return 0.45f;
 	}
 
 	return 1.00;

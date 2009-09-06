@@ -131,14 +131,14 @@ vmCvar_t	cg_crosshair1X;
 vmCvar_t	cg_crosshair1Y;
 vmCvar_t	cg_crosshair1Size;
 vmCvar_t	cg_crosshair1Health;
-vmCvar_t	cg_crosshair1HealthColor1;
-vmCvar_t	cg_crosshair1HealthColor2;
 vmCvar_t	cg_crosshair2X;
 vmCvar_t	cg_crosshair2Y;
 vmCvar_t	cg_crosshair2Size;
 vmCvar_t	cg_crosshair2Health;
-vmCvar_t	cg_crosshair2HealthColor1;
-vmCvar_t	cg_crosshair2HealthColor2;
+vmCvar_t	cg_healthInjuredColor;
+vmCvar_t	cg_healthBadColor;
+vmCvar_t	cg_healthDeadColor;
+vmCvar_t	cg_healthUsualColor;
 vmCvar_t	cg_drawRewards;
 vmCvar_t	cg_draw2D;
 vmCvar_t	cg_drawStatus;
@@ -336,36 +336,36 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
-	{ &cg_crosshairDrawFriend, "cg_crosshairDrawFriend", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair1FriendColor, "cg_crosshair1FriendColor", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair1ActivateColor, "cg_crosshair1ActivateColor", "3", CVAR_ARCHIVE },
-	{ &cg_crosshair1OpponentColor, "cg_crosshair1OpponentColor", "2", CVAR_ARCHIVE },
-	{ &cg_crosshair1Color, "cg_crosshair1Color", "7", CVAR_ARCHIVE },
-	{ &cg_drawCrosshair1, "cg_drawCrosshair1", "4", CVAR_ARCHIVE },
-	{ &cg_crosshair1PickUpPulse, "cg_crosshair1PickUpPulse", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair1WidthRatio, "cg_crosshair1WidthRatio", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair1Transparency, "cg_crosshair1Transparency", "1.0", CVAR_ARCHIVE },
-	{ &cg_crosshair2Color, "cg_crosshair2Color", "2", CVAR_ARCHIVE },
-	{ &cg_drawCrosshair2, "cg_drawCrosshair2", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair2FriendColor, "cg_crosshair2FriendColor", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair2ActivateColor, "cg_crosshair2ActivateColor", "3", CVAR_ARCHIVE },
-	{ &cg_crosshair2OpponentColor, "cg_crosshair2OpponentColor", "2", CVAR_ARCHIVE },
-	{ &cg_crosshair2PickUpPulse, "cg_crosshair2PickUpPulse", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair2WidthRatio, "cg_crosshair2WidthRatio", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair2Transparency, "cg_crosshair2Transparency", "1.0", CVAR_ARCHIVE },
-	{ &cg_crosshair1X, "cg_crosshair1X", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair1Y, "cg_crosshair1Y", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair1Size, "cg_crosshair1Size", "24", CVAR_ARCHIVE },
-	{ &cg_crosshair1Health, "cg_crosshair1Health", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair1HealthColor1, "cg_crosshair1HealthColor1", "8", CVAR_ARCHIVE },
-	{ &cg_crosshair1HealthColor2, "cg_crosshair1HealthColor2", "25", CVAR_ARCHIVE },
-	{ &cg_crosshair2X, "cg_crosshair2X", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair2Y, "cg_crosshair2Y", "0", CVAR_ARCHIVE },
-	{ &cg_crosshair2Size, "cg_crosshair2Size", "24", CVAR_ARCHIVE },
-	{ &cg_crosshair2Health, "cg_crosshair2Health", "1", CVAR_ARCHIVE },
-	{ &cg_crosshair2HealthColor1, "cg_crosshair2HealthColor1", "8", CVAR_ARCHIVE },
-	{ &cg_crosshair2HealthColor2, "cg_crosshair2HealthColor2", "25", CVAR_ARCHIVE },
-	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1Color,			"cg_crosshair1Color", "7", CVAR_ARCHIVE },
+	{ &cg_drawCrosshair1,			"cg_drawCrosshair1", "4", CVAR_ARCHIVE },
+	{ &cg_crosshairDrawFriend,		"cg_crosshairDrawFriend", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1FriendColor,	"cg_crosshair1FriendColor", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1ActivateColor,	"cg_crosshair1ActivateColor", "3", CVAR_ARCHIVE },
+	{ &cg_crosshair1OpponentColor,	"cg_crosshair1OpponentColor", "2", CVAR_ARCHIVE },
+	{ &cg_crosshair1PickUpPulse,	"cg_crosshair1PickUpPulse", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1WidthRatio,		"cg_crosshair1WidthRatio", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair1Transparency,	"cg_crosshair1Transparency", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshair1X,				"cg_crosshair1X", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair1Y,				"cg_crosshair1Y", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair1Size,			"cg_crosshair1Size", "24", CVAR_ARCHIVE },
+	{ &cg_crosshair1Health,			"cg_crosshair1Health", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2Color,			"cg_crosshair2Color", "2", CVAR_ARCHIVE },
+	{ &cg_drawCrosshair2,			"cg_drawCrosshair2", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2FriendColor,	"cg_crosshair2FriendColor", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair2ActivateColor,	"cg_crosshair2ActivateColor", "3", CVAR_ARCHIVE },
+	{ &cg_crosshair2OpponentColor,	"cg_crosshair2OpponentColor", "2", CVAR_ARCHIVE },
+	{ &cg_crosshair2PickUpPulse,	"cg_crosshair2PickUpPulse", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2WidthRatio,		"cg_crosshair2WidthRatio", "1", CVAR_ARCHIVE },
+	{ &cg_crosshair2Transparency,	"cg_crosshair2Transparency", "1.0", CVAR_ARCHIVE },
+	{ &cg_crosshair2X,				"cg_crosshair2X", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2Y,				"cg_crosshair2Y", "0", CVAR_ARCHIVE },
+	{ &cg_crosshair2Size,			"cg_crosshair2Size", "24", CVAR_ARCHIVE },
+	{ &cg_crosshair2Health,			"cg_crosshair2Health", "1", CVAR_ARCHIVE },
+	{ &cg_healthInjuredColor,		"cg_healthInjuredColor", "8", CVAR_ARCHIVE },
+	{ &cg_healthBadColor,			"cg_healthBadColor", "25", CVAR_ARCHIVE },
+	{ &cg_healthDeadColor,			"cg_healthDeadColor", "0", CVAR_ARCHIVE },
+	{ &cg_healthUsualColor,			"cg_healthUsualColor", "7", CVAR_ARCHIVE },
+	{ &cg_drawCrosshairNames,		"cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
 	{ &cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },

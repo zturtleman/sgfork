@@ -1648,23 +1648,8 @@ static void CG_DrawCrosshair( int changeCrosshairFlags )
 			hcolor[2] = g_color_table[cg_crosshair1ActivateColor.integer & Q_COLORS_COUNT][2];
 		} else {
 			// set color based on health
-			if ( cg_crosshair1Health.integer && cg.snap->ps.stats[STAT_HEALTH] < 80) {
-				if (cg.snap->ps.stats[STAT_HEALTH] > 49) {
-					//Injuried
-					hcolor[0] = g_color_table[cg_crosshair1HealthColor1.integer & Q_COLORS_COUNT][0];
-					hcolor[1] = g_color_table[cg_crosshair1HealthColor1.integer & Q_COLORS_COUNT][1];
-					hcolor[2] = g_color_table[cg_crosshair1HealthColor1.integer & Q_COLORS_COUNT][2];
-				} else if (cg.snap->ps.stats[STAT_HEALTH] > 0) {
-					//Badly injuried
-					hcolor[0] = g_color_table[cg_crosshair1HealthColor2.integer & Q_COLORS_COUNT][0];
-					hcolor[1] = g_color_table[cg_crosshair1HealthColor2.integer & Q_COLORS_COUNT][1];
-					hcolor[2] = g_color_table[cg_crosshair1HealthColor2.integer & Q_COLORS_COUNT][2];
-				} else {
-					//Dead, Black
-					hcolor[0] = g_color_table[0][0];
-					hcolor[1] = g_color_table[0][1];
-					hcolor[2] = g_color_table[0][2];
-				}
+			if ( cg_crosshair1Health.integer && cg.snap->ps.stats[STAT_HEALTH] < HEALTH_USUAL) {
+				CG_GetColorForHealth(cg.snap->ps.stats[STAT_HEALTH],hcolor);
 			} else {
 				//Usual color
 				hcolor[0] = g_color_table[cg_crosshair1Color.integer & Q_COLORS_COUNT][0];
@@ -1738,23 +1723,8 @@ static void CG_DrawCrosshair( int changeCrosshairFlags )
 			hcolor[2] = g_color_table[cg_crosshair2ActivateColor.integer & Q_COLORS_COUNT][2];
 		} else {
 			// set color based on health
-			if ( cg_crosshair2Health.integer && cg.snap->ps.stats[STAT_HEALTH] < 80) {
-				if (cg.snap->ps.stats[STAT_HEALTH] > 49) {
-					//Injuried
-					hcolor[0] = g_color_table[cg_crosshair2HealthColor1.integer & Q_COLORS_COUNT][0];
-					hcolor[1] = g_color_table[cg_crosshair2HealthColor1.integer & Q_COLORS_COUNT][1];
-					hcolor[2] = g_color_table[cg_crosshair2HealthColor1.integer & Q_COLORS_COUNT][2];
-				} else if (cg.snap->ps.stats[STAT_HEALTH] > 0) {
-					//Badly injuried
-					hcolor[0] = g_color_table[cg_crosshair2HealthColor2.integer & Q_COLORS_COUNT][0];
-					hcolor[1] = g_color_table[cg_crosshair2HealthColor2.integer & Q_COLORS_COUNT][1];
-					hcolor[2] = g_color_table[cg_crosshair2HealthColor2.integer & Q_COLORS_COUNT][2];
-				} else {
-					//Dead, Black
-					hcolor[0] = g_color_table[0][0];
-					hcolor[1] = g_color_table[0][1];
-					hcolor[2] = g_color_table[0][2];
-				}
+			if ( cg_crosshair2Health.integer && cg.snap->ps.stats[STAT_HEALTH] < HEALTH_USUAL) {
+				CG_GetColorForHealth(cg.snap->ps.stats[STAT_HEALTH],hcolor);
 			} else {
 				//Usual color
 				hcolor[0] = g_color_table[cg_crosshair2Color.integer & Q_COLORS_COUNT][0];
@@ -1892,9 +1862,15 @@ static void CG_ScanForCrosshairEntity(int *changeCrosshairFlags) {
 	}
 
 	// trace through glass
-	while ( trace.surfaceFlags & SURF_GLASS ) {
+	// FIXME: doesn't work through more than one level of glass
+	/*	while ( trace.surfaceFlags & SURF_GLASS ) {
 		CG_Trace( &trace, trace.endpos, vec3_origin, vec3_origin,
 			       end, trace.entityNum, CONTENTS_SOLID|CONTENTS_BODY );
+	} <- This fix causes game's freeze   */
+	if ( trace.surfaceFlags & SURF_GLASS ) {
+			CG_Trace( &trace, start, vec3_origin, vec3_origin,
+			          end, trace.entityNum, CONTENTS_SOLID|CONTENTS_BODY 
+			);
 	}
 
 	// update the fade timer
@@ -1928,7 +1904,7 @@ static void CG_ScanForCrosshairEntity(int *changeCrosshairFlags) {
 CG_DrawCrosshairNames
 =====================
 */
-static void CG_DrawCrosshairNames(qboolean isPlayer) {
+static void CG_DrawCrosshairNames(int isPlayer) {
 	float		*color;
 	char		*name;
 	float		w;
