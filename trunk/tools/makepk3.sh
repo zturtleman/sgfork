@@ -63,7 +63,7 @@ zip -r $VMPAKNAME vm/
 mv $VMPAKNAME "$HDIR"
 cd ../../..
 cd base
-sed "s/SGFORK_RELEASE/SGFork release at `date`/" ui/main.menu.template > ui/main.menu
+[ -f  ui/main.menu.template ] && sed "s/SGFORK_RELEASE/SGFork release at `date`/" ui/main.menu.template > ui/main.menu
 zip -r $UIPAKNAME ui/
 zip -r $GFXPAKNAME gfx/
 zip -r $SCRIPTSPAKNAME scripts/

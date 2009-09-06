@@ -99,6 +99,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CHANGE_CROSSHAIR_TEAMMATE  2
 #define CHANGE_CROSSHAIR_OPPONENT  4
 
+//Health stages
+#define HEALTH_USUAL	80
+#define HEALTH_INJURED	49
+
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -1350,14 +1354,14 @@ extern	vmCvar_t		cg_crosshair1X;
 extern	vmCvar_t		cg_crosshair1Y;
 extern	vmCvar_t		cg_crosshair1Size;
 extern	vmCvar_t		cg_crosshair1Health;
-extern	vmCvar_t		cg_crosshair1HealthColor1;
-extern	vmCvar_t		cg_crosshair1HealthColor2;
 extern	vmCvar_t		cg_crosshair2X;
 extern	vmCvar_t		cg_crosshair2Y;
 extern	vmCvar_t		cg_crosshair2Size;
 extern	vmCvar_t		cg_crosshair2Health;
-extern	vmCvar_t		cg_crosshair2HealthColor1;
-extern	vmCvar_t		cg_crosshair2HealthColor2;
+extern	vmCvar_t		cg_healthInjuredColor;
+extern	vmCvar_t		cg_healthBadColor;
+extern	vmCvar_t		cg_healthDeadColor;
+extern	vmCvar_t		cg_healthUsualColor;
 extern	vmCvar_t		cg_drawCrosshairNames;
 extern	vmCvar_t		cg_drawRewards;
 extern	vmCvar_t		cg_drawTeamOverlay;
@@ -1598,6 +1602,7 @@ int CG_DrawStrlen( const char *str );
 
 float	*CG_FadeColor( int startMsec, int totalMsec );
 float *CG_TeamColor( int team );
+void CG_GetColorForHealth( int health, vec4_t hcolor );
 void CG_TileClear( void );
 
 void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
