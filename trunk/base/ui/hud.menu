@@ -23,6 +23,78 @@
 
   }
 
+//	Stuffity	//
+menuDef {
+	name "stuffity"
+	fullScreen MENU_FALSE
+	visible MENU_TRUE
+	rect 0 0 640 480
+
+	itemDef {
+      		name "lagomtr"
+        	rect 592 432 48 48
+		visible 1
+		decoration
+		ownerdraw CG_LAGOMETER
+	}
+	itemDef {
+      		name "fps"
+        	rect 585 40 0 0
+		visible 1
+		decoration
+		ownerdraw CG_FPS
+	}
+	itemDef {
+      		name "snapshot"
+        	rect 500 80 0 0
+		visible 1
+		decoration
+		ownerdraw CG_SNAPSHOT
+	}
+	itemDef {
+      		name "timer"
+        	rect 300 40 0 0
+		visible 1
+		decoration
+		ownerdraw CG_TIMER
+	}
+	itemDef {
+      		name "attacker"
+        	rect 550 200 0 0
+		visible 1
+		decoration
+		ownerdraw CG_ATTACKER
+	}
+	itemDef {
+      		name "deathmessages"
+        	rect 640 100 0 0
+		visible 1
+		decoration
+		ownerdraw CG_DEATHMESSAGES
+	}
+	itemDef {
+      		name "teamoverlay"
+        	rect 640 40 0 0
+		visible 1
+		decoration
+		ownerdraw CG_TEAMOVERLAY
+	}
+	itemDef {
+      		name "dbstatentities"
+        	rect 0 200 0 0
+		visible 1
+		decoration
+		ownerdraw CG_STATUSENTITIES
+	}
+	itemDef {
+      		name "dbcamerainfo"
+        	rect 445 200 0 0
+		visible 1
+		decoration
+		ownerdraw CG_CAMERAINFO
+	}
+
+}
 
 //	STATUS BAR	//
 

@@ -1239,6 +1239,8 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.flare = trap_R_RegisterShader("wqfx/flare");
 	//cgs.media.sparktrail = trap_R_RegisterShader("wqfx/spark");
 
+	cgs.media.heartShader = trap_R_RegisterShaderNoMip( "ui/assets/statusbar/selectedhealth.tga" );
+
 	CG_LoadingStage(1);
 
 	memset( cg_items, 0, sizeof( cg_items ) );
@@ -1313,6 +1315,22 @@ static void CG_RegisterGraphics( void ) {
        cgs.media.quad = trap_R_RegisterModel("models/misc/quad.md3");
        // not quad damage, but a model consisting of a simple square
        // (needed for bullet holes in breakables
+
+	// new stuff
+	cgs.media.patrolShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/patrol.tga");
+	cgs.media.assaultShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/assault.tga");
+	cgs.media.campShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/camp.tga");
+	cgs.media.followShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/follow.tga");
+	cgs.media.defendShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/defend.tga");
+	cgs.media.teamLeaderShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/team_leader.tga");
+	cgs.media.retrieveShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/retrieve.tga");
+	cgs.media.escortShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/escort.tga");
+	cgs.media.cursor = trap_R_RegisterShaderNoMip( "menu/art/3_cursor2" );
+	cgs.media.sizeCursor = trap_R_RegisterShaderNoMip( "ui/assets/sizecursor.tga" );
+	cgs.media.selectCursor = trap_R_RegisterShaderNoMip( "ui/assets/selectcursor.tga" );
+	cgs.media.flagShaders[0] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_in_base.tga");
+	cgs.media.flagShaders[1] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_capture.tga");
+	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
 
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
@@ -1705,6 +1723,164 @@ qboolean CG_Asset_Parse(int handle) {
 			cgDC.Assets.shadowFadeClamp = cgDC.Assets.shadowColor[3];
 			continue;
 		}
+
+		if (Q_stricmp(token.string, "scrollbarSize") == 0) {
+			if (!PC_Float_Parse(handle, &cgDC.Assets.scrollbarsize)) {
+				return qfalse;
+			}
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderWidth") == 0) {
+			if (!PC_Float_Parse(handle, &cgDC.Assets.sliderwidth)) {
+			   return qfalse;
+			}
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderHeight") == 0) {
+			if (!PC_Float_Parse(handle, &cgDC.Assets.sliderheight)) {
+			   return qfalse;
+			}
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderthumbWidth") == 0) {
+			if (!PC_Float_Parse(handle, &cgDC.Assets.sliderthumbwidth)) {
+			   return qfalse;
+			}
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderthumbHeight") == 0) {
+			if (!PC_Float_Parse(handle, &cgDC.Assets.sliderthumbheight)) {
+			   return qfalse;
+			}
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderBar") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.sliderBar = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderThumb") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+				return qfalse;
+			}
+			cgDC.Assets.sliderThumb = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "sliderThumbSel") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.sliderThumb_sel = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarHorz") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarHorz = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarVert") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarVert = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarThumb") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarThumb = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarArrowUp") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarArrowUp = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarArrowDown") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarArrowDown = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarArrowLeft") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "scrollBarArrowRight") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.scrollBarArrowRight = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxBase") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxRed") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxYellow") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxGreen") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxTeal") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[3] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxBlue") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[4] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxCyan") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[5] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+		if (Q_stricmp(token.string, "fxWhite") == 0) {
+			if (!PC_String_Parse(handle, &tempStr)) {
+			   return qfalse;
+			}
+			cgDC.Assets.fxPic[6] = trap_R_RegisterShaderNoMip( tempStr);
+			continue;
+		}
+
 	}
 	return qfalse;
 }
@@ -2176,7 +2352,16 @@ void CG_AssetCache( void ) {
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	cgDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-//	cgDC.Assets.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
+	cgDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
+	cgDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
+	cgDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
+	cgDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
+	cgDC.Assets.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
+	cgDC.Assets.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
+	cgDC.Assets.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	cgDC.Assets.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+	cgDC.Assets.scrollBarHorz = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
+	cgDC.Assets.scrollBarVert = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
 	cgDC.Assets.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
 	cgDC.Assets.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
 	cgDC.Assets.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
@@ -2184,6 +2369,12 @@ void CG_AssetCache( void ) {
 	cgDC.Assets.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
 	cgDC.Assets.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
 	cgDC.Assets.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
+	cgDC.Assets.sliderThumb_sel = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB_SEL );
+	cgDC.Assets.scrollbarsize = SCROLLBAR_SIZE;
+	cgDC.Assets.sliderwidth = SLIDER_WIDTH;
+	cgDC.Assets.sliderheight = SLIDER_HEIGHT;
+	cgDC.Assets.sliderthumbwidth = SLIDER_THUMB_WIDTH;
+	cgDC.Assets.sliderthumbheight = SLIDER_THUMB_HEIGHT;
 }
 /*
 =================

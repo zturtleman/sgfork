@@ -86,6 +86,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_SCRIPT_ARGS 12
 #define MAX_EDITFIELD 256
 
+#define ART_FX_BASE				"menu/art/fx_base.tga"
+#define ART_FX_RED				"menu/art/fx_red.tga"
+#define ART_FX_YELLOW			"menu/art/fx_yellow.tga"
+#define ART_FX_GREEN			"menu/art/fx_green.tga"
+#define ART_FX_TEAL				"menu/art/fx_blue.tga"
+#define ART_FX_BLUE				"menu/art/fx_teal.tga"
+#define ART_FX_CYAN				"menu/art/fx_cyan.tga"
+#define ART_FX_WHITE			"menu/art/fx_white.tga"
+
 #define ASSET_GRADIENTBAR			"ui/assets/gradientbar2.tga"
 #define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
 #define ASSET_SCROLLBAR_ARROWDOWN   "ui/assets/scrollbar_arrow_dwn_a.tga"

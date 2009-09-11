@@ -2264,6 +2264,10 @@
 					RelativePath="..\..\code\botlib\l_utils.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\base\ui\menudef.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

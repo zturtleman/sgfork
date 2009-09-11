@@ -1069,6 +1069,7 @@ typedef struct {
 	qhandle_t	teleportEffectModel;
 	qhandle_t	teleportEffectShader;
 	qhandle_t	dustPuffShader;
+	qhandle_t	heartShader;
 
 	// scoreboard headers
 	qhandle_t	scoreboardName;
@@ -1115,6 +1116,23 @@ typedef struct {
 	sfxHandle_t watrInSound;
 	sfxHandle_t watrOutSound;
 	sfxHandle_t watrUnSound;
+
+	// new stuff
+	qhandle_t patrolShader;
+	qhandle_t assaultShader;
+	qhandle_t campShader;
+	qhandle_t followShader;
+	qhandle_t defendShader;
+	qhandle_t teamLeaderShader;
+	qhandle_t retrieveShader;
+	qhandle_t escortShader;
+	qhandle_t flagShaders[3];
+	sfxHandle_t	countPrepareTeamSound;
+
+	sfxHandle_t ammoregenSound;
+	sfxHandle_t doublerSound;
+	sfxHandle_t guardSound;
+	sfxHandle_t scoutSound;
 
 	qhandle_t cursor;
 	qhandle_t selectCursor;
@@ -1681,8 +1699,6 @@ int	CG_PointContents( const vec3_t point, int passEntityNum );
 void CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 					 int skipNumber, int mask );
 int CG_Trace_New( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
-					 int skipNumber, int mask );
-void CG_Trace2( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 					 int skipNumber, int mask );
 int CG_Trace_Visible( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 					 int skipNumber, int mask, vec_t max_distance );
