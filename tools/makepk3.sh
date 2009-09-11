@@ -6,6 +6,7 @@ CONFPAKNAME="sgfork-configs.pk3"
 UIPAKNAME="sgfork-ui.pk3"
 SCRIPTSPAKNAME="sgfork-scripts.pk3"
 GFXPAKNAME="sgfork-gfx.pk3"
+MENUPAKNAME="sgfork-menu.pk3"
 CONFDIR="configs"
 PWD=`pwd`
 MAINBINARY=
@@ -54,6 +55,7 @@ then
   mv $MAINBINARY "$HDIR/../"
   mv $DEDIBINARY "$HDIR/../"
   cd ../../
+  [ "$PLATFORM" = "mingw32" ] && cp misc/win32/dlls/SDL.dll "$HDIR/../"
 else
   make BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1 $*
 fi
@@ -67,6 +69,8 @@ cd base
 zip -r $UIPAKNAME ui/
 zip -r $GFXPAKNAME gfx/
 zip -r $SCRIPTSPAKNAME scripts/
-mv $UIPAKNAME $GFXPAKNAME $SCRIPTSPAKNAME "$HDIR"
+zip -r $MENUPAKNAME menu/
+mv $UIPAKNAME $GFXPAKNAME $SCRIPTSPAKNAME $MENUPAKNAME "$HDIR"
 cd ../
 cd $PWD
+echo "<<<The game is successfully deployed!>>>"

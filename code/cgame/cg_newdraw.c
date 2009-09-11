@@ -27,6 +27,42 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern displayContextDef_t cgDC;
 
+#define	LAG_SAMPLES		128
+typedef struct {
+	int		frameSamples[LAG_SAMPLES];
+	int		frameCount;
+	int		snapshotFlags[LAG_SAMPLES];
+	int		snapshotSamples[LAG_SAMPLES];
+	int		snapshotCount;
+} lagometer_t;
+lagometer_t	 lagometer;	
+
+//Adds the current interpolate / extrapolate bar for this frame
+void CG_AddLagometerFrameInfo( void ) {
+	int			offset;
+
+	offset = cg.time - cg.latestSnapshotTime;
+	lagometer.frameSamples[ lagometer.frameCount & ( LAG_SAMPLES - 1) ] = offset;
+	lagometer.frameCount++;
+}
+
+/*Each time a snapshot is received, log its ping time and
+the number of snapshots that were dropped before it.
+Pass NULL for a dropped packet.*/
+void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
+	// dropped packet
+	if ( !snap ) {
+		lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = -1;
+		lagometer.snapshotCount++;
+		return;
+	}
+
+	// add this snapshot's info
+	lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->ping;
+	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
+	lagometer.snapshotCount++;
+}
+
 void CG_DrawField (int x, int y, int width, int value);
 void CG_DrawMoneyField (int x, int y, int width, int value);
 
@@ -140,21 +176,17 @@ int CG_GetSelectedPlayer( void ) {
 
 void CG_SelectNextPlayer( void ) {
 	CG_CheckOrderPending();
-	if (cg_currentSelectedPlayer.integer >= 0 && cg_currentSelectedPlayer.integer < numSortedTeamPlayers) {
-		cg_currentSelectedPlayer.integer++;
-	} else {
+	cg_currentSelectedPlayer.integer +=1;
+	if (cg_currentSelectedPlayer.integer > numSortedTeamPlayers)
 		cg_currentSelectedPlayer.integer = 0;
-	}
 	CG_SetSelectedPlayerName();
 }
 
 void CG_SelectPrevPlayer( void ) {
 	CG_CheckOrderPending();
-	if (cg_currentSelectedPlayer.integer > 0 && cg_currentSelectedPlayer.integer < numSortedTeamPlayers) {
-		cg_currentSelectedPlayer.integer--;
-	} else {
+	cg_currentSelectedPlayer.integer -=1;
+	if (cg_currentSelectedPlayer.integer < 0)
 		cg_currentSelectedPlayer.integer = numSortedTeamPlayers;
-	}
 	CG_SetSelectedPlayerName();
 }
 
@@ -696,14 +728,50 @@ qboolean CG_OwnerDrawVisible(int flags) {
 		}
 	}
 
-	if (flags & CG_SHOW_HEALTHCRITICAL) {
-		if (cg.snap->ps.stats[STAT_HEALTH] < 25) {
+	if (flags & CG_SHOW_BR) {
+		if( cgs.gametype == GT_BR ) {
+			return qtrue;
+		} else {
+			return qfalse;
+		}
+	}
+
+	if (flags & CG_SHOW_TDM) {
+		if( cgs.gametype == GT_TEAM) {
+			return qtrue;
+		} else {
+			return qfalse;
+		}
+	}
+
+	if (flags & CG_SHOW_RTP) {
+		if( cgs.gametype == GT_RTP ) {
 			return qtrue;
 		}
 	}
 
-	if (flags & CG_SHOW_HEALTHOK) {
-		if (cg.snap->ps.stats[STAT_HEALTH] >= 25) {
+	if (flags & CG_SHOW_DM) {
+		if( cgs.gametype == GT_FFA ) {
+			return qtrue;
+		} else {
+			return qfalse;
+		}
+	}
+
+	if (flags & CG_SHOW_HEALTHUSUAL) {
+		if (cg.snap->ps.stats[STAT_HEALTH] >= HEALTH_USUAL ) {
+			return qtrue;
+		}
+	}
+
+	if (flags & CG_SHOW_HEALTHINJURED) {
+		if (cg.snap->ps.stats[STAT_HEALTH] > HEALTH_INJURED && cg.snap->ps.stats[STAT_HEALTH] < HEALTH_USUAL ) {
+			return qtrue;
+		}
+	}
+
+	if (flags & CG_SHOW_HEALTHBAD) {
+		if (cg.snap->ps.stats[STAT_HEALTH] <= HEALTH_INJURED ) {
 			return qtrue;
 		}
 	}
@@ -723,16 +791,18 @@ qboolean CG_OwnerDrawVisible(int flags) {
 	if (flags & CG_SHOW_DURINGINCOMINGVOICE) {
 	}
 
+
+	if (flags & CG_SHOW_IF_PLAYER_HAS_GOLD) {
+		if(cg.snap->ps.powerups[PW_GOLD] && cgs.gametype == GT_BR) {
+			return qtrue;
+		}
+	}
+
 	if (flags & CG_SHOW_WEAPON2){
 		if( cg.snap->ps.weapon2)
 			return qtrue;
 	}
 	return qfalse;
-}
-
-
-
-static void CG_DrawPlayerHasFlag(rectDef_t *rect, qboolean force2D) {
 }
 
 static void CG_DrawAreaSystemChat(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader) {
@@ -875,7 +945,792 @@ static void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4
 
 }
 
+static void CG_DrawTimer(rectDef_t *rect, vec4_t textColor) {
+	char		*s;
+//	int			w;
+	int			mins, seconds, tens;
+	int			msec;
 
+	if (!cg_drawTimer.integer || cg_paused.integer)
+		return;
+
+	msec = cg.time - cgs.levelStartTime;
+
+	seconds = msec / 1000;
+	mins = seconds / 60;
+	seconds -= mins * 60;
+	tens = seconds / 10;
+	seconds -= tens * 10;
+
+	s = va( "%i:%i%i", mins, tens, seconds );
+//	w = CG_DrawStrlen( s ) * 11;
+
+	CG_Text_Paint(rect->x, rect->y + 5 + BIGCHAR_HEIGHT, 0.4f, textColor, s, 0, 0, 3);
+}
+
+//by: hika / 2006-12-30
+//Shows entities visibility status on the right
+static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
+	char *s;
+	float x,y;
+	snapshot_t *snap;
+	int i, j;
+	int eType[ET_EVENTS+3][4];	// visible, solid, visible + solid, total + ET_EVENTS + EV_*
+	int max_eType = ET_EVENTS+2;
+	centity_t *cent;
+	localEntity_t	*active, *le, *next;
+	int leType[LE_SHOWREFENTITY+2][2];	// local entities
+	int max_leType = LE_SHOWREFENTITY+1;
+
+	if (!cg_drawdebug.integer || cg_paused.integer)
+		return;
+
+	if (cg.nextSnap && !cg.nextFrameTeleport && !cg.thisFrameTeleport) {
+		snap = cg.nextSnap;
+	}
+	else {
+		snap = cg.snap;
+	}
+
+    x = rect->x;
+	y = rect->y;
+
+	memset(eType, 0, sizeof(eType));
+	memset(leType, 0, sizeof(leType));
+
+	// Fill status informations for entities
+	for( i = 0; i < snap->numEntities; i++ ) {
+		cent = &cg_entities[ snap->entities[i].number ];
+		if (cent->currentState.eType > ET_EVENTS)
+			j = max_eType - 1;	// It is an event entity
+		else
+			j = cent->currentState.eType;
+
+		eType[ j ][0]++;
+		eType[ max_eType ][0]++;
+		if (CG_IsEntityVisible(cent, 0)) {
+			eType[ j ][1]++;	// visible
+			eType[ max_eType ][1]++;
+			if (cent->nextState.solid) {
+				eType[ j ][2]++;	// solid
+				eType[ j ][3]++;	// visible and solid
+
+				eType[ max_eType ][2]++;
+				eType[ max_eType ][3]++;
+			}
+		}
+		else if (cent->nextState.solid) {
+			eType[ j ][2]++;	// solid but not visible
+			eType[ max_eType ][2]++;
+		}
+	}
+
+	if (eType[ max_eType ][0] > 0) {
+		s = va("=== Entities ===");
+		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		y += TINYCHAR_HEIGHT + 4;
+
+		// Then, display for each entity type, the total number in the snapshot
+		// and the total number in the player's field of view.
+		for (i = 0; i < max_eType; i++) {
+			if (eType[i][0] > 0) {
+				char *s_eType = NULL;
+				switch ( i ) {
+				case ET_FLY:
+					s_eType = "ET_FLY";
+					break;
+				case ET_PLAYER:
+					s_eType = "ET_PLAYER";
+					break;
+				case ET_INVISIBLE:
+					s_eType = "ET_INVISIBLE";
+					break;
+				case ET_PUSH_TRIGGER:
+					s_eType = "ET_PUSH_TRIGGER";
+					break;
+				case ET_TELEPORT_TRIGGER:
+					s_eType = "ET_TELEPORT_TRIGGER";
+					break;
+				case ET_GENERAL:
+					s_eType = "ET_GENERAL";
+					break;
+				case ET_ITEM:
+					s_eType = "ET_ITEM";
+					break;
+				case ET_MISSILE:
+					s_eType = "ET_MISSILE";
+					break;
+				case ET_MOVER:
+					s_eType = "ET_MOVER";
+					break;
+				case ET_BREAKABLE:
+					s_eType = "ET_BREAKABLE";
+					break;
+				case ET_BEAM:
+					s_eType = "ET_BEAM";
+					break;
+				case ET_PORTAL:
+					s_eType = "ET_PORTAL";
+					break;
+				case ET_SPEAKER:
+					s_eType = "ET_SPEAKER";
+					break;
+				case ET_GRAPPLE:
+					s_eType = "ET_GRAPPLE";
+					break;
+				case ET_TEAM:
+					s_eType = "ET_TEAM";
+					break;
+				case ET_TURRET:
+					s_eType = "ET_TURRET";
+					break;
+				case ET_FLARE:
+					s_eType = "ET_FLARE";
+					break;
+				case ET_SMOKE:
+					s_eType = "ET_SMOKE";
+					break;
+				case ET_ESCAPE:
+					s_eType = "ET_ESCAPE";
+					break;
+				case ET_INTERMISSION:
+					s_eType = "ET_INTERMISSION";
+					break;
+				case ET_EVENTS:
+					s_eType = "ET_EVENTS";
+					break;
+				default:
+					s_eType = "EV_";
+					break;
+				}
+				if (s_eType != NULL) {
+					s = va("[%s]: %i/%i entities, %i/%i solids",
+						s_eType, eType[i][1], eType[i][0], eType[i][3], eType[i][2]);
+					CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+					y += TINYCHAR_HEIGHT + 4;
+				}
+			}
+		}
+
+		// Show total entities
+		s = va("TOTAL: %i/%i entities, %i/%i solids",
+			eType[i][1], eType[i][0], eType[i][3], eType[i][2]);
+		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		y += TINYCHAR_HEIGHT + 4;
+	}
+
+	// Fill status information for local entities
+	active = CG_GetActiveLocalEntities();
+	// walk the list backwards
+	le = active->prev;
+	for ( i = 0; le != active ; le = next, i++ ) {
+		int endTime = le->endTime;
+		j = le->leType;
+		// grab next now, so if the local entity is freed we
+		// still have it
+		next = le->prev;
+		if ( cg.time >= endTime )
+			continue;
+
+		if (j < max_leType) {
+			leType[j][0]++;
+			leType[max_leType][0]++;	// Fill total local entities
+			if (CG_IsLocalEntityVisible(le, 0)) {
+			// Visible
+				leType[j][1]++;
+				leType[max_leType][1]++;
+			}
+		}
+	}
+
+	if (leType[ max_leType ][0] > 0) {
+		s = va("=== Local Entities ===");
+		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		y += TINYCHAR_HEIGHT + 4;
+
+		// Then, display for each locale entity type
+		for ( i = 0; i < max_leType; i++) {
+			if (leType[i][0] > 0) {
+				char *s_leType = NULL;
+				switch ( i ) {
+				case LE_MARK:
+					s_leType = "LE_MARK";
+					break;
+				case LE_SMOKE:
+					s_leType = "LE_SMOKE";
+					break;
+				case LE_SPRITE_EXPLOSION:
+					s_leType = "LE_SPRITE_EXPLOSION";
+					break;
+				case LE_EXPLOSION:
+					s_leType = "LE_EXPLOSION";
+					break;
+				case LE_FRAGMENT:			// gibs and brass
+					s_leType = "LE_FRAGMENT";
+					break;
+				case LE_MOVE_SCALE_FADE:		// water bubbles
+					s_leType = "LE_MOVE_SCALE_FADE";
+					break;
+				case LE_FADE_RGB:				// teleporters, railtrails
+					s_leType = "LE_FADE_RGB";
+					break;
+				case LE_FALL_SCALE_FADE: // gib blood trails
+					s_leType = "LE_FALL_SCALE_FADE";
+					break;
+				case LE_SCALE_FADE:		// rocket trails
+					s_leType = "LE_SCALE_FADE";
+					break;
+				case LE_SCOREPLUM:
+					s_leType = "LE_SCOREPLUM";
+					break;
+				}
+
+				if (s_leType != NULL) {
+					s = va("[%s]: %i/%i local entities", s_leType, leType[i][1], leType[i][0]);
+					CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+					y += TINYCHAR_HEIGHT + 4;
+				}
+			}
+		}
+
+		// Show total local entities
+		s = va("TOTAL: %i/%i local entities", leType[i][1], leType[i][0]);
+		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		y += TINYCHAR_HEIGHT + 4;
+	}
+}
+
+//by: hika /2007-01-06
+static void CG_DrawCameraInfo(rectDef_t *rect,vec4_t textColor) {
+	char *s;
+	float x, y;
+	int i;
+
+	if (!cg_drawdebug.integer || cg_paused.integer)
+		return;
+
+	x = rect->x;
+	y = rect->y;
+
+	s = va("=== Camera Origin ===");
+	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	y += TINYCHAR_HEIGHT + 5;
+
+	s = va("[ %f, %f, %f ]", cg.refdef.vieworg[0], cg.refdef.vieworg[1], cg.refdef.vieworg[2]);
+	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	y += TINYCHAR_HEIGHT + 5;
+
+	s = va("=== Camera Axis ===");
+	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	y += TINYCHAR_HEIGHT + 5;
+
+	for ( i = 0; i < 3; i++ ) {
+		s = va("[ %f, %f, %f ]",
+			cg.refdef.viewaxis[i][0], cg.refdef.viewaxis[i][1], cg.refdef.viewaxis[i][2]);
+		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		y += TINYCHAR_HEIGHT + 5;
+	}
+
+	s = va("=== Frustum Plane%s ===", (sa_engine_inuse ? " (SG engine)" : ""));
+	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	y += TINYCHAR_HEIGHT + 5;
+	for ( i = 0; i < 4; i++ ) {
+		s = va("[%i].normal : [ %f, %f, %f ]", i,
+			cg_frustum[i].normal[0], cg_frustum[i].normal[1], cg_frustum[i].normal[2]);
+		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		y += TINYCHAR_HEIGHT + 5;
+	}
+}
+
+static void CG_DrawTeamOverlay(rectDef_t *rect, qboolean right, qboolean upper) {
+	int w, h, xx;
+	int i, j, len;
+	const char *p;
+	vec4_t		hcolor;
+	int pwidth, lwidth;
+	int plyrs;
+	char st[16];
+	clientInfo_t *ci;
+	gitem_t	*item;
+	int ret_y, count;
+	float x,y;
+
+	if (!cg_drawTeamOverlay.integer  || cg_paused.integer || cgs.gametype < GT_TEAM)
+		return;
+
+	if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_RED && cg.snap->ps.persistant[PERS_TEAM] != TEAM_BLUE) {
+		return; // Not on any team
+	}
+
+	y = rect->y;
+
+	plyrs = 0;
+
+	// max player name width
+	pwidth = 0;
+	count = (numSortedTeamPlayers > 8) ? 8 : numSortedTeamPlayers;
+	for (i = 0; i < count; i++) {
+		ci = cgs.clientinfo + sortedTeamPlayers[i];
+		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM]) {
+			plyrs++;
+			len = CG_DrawStrlen(ci->name);
+			if (len > pwidth)
+				pwidth = len;
+		}
+	}
+
+	if (!plyrs)
+		return;
+
+	if (pwidth > TEAM_OVERLAY_MAXNAME_WIDTH)
+		pwidth = TEAM_OVERLAY_MAXNAME_WIDTH;
+
+	// max location name width
+	lwidth = 0;
+	for (i = 1; i < MAX_LOCATIONS; i++) {
+		p = CG_ConfigString(CS_LOCATIONS + i);
+		if (p && *p) {
+			len = CG_DrawStrlen(p);
+			if (len > lwidth)
+				lwidth = len;
+		}
+	}
+
+	if (lwidth > TEAM_OVERLAY_MAXLOCATION_WIDTH)
+		lwidth = TEAM_OVERLAY_MAXLOCATION_WIDTH;
+
+	w = (pwidth + lwidth + 4 + 7) * TINYCHAR_WIDTH;
+
+	if ( right )
+		x = rect->x - w;
+	else
+		x = 0;
+
+	h = plyrs * TINYCHAR_HEIGHT;
+
+	if ( upper ) {
+		ret_y = y + h;
+	} else {
+		y -= h;
+		ret_y = y;
+	}
+
+	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED ) {
+		hcolor[0] = 1.0f;
+		hcolor[1] = 0.0f;
+		hcolor[2] = 0.0f;
+		hcolor[3] = 0.33f;
+	} else { // if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE )
+		hcolor[0] = 0.0f;
+		hcolor[1] = 0.0f;
+		hcolor[2] = 1.0f;
+		hcolor[3] = 0.33f;
+	}
+	trap_R_SetColor( hcolor );
+	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
+	trap_R_SetColor( NULL );
+
+	for (i = 0; i < count; i++) {
+		ci = cgs.clientinfo + sortedTeamPlayers[i];
+		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM]) {
+
+			hcolor[0] = hcolor[1] = hcolor[2] = hcolor[3] = 1.0;
+
+			xx = x + TINYCHAR_WIDTH;
+
+			CG_DrawStringExt( xx, y,
+				ci->name, hcolor, qfalse, qfalse,
+				TINYCHAR_WIDTH, TINYCHAR_HEIGHT, TEAM_OVERLAY_MAXNAME_WIDTH);
+
+			if (lwidth) {
+				p = CG_ConfigString(CS_LOCATIONS + ci->location);
+				if (!p || !*p)
+					p = "unknown";
+				len = CG_DrawStrlen(p);
+				if (len > lwidth)
+					len = lwidth;
+
+//				xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth + 
+//					((lwidth/2 - len/2) * TINYCHAR_WIDTH);
+				xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth;
+				CG_DrawStringExt( xx, y,
+					p, hcolor, qfalse, qfalse, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
+					TEAM_OVERLAY_MAXLOCATION_WIDTH);
+			}
+
+			CG_GetColorForHealth ( ci->health, hcolor);
+
+			Com_sprintf (st, sizeof(st), "%3i %3i", ci->health,	ci->armor);
+
+			xx = x + TINYCHAR_WIDTH * 3 + 
+				TINYCHAR_WIDTH * pwidth + TINYCHAR_WIDTH * lwidth;
+
+			CG_DrawStringExt( xx, y,
+				st, hcolor, qfalse, qfalse,
+				TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+
+			// draw weapon icon
+			xx += TINYCHAR_WIDTH * 3;
+
+			if ( cg_weapons[ci->curWeapon].weaponIcon ) {
+				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
+					cg_weapons[ci->curWeapon].weaponIcon );
+			} else {
+				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
+					cgs.media.deferShader );
+			}
+
+			// Draw powerup icons
+			if (right) {
+				xx = x;
+			} else {
+				xx = x + w - TINYCHAR_WIDTH;
+			}
+			for (j = 0; j <= PW_NUM_POWERUPS; j++) {
+				if (ci->powerups & (1 << j)) {
+
+					item = BG_FindItemForPowerup( j );
+
+					if (item) {
+						CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
+						trap_R_RegisterShader( item->icon ) );
+						if (right) {
+							xx -= TINYCHAR_WIDTH;
+						} else {
+							xx += TINYCHAR_WIDTH;
+						}
+					}
+				}
+			}
+
+			y += TINYCHAR_HEIGHT;
+		}
+	}
+}
+
+#define CHARMESS	9
+#define	MESSAGETIME	5000
+#define MESSICON	28
+//by Spoon
+static void CG_DrawDeathMessages(rectDef_t *rect, vec4_t textColor) {
+	int length[2], width, n, i;
+	qhandle_t	weapon;
+	qboolean	iscolor;
+	float x, y;
+
+	if (cg_paused.integer)
+		return;
+
+	y = rect->y;
+
+	for(n = 0; n < MAX_DEATH_MESSAGES; n++){
+
+		if(cg.messagetime[n] + MESSAGETIME > cg.time && cg.messagetime[n]){
+			gitem_t	*item = BG_FindItemForWeapon(cg.mod[n]);
+
+			if(item)
+				width = MESSICON*item->xyrelation;
+			else
+				width = MESSICON;
+
+			if(!cg_weapons[cg.mod[n]].weaponIcon){
+				cg.messagetime[n] = 0;
+				continue;
+			}
+
+			weapon = cg_weapons[cg.mod[n]].weaponIcon;
+
+			iscolor = qfalse;
+
+			for(length[0]=0, i=0; cg.attacker[n][i] != 0; i++){
+				if(cg.attacker[n][i] == '^' && cg.attacker[n][i+1] != '^'){
+					iscolor = qtrue;
+					continue;
+				}
+				if(iscolor){
+					iscolor = qfalse;
+					continue;
+				}
+
+				length[0]++;
+			}
+
+			iscolor = qfalse;
+
+			for(length[1]=0, i=0; cg.target[n][i] != 0; i++){
+				if(cg.target[n][i] == '^' && cg.target[n][i+1] != '^'){
+					iscolor = qtrue;
+					continue;
+				}
+				if(iscolor){
+					iscolor = qfalse;
+					continue;
+				}
+
+				length[1]++;
+			}
+
+			//x = 640 - width - CHARMESS * (length[0]+length[1]);
+			x = rect->x - width - CHARMESS * (length[0]+length[1]);
+
+			//attacker
+			CG_DrawStringExt( x, y + MESSICON - CHARMESS,
+				cg.attacker[n], textColor, qfalse, qfalse, CHARMESS, CHARMESS, 32);
+
+			x += CHARMESS*length[0];
+
+			//weapon
+			CG_DrawPic(x, y, width, MESSICON, weapon);
+
+			x += width;
+
+			//target
+			CG_DrawStringExt( x, y + MESSICON - CHARMESS, cg.target[n],
+				textColor, qfalse, qfalse, CHARMESS, CHARMESS, 32);
+
+			y += MESSICON + MESSICON / 5;
+		} else
+			cg.messagetime[n] = 0;
+	}
+}
+
+static void CG_DrawAttacker(rectDef_t *rect, vec4_t textColor) {
+	int			t;
+	float		size;
+	vec3_t		angles;
+	const char	*info;
+	const char	*name;
+	int			clientNum;
+
+	if (!cg_drawAttacker.integer || cg_paused.integer)
+		return;
+
+	if (cg.predictedPlayerState.stats[STAT_HEALTH] <= 0)
+		return;
+
+	if (!cg.attackerTime)
+		return;
+
+	clientNum = cg.predictedPlayerState.persistant[PERS_ATTACKER];
+	if (clientNum < 0 || clientNum >= MAX_CLIENTS || clientNum == cg.snap->ps.clientNum)
+		return;
+
+	t = cg.time - cg.attackerTime;
+	if ( t > ATTACKER_HEAD_TIME ) {
+		cg.attackerTime = 0;
+		return;
+	}
+
+	size = ICON_SIZE * 1.25;
+
+	angles[PITCH] = 0;
+	angles[YAW] = 180;
+	angles[ROLL] = 0;
+	CG_DrawHead( rect->x, rect->y, size, size, clientNum, angles );
+
+	info = CG_ConfigString( CS_PLAYERS + clientNum );
+	name = Info_ValueForKey(info, "n");
+	//CG_DrawBigString( 640 - ( Q_PrintStrlen( name ) * BIGCHAR_WIDTH), y, name, 0.5 );
+	CG_DrawBigStringColor(rect->x, rect->y+size, name, textColor);
+}
+
+static void CG_DrawSnapshot(rectDef_t *rect, vec4_t textColor) {
+	char		*s;
+//  int			w;
+
+	if (!cg_drawSnapshot.integer || cg_paused.integer)
+		return;
+
+	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime,
+		cg.latestSnapshotNum, cgs.serverCommandSequence );
+//	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+
+//	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
+	CG_DrawBigStringColor( rect->x, rect->y + 2, s, textColor);
+}
+
+#define	FPS_FRAMES	4
+static void CG_DrawFPS(rectDef_t *rect, vec4_t textColor) {
+	char		*s;
+	static int	previousTimes[FPS_FRAMES];
+	static int	index;
+	int		i, total;
+	int		fps;
+	static	int	previous;
+	int		t, frameTime;
+
+	if (!cg_drawFPS.integer || cg_paused.integer)
+		return;
+
+	// don't use serverTime, because that will be drifting to
+	// correct for internet lag changes, timescales, timedemos, etc
+	t = trap_Milliseconds();
+	frameTime = t - previous;
+	previous = t;
+
+	previousTimes[index % FPS_FRAMES] = frameTime;
+	index++;
+	if ( index > FPS_FRAMES ) {
+		// average multiple frames together to smooth changes out a bit
+		total = 0;
+		for ( i = 0 ; i < FPS_FRAMES ; i++ ) {
+			total += previousTimes[i];
+		}
+		if ( !total ) {
+			total = 1;
+		}
+		fps = 1000 * FPS_FRAMES / total;
+
+		s = va( "%ifps", fps );
+		CG_Text_Paint(rect->x, rect->y + 5 + BIGCHAR_HEIGHT, 0.4f, textColor, s, 0, 0, 3);
+	}
+}
+
+//Should we draw something differnet for long lag vs no packets?
+static void CG_DrawDisconnect(rectDef_t *rect) {
+	int			cmdNum;
+	usercmd_t	cmd;
+	const char		*s;
+	int			w;
+
+	// draw the phone jack if we are completely past our buffers
+	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
+	trap_GetUserCmd( cmdNum, &cmd );
+	if ( cmd.serverTime <= cg.snap->ps.commandTime
+		|| cmd.serverTime > cg.time ) {	// special check for map_restart
+		return;
+	}
+
+	// also add text in center of screen
+	s = "Connection Interrupted";
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( 320 - w/2, 100, s, 1.0F);
+
+	// blink the icon
+	if ( ( cg.time >> 9 ) & 1 ) {
+		return;
+	}
+
+	CG_DrawPic( rect->x, rect->y, rect->w, rect->h, trap_R_RegisterShader("gfx/2d/net.tga" ) );
+}
+
+#define	MAX_LAGOMETER_PING	900
+#define	MAX_LAGOMETER_RANGE	300
+
+static void CG_DrawLagometer( rectDef_t *rect, vec4_t textColor ) {
+	int		a, x, y, i;
+	float	v;
+	float	ax, ay, aw, ah, mid, range;
+	int		color;
+	float	vscale;
+	vec4_t  adjustedColor;
+//unlagged - misc
+	if ( !cg_lagometer.integer ) {
+//unlagged - misc
+		CG_DrawDisconnect(rect);
+		return;
+	}
+
+	if( cg.snap->ps.pm_type == PM_INTERMISSION )
+		return;
+
+	if( !cg_lagometer.integer )
+		return;
+
+	if( cg.demoPlayback )
+		return;
+
+	Vector4Copy( textColor, adjustedColor );
+	adjustedColor[ 3 ] = 0.25f;
+
+	trap_R_SetColor( adjustedColor );
+	CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cgs.media.whiteShader );
+	trap_R_SetColor( NULL );
+
+	// draw the graph
+	ax = x = rect->x;
+	ay = y = rect->y;
+	aw = rect->w;
+	ah = rect->h;
+
+	trap_R_SetColor( NULL );
+
+	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
+
+	color = -1;
+	range = ah / 3;
+	mid = ay + range;
+
+	vscale = range / MAX_LAGOMETER_RANGE;
+
+	// draw the frame interpoalte / extrapolate graph
+	for ( a = 0 ; a < aw ; a++ ) {
+		i = ( lagometer.frameCount - 1 - a ) & (LAG_SAMPLES - 1);
+		v = lagometer.frameSamples[i];
+		v *= vscale;
+		if ( v > 0 ) {
+			if ( color != 1 ) {
+				color = 1;
+				trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
+			}
+			if ( v > range ) {
+				v = range;
+			}
+			trap_R_DrawStretchPic ( ax + aw - a, mid - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+		} else if ( v < 0 ) {
+			if ( color != 2 ) {
+				color = 2;
+				trap_R_SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
+			}
+			v = -v;
+			if ( v > range ) {
+				v = range;
+			}
+			trap_R_DrawStretchPic( ax + aw - a, mid, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+		}
+	}
+
+	// draw the snapshot latency / drop graph
+	range = ah / 2;
+	vscale = range / MAX_LAGOMETER_PING;
+
+	for ( a = 0 ; a < aw ; a++ ) {
+		i = ( lagometer.snapshotCount - 1 - a ) & (LAG_SAMPLES - 1);
+		v = lagometer.snapshotSamples[i];
+		if ( v > 0 ) {
+			if ( lagometer.snapshotFlags[i] & SNAPFLAG_RATE_DELAYED ) {
+				if ( color != 5 ) {
+					color = 5;	// YELLOW for rate delay
+					trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
+				}
+			} else {
+				if ( color != 3 ) {
+					color = 3;
+					trap_R_SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
+				}
+			}
+			v = v * vscale;
+			if ( v > range ) {
+				v = range;
+			}
+			trap_R_DrawStretchPic( ax + aw - a, ay + ah - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+		} else if ( v < 0 ) {
+			if ( color != 4 ) {
+				color = 4;		// RED for dropped snapshots
+				trap_R_SetColor( g_color_table[ColorIndex(COLOR_RED)] );
+			}
+			trap_R_DrawStretchPic( ax + aw - a, ay + ah - range, 1, range, 0, 0, 0, 0, cgs.media.whiteShader );
+		}
+	}
+
+	trap_R_SetColor( NULL );
+
+	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
+		CG_DrawBigString( ax, ay, "snc", 1.0 );
+	}
+
+	CG_DrawDisconnect(rect);
+}
 
 #define PIC_WIDTH 12
 
@@ -1541,6 +2396,37 @@ void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float tex
   case CG_PLAYER_LOCATION:
     CG_DrawPlayerLocation(&rect, scale, color, textStyle);
     break;
+
+//Some extended features to HUD:
+
+  case CG_LAGOMETER:
+		CG_DrawLagometer(&rect, color);
+		break;
+	case CG_FPS:
+		CG_DrawFPS(&rect, color);
+		break;
+	case CG_SNAPSHOT:
+		CG_DrawSnapshot(&rect, color);
+		break;
+	case CG_TIMER:
+		CG_DrawTimer(&rect, color);
+		break;
+	case CG_ATTACKER:
+		CG_DrawAttacker(&rect, color);
+		break;
+	case CG_DEATHMESSAGES:
+		CG_DrawDeathMessages(&rect, color);
+		break;
+	case CG_TEAMOVERLAY:
+		CG_DrawTeamOverlay(&rect, qfalse, qtrue);
+		break;
+	case CG_STATUSENTITIES:
+		CG_DrawStatusEntities(&rect, color);
+		break;
+	case CG_CAMERAINFO:
+		CG_DrawCameraInfo(&rect, color);
+		break;
+
   case CG_TEAM_COLOR:
     CG_DrawTeamColor(&rect, color);
     break;
@@ -1549,12 +2435,6 @@ void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float tex
     break;
   case CG_PLAYER_STATUS:
     CG_DrawPlayerStatus(&rect);
-    break;
-  case CG_PLAYER_HASFLAG:
-    CG_DrawPlayerHasFlag(&rect, qfalse);
-    break;
-  case CG_PLAYER_HASFLAG2D:
-    CG_DrawPlayerHasFlag(&rect, qtrue);
     break;
   case CG_AREA_SYSTEMCHAT:
     CG_DrawAreaSystemChat(&rect, scale, color, shader);
@@ -1582,6 +2462,7 @@ void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float tex
 	case CG_PERFECT:
 	case CG_GAUNTLET:
 	case CG_CAPTURES:
+		//CG_DrawMedal(ownerDraw, &rect, scale, color, shader);
 		break;
   case CG_SPECTATORS:
 		CG_DrawTeamSpectators(&rect, scale, color, shader);
@@ -1677,7 +2558,7 @@ void CG_EventHandling(int type) {
   if (type == CGAME_EVENT_NONE) {
     CG_HideTeamMenu();
   } else if (type == CGAME_EVENT_TEAMMENU) {
-    //CG_ShowTeamMenu();
+    CG_ShowTeamMenu();
   } else if (type == CGAME_EVENT_SCOREBOARD) {
   }
 

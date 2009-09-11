@@ -350,6 +350,18 @@ typedef enum {
 } powerup_t;
 
 typedef enum {
+	HI_NONE,
+
+	HI_TELEPORTER,
+	HI_MEDKIT,
+	HI_KAMIKAZE,
+	HI_PORTAL,
+	HI_INVULNERABILITY,
+
+	HI_NUM_HOLDABLE
+} holdable_t;
+
+typedef enum {
 	WP_NONE,
 
 	//melee
@@ -852,6 +864,7 @@ typedef enum {
 							// EFX: rotate + external ring that rotates
 	IT_HOLDABLE,			// single use, holdable item
 							// EFX: rotate + bob
+	IT_PERSISTANT_POWERUP,
 	IT_TEAM
 } itemType_t;
 
@@ -924,6 +937,8 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForClassname( const char *classname );
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
 gitem_t	*BG_FindItemForAmmo( weapon_t ammo ) ;
+gitem_t	*BG_FindItemForPowerup( powerup_t pw );
+gitem_t	*BG_FindItemForHoldable( holdable_t pw );
 int	BG_FindPlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps);
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 

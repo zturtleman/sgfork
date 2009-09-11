@@ -71,30 +71,30 @@
 #define BIND_ALTERNATE						0x02
 
 // display flags
-#define CG_SHOW_BLUE_TEAM_HAS_REDFLAG     0x00000001
-#define CG_SHOW_RED_TEAM_HAS_BLUEFLAG     0x00000002
+//FIXME: To add moneybag status instead
+//#define CG_SHOW_BLUE_TEAM_HAS_REDFLAG     0x00000001
+//#define CG_SHOW_RED_TEAM_HAS_BLUEFLAG     0x00000002
 #define CG_SHOW_ANYTEAMGAME               0x00000004
-#define CG_SHOW_HARVESTER                 0x00000008
-#define CG_SHOW_ONEFLAG                   0x00000010
-#define CG_SHOW_CTF                       0x00000020
-#define CG_SHOW_OBELISK                   0x00000040
-#define CG_SHOW_HEALTHCRITICAL            0x00000080
-#define CG_SHOW_SINGLEPLAYER              0x00000100
-#define CG_SHOW_TOURNAMENT                0x00000200
-#define CG_SHOW_DURINGINCOMINGVOICE       0x00000400
-#define CG_SHOW_IF_PLAYER_HAS_FLAG			0x00000800
-#define CG_SHOW_LANPLAYONLY					0x00001000
-#define CG_SHOW_MINED						0x00002000
-#define CG_SHOW_HEALTHOK			        0x00004000
-#define CG_SHOW_TEAMINFO			        0x00008000
-#define CG_SHOW_NOTEAMINFO		            0x00010000
-#define CG_SHOW_OTHERTEAMHASFLAG          0x00020000
-#define CG_SHOW_YOURTEAMHASENEMYFLAG      0x00040000
-#define CG_SHOW_ANYNONTEAMGAME            0x00080000
-#define CG_SHOW_2DONLY						0x10000000
+#define CG_SHOW_BR                        0x00000008
+#define CG_SHOW_TDM                       0x00000010
+#define CG_SHOW_RTP                       0x00000020
+#define CG_SHOW_DM                        0x00000040
+#define CG_SHOW_SINGLEPLAYER              0x00000080
+#define CG_SHOW_TOURNAMENT                0x00000100
+#define CG_SHOW_DURINGINCOMINGVOICE       0x00000200
+#define CG_SHOW_IF_PLAYER_HAS_GOLD        0x00000400
+#define CG_SHOW_LANPLAYONLY               0x00000800
+//Not used, free:
+//#define CG_SHOW_MINED                     0x00001000
+#define CG_SHOW_HEALTHUSUAL               0x00002000
+#define CG_SHOW_HEALTHINJURED             0x00004000
+#define CG_SHOW_HEALTHBAD                 0x00008000
+#define CG_SHOW_TEAMINFO                  0x00010000
+#define CG_SHOW_NOTEAMINFO                0x00020000
+#define CG_SHOW_ANYNONTEAMGAME            0x00040000
+#define CG_SHOW_2DONLY                    0x00080000
 // Smokin'Guns
-#define CG_SHOW_WEAPON2						0x20000000
-
+#define CG_SHOW_WEAPON2                   0x10000000
 
 #define UI_SHOW_LEADER				            0x00000001
 #define UI_SHOW_NOTLEADER			            0x00000002
@@ -221,6 +221,14 @@
 #define CG_LAGOMETER              97
 #define CG_CONSOLE                98
 #define CG_WEAPONSELECT           99
+
+//HUD groups extensions
+#define CG_ATTACKER       301
+#define CG_DEATHMESSAGES  302
+#define CG_TEAMOVERLAY    303
+#define CG_STATUSENTITIES 304
+#define CG_CAMERAINFO     305
+
 // end Hud groups
 
 // Smokin'Guns hud

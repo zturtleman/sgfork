@@ -1278,7 +1278,6 @@ Cmd_CallVote_f
 void Cmd_CallVote_f( gentity_t *ent ) {
 	char*	c;
 	int		i;
-	char	buf[MAX_STRING_TOKENS];
   char  args[MAX_VOTE_ARGS][MAX_STRING_TOKENS];
   int   argc = trap_Argc( );
 
