@@ -1010,7 +1010,8 @@ G_Say
 static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
 	if (!other || !other->inuse || !other->client || 
       other->client->pers.connected != CON_CONNECTED ||
-      mode == SAY_TEAM  && !OnSameTeam(ent, other ) )
+      mode == SAY_TEAM  && !OnSameTeam(ent, other ) 
+      || (ent->client->pers.punished & AP_MUTED) )
 		return;
 
 	trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"",
@@ -1029,6 +1030,9 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	// don't let text be too long for malicious reasons
 	char		text[MAX_SAY_TEXT];
 	char		location[64];
+
+  if( ent->client->pers.punished & AP_MUTED )
+    return;
 
 	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM )
 		mode = SAY_ALL;
@@ -1359,6 +1363,12 @@ void Cmd_CallVote_f( gentity_t *ent ) {
     Vote_Cat_Number( );
   }
   else if ( !Q_stricmp( args[1], "clientkick")  && g_allowVote_kick.integer) {
+    Vote_Cat_String( );
+  }
+  else if( !Q_stricmp( args[1], "mute" ) && g_allowVote_mute.integer ) {
+    Vote_Cat_String( );
+  }
+  else if( !Q_stricmp( args[1], "unmute" ) && g_allowVote_unmute.integer ) {
     Vote_Cat_String( );
   }
   else if ( !Q_stricmp( args[1], "g_doWarmup")  && g_allowVote_g_doWarmup.integer) {

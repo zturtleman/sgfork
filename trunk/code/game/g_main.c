@@ -141,6 +141,8 @@ vmCvar_t	g_allowVote_g_doWarmup;
 vmCvar_t	g_allowVote_timelimit;
 vmCvar_t	g_allowVote_fraglimit;
 vmCvar_t	g_allowVote_mapcycle;
+vmCvar_t  g_allowVote_mute;
+vmCvar_t  g_allowVote_unmute;
 vmCvar_t	g_teamAutoJoin;
 vmCvar_t	g_teamForceBalance;
 vmCvar_t	g_banIPs;
@@ -267,6 +269,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_allowVote_timelimit, "g_allowVote_timelimit", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_fraglimit, "g_allowVote_fraglimit", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_mapcycle, "g_allowVote_mapcycle", "1", CVAR_ARCHIVE, 0, qfalse },
+  { &g_allowVote_mute, "g_allowVote_mute", "1", CVAR_ARCHIVE, 0, qfalse },
+  { &g_allowVote_unmute, "g_allowVote_unmute", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
