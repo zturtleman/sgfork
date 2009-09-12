@@ -453,6 +453,39 @@ void Svcmd_KickBots_f(void){
 	}
 }
 
+void Svcmd_Mute( qboolean mute )
+{
+  gclient_t *cl;
+  char buf[MAX_TOKEN_CHARS];
+
+  trap_Argv( 1, buf, sizeof(buf) );
+  cl = ClientForString( buf );
+
+  if( !cl )
+    return;
+
+  if( mute && (cl->pers.punished & AP_MUTED) )
+  {
+    G_LogPrintf( "%s is already muted\n" );
+    return;
+  }
+  else if( !mute && !(cl->pers.punished & AP_MUTED) )
+  {
+    G_LogPrintf( "%s is not muted\n" );
+    return;
+  }
+
+  if( !mute )
+    cl->pers.punished &= ~AP_MUTED;
+  else
+    cl->pers.punished |= AP_MUTED;
+
+  trap_SendServerCommand( cl->ps.clientNum,
+      va( "print \"You have been ^1%s\n\"", (mute) ? "muted" : "unmuted" ) );
+  G_LogPrintf( "%s has been %s\n", cl->pers.netname,
+      (mute) ? "muted" : "unmuted" );
+}
+
 char	*ConcatArgs( int start );
 
 /*
@@ -475,6 +508,14 @@ qboolean	ConsoleCommand( void ) {
 		Svcmd_ForceTeam_f();
 		return qtrue;
 	}
+
+  if( !Q_stricmp( cmd, "mute" ) ) {
+    Svcmd_Mute(qtrue);
+    return qtrue;
+  } else if( !Q_stricmp( cmd, "unmute" ) ) {
+    Svcmd_Mute(qfalse);
+    return qtrue;
+  }
 
 	if (Q_stricmp (cmd, "game_memory") == 0) {
 		Svcmd_GameMem_f();

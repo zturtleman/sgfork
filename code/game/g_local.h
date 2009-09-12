@@ -310,6 +310,7 @@ typedef struct {
 	int			plOut;
 	usercmd_t	cmdqueue[MAX_LATENT_CMDS];
 	int			cmdhead;
+  int     punished;
 //unlagged - lag simulation #2
 //unlagged - true ping
 	int			realPing;
@@ -615,7 +616,7 @@ void SaveRegisteredItems( void );
 //
 // g_utils.c
 //
-gentity_t *G_EntNumForName( const char *name );
+gentity_t *G_EntNumForName( char *name );
 char *G_DecolorString( const char *str );
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
@@ -919,6 +920,8 @@ extern	vmCvar_t	g_allowVote_g_doWarmup;
 extern	vmCvar_t	g_allowVote_timelimit;
 extern	vmCvar_t	g_allowVote_fraglimit;
 extern	vmCvar_t	g_allowVote_mapcycle;
+extern  vmCvar_t  g_allowVote_mute;
+extern  vmCvar_t  g_allowVote_unmute;
 extern	vmCvar_t	g_teamAutoJoin;
 extern	vmCvar_t	g_teamForceBalance;
 extern	vmCvar_t	g_banIPs;

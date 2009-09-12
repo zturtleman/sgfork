@@ -295,3 +295,9 @@ Duel stats
 #define DU_CROSSHAIR_FADE	4500.0f
 #define DU_WP_STEP			2
 
+/*
+=============================
+Administration part
+=============================
+*/
+#define AP_MUTED 0x00000001

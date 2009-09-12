@@ -12,6 +12,25 @@ PWD=`pwd`
 MAINBINARY=
 DEDIBINARY=
 
+buildqvms( )
+{
+  make BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1 $*
+}
+
+ARCH=`uname -m | sed -e s/i.86/i386/`
+if [ "$PLATFORM" = "mingw32" ]
+then
+  if [ "$ARCH" = "i386" ]
+  then
+    ARCH="x86"
+  fi
+fi
+
+if [ "$PLATFORM" = "sunos" ] || [ "$PLATFORM" = "darwin" ]
+then
+  ARCH=`uname -p | sed -e s/i.86/i386/`
+fi
+
 if [ "$PLATFORM" = "mingw32" ]
 then
   BDIR=build/release-mingw32-x86
@@ -29,10 +48,10 @@ fi
 
 if [ "$PLATFORM" = "linux" ]
 then
-  BDIR=build/release-linux-i386
+  BDIR=build/release-linux-${ARCH}
   HDIR=$HOME/.smokinguns/base
-  MAINBINARY=smokinguns.x86.exe
-  DEDIBINARY=smokinguns_dedicated.x86.exe
+  MAINBINARY=smokinguns.${ARCH}
+  DEDIBINARY=smokinguns_dedicated.${ARCH}
 fi
 
 if [ `basename $PWD` = "tools" ]
@@ -56,14 +75,24 @@ then
   mv $DEDIBINARY "$HDIR/../"
   cd ../../
   [ "$PLATFORM" = "mingw32" ] && cp misc/win32/dlls/SDL.dll "$HDIR/../"
+elif [ "$1" = "-qvmonly" ]
+then
+  buildqvms
+  QVM_ONLY=1
 else
-  make BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1 $*
+  buildqvms
 fi
 
 cd $BDIR/smokinguns/
 zip -r $VMPAKNAME vm/
 mv $VMPAKNAME "$HDIR"
 cd ../../..
+
+if [ "$QVM_ONLY" = "1" ]
+then
+  exit
+fi
+
 cd base
 [ -f  ui/main.menu.template ] && sed "s/SGFORK_RELEASE/SGFork release at `date`/" ui/main.menu.template > ui/main.menu
 zip -r $UIPAKNAME ui/
