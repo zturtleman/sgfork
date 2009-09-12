@@ -142,10 +142,10 @@ typedef struct bot_orient_s {
 	vec3_t lastpos;
 	vec3_t midpoint[2]; // the last two routes' midpoint
 	int		count;	// count of the points on the route till now
-	qboolean	bit; // just to check which midpoint has to be used
+	qbool	bit; // just to check which midpoint has to be used
 	int money1, money2; // set the moneybags if we're going for it
 
-	qboolean nodes[MAX_AINODES]; // which nodes have been already used?
+	qbool nodes[MAX_AINODES]; // which nodes have been already used?
 } bot_orient_t;
 
 //bot state

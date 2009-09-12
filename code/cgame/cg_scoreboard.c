@@ -72,7 +72,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //  wins/losses are drawn on bot icon now
 
-static qboolean localClient; // true if local client has been displayed
+static qbool localClient; // true if local client has been displayed
 
 
 							 /*
@@ -80,7 +80,7 @@ static qboolean localClient; // true if local client has been displayed
 CG_DrawClientScore
 =================
 */
-static void CG_DrawClientScore( int y, score_t *score, float *color, float fade, qboolean largeFormat ) {
+static void CG_DrawClientScore( int y, score_t *score, float *color, float fade, qbool largeFormat ) {
 	char	string[1024];
 	vec3_t	headAngles;
 	clientInfo_t	*ci;
@@ -285,7 +285,7 @@ CG_DrawScoreboard
 Draw the normal in-game scoreboard
 =================
 */
-qboolean CG_DrawOldScoreboard( void ) {
+qbool CG_DrawOldScoreboard( void ) {
 	int		x, y, w, i, n1, n2, n1b, n2b;
 	float	fade;
 	float	*fadeColor;

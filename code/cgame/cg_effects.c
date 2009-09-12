@@ -246,7 +246,7 @@ CG_MakeExplosion
 */
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader,
-								int msec, qboolean isSprite, float radius, qboolean smokeexp) {
+								int msec, qbool isSprite, float radius, qbool smokeexp) {
 	float			ang;
 	localEntity_t	*ex;
 	int				offset;

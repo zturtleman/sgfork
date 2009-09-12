@@ -99,7 +99,7 @@ Check for lava / slime contents and drowning
 =============
 */
 void P_WorldEffects( gentity_t *ent ) {
-	qboolean	envirosuit;
+	qbool	envirosuit;
 	int			waterlevel;
 
 	if ( ent->client->noclip ) {
@@ -465,7 +465,7 @@ void G_TouchStartpoint( gentity_t *ent ) {
 		if(!Q_stricmp(hit->classname, classname)){
 			vec3_t distance;
 			int j;
-			qboolean use =  qtrue;
+			qbool use =  qtrue;
 
 			VectorSubtract(ent->client->ps.origin, hit->r.currentOrigin, distance);
 
@@ -618,7 +618,7 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 
 			// in duel mode, this switches through the mapparts
 			if(g_gametype.integer == GT_DUEL){
-				qboolean realspec = client->realspec;
+				qbool realspec = client->realspec;
 				int save_specmappart;
 				int startpart;
 
@@ -682,7 +682,7 @@ ClientInactivityTimer
 Returns qfalse if the client is dropped
 =================
 */
-qboolean ClientInactivityTimer( gclient_t *client ) {
+qbool ClientInactivityTimer( gclient_t *client ) {
 	if ( ! g_inactivity.integer ) {
 		// give everyone some time, so if the operator sets g_inactivity during
 		// gameplay, everyone isn't kicked
@@ -761,7 +761,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	int		damage;
 	vec3_t	dir;
 	vec3_t	origin, angles;
-//	qboolean	fired;
+//	qbool	fired;
 	gitem_t *item;
 
 	client = ent->client;
@@ -1079,7 +1079,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	//count down pain acceleration counter
 	if(client->ps.stats[STAT_KNOCKTIME]){
-		qboolean left = (client->ps.stats[STAT_KNOCKTIME] < 0);
+		qbool left = (client->ps.stats[STAT_KNOCKTIME] < 0);
 
 		if(fabs(client->ps.stats[STAT_KNOCKTIME]) >= KNOCKTIME || client->ps.stats[STAT_HEALTH] <= 0){
 			client->ps.stats[STAT_KNOCKTIME] = 0;

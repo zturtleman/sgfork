@@ -48,7 +48,7 @@ efficient collision detection
 ====================
 */
 // if light is set to 1, movers will be taken into recognition when being a spectator
-void CG_BuildSolidList( qboolean light ) {
+void CG_BuildSolidList( qbool light ) {
 	int			i;
 	centity_t	*cent;
 	snapshot_t	*snap;
@@ -102,7 +102,7 @@ Same as CG_BuildSolidList, except that only visible entities are computed.
 ====================
 */
 // if light is set to 1, movers will be taken into recognition when being a spectator
-void CG_BuildVisibleSolidList( qboolean light ) {
+void CG_BuildVisibleSolidList( qbool light ) {
 	int			i;
 	centity_t	*cent;
 	snapshot_t	*snap;
@@ -562,7 +562,7 @@ Generates cg.predictedPlayerState by interpolating between
 cg.snap->player_state and cg.nextFrame->player_state
 ========================
 */
-static void CG_InterpolatePlayerState( qboolean grabAngles ) {
+static void CG_InterpolatePlayerState( qbool grabAngles ) {
 	float			f;
 	int				i;
 	playerState_t	*out;
@@ -694,7 +694,7 @@ static void CG_TouchTriggerPrediction( void ) {
 	entityState_t	*ent;
 	clipHandle_t cmodel;
 	centity_t	*cent;
-	qboolean	spectator;
+	qbool	spectator;
 
 	// dead clients don't activate triggers
 	if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
@@ -896,7 +896,7 @@ to ease the jerk.
 void CG_PredictPlayerState( void ) {
 	int			cmdNum, current;
 	playerState_t	oldPlayerState;
-	qboolean	moved;
+	qbool	moved;
 	usercmd_t	oldestCmd;
 	usercmd_t	latestCmd;
 
@@ -1026,7 +1026,7 @@ void CG_PredictPlayerState( void ) {
 			// we have a new snapshot
 
 			int i;
-			qboolean error = qtrue;
+			qbool error = qtrue;
 
 			// loop through the saved states queue
 			for ( i = cg.stateHead; i != cg.stateTail; i = (i + 1) % NUM_SAVED_STATES ) {

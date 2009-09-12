@@ -393,7 +393,7 @@ UI_SwingAngles
 ==================
 */
 static void UI_SwingAngles( float destination, float swingTolerance, float clampTolerance,
-					float speed, float *angle, qboolean *swinging ) {
+					float speed, float *angle, qbool *swinging ) {
 	float	swing;
 	float	move;
 	float	scale;
@@ -808,7 +808,7 @@ UI_RegisterClientSkin
 ==========================
 */
 
-static qboolean	UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, const char *skinName) {
+static qbool	UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, const char *skinName) {
 	char		filename[MAX_QPATH];
 
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/lower_%s.skin", modelName, skinName );
@@ -833,7 +833,7 @@ static qboolean	UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, 
 UI_ParseAnimationFile
 ======================
 */
-static qboolean UI_ParseAnimationFile( const char *filename, animation_t *animations ) {
+static qbool UI_ParseAnimationFile( const char *filename, animation_t *animations ) {
 	char		*text_p, *prev;
 	int			len;
 	int			i;
@@ -949,7 +949,7 @@ static qboolean UI_ParseAnimationFile( const char *filename, animation_t *animat
 UI_RegisterClientModelname
 ==========================
 */
-qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName ) {
+qbool UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName ) {
 	char		modelName[MAX_QPATH];
 	char		skinName[MAX_QPATH];
 	char		filename[MAX_QPATH];
@@ -1038,7 +1038,7 @@ void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model ) {
 UI_PlayerInfo_SetInfo
 ===============
 */
-void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_t viewAngles, vec3_t moveAngles, weapon_t weaponNumber, qboolean chat ) {
+void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_t viewAngles, vec3_t moveAngles, weapon_t weaponNumber, qbool chat ) {
 	int			currentAnim;
 	weapon_t	weaponNum;
 

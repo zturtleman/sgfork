@@ -108,7 +108,7 @@ ResampleSfx
 resample / decimate to the current source rate
 ================
 */
-static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, qboolean compressed ) {
+static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, qbool compressed ) {
 	int		outcount;
 	int		srcsample;
 	float	stepscale;
@@ -196,7 +196,7 @@ The filename may be different than sfx->name in the case
 of a forced fallback of a player specific sound
 ==============
 */
-qboolean S_LoadSound( sfx_t *sfx )
+qbool S_LoadSound( sfx_t *sfx )
 {
 	byte	*data;
 	short	*samples;

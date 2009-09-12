@@ -261,7 +261,7 @@ valid snapshot.
 ========================
 */
 static snapshot_t *CG_ReadNextSnapshot( void ) {
-	qboolean	r;
+	qbool	r;
 	snapshot_t	*dest;
 
 	while ( cgs.processedSnapshotNum < cg.latestSnapshotNum ) {

@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // we'll need these prototypes
 //void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, int otherEntNum );
-//void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum );
+//void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qbool flesh, int fleshEntityNum );
 
 // and this as well
 #define MACHINEGUN_SPREAD	200
@@ -193,7 +193,7 @@ void CG_PredictWeaponEffects( centity_t *cent ) {
 			int seed = cg.oldTime % 256;
 			float r, u;
 			trace_t tr;
-			qboolean flesh;
+			qbool flesh;
 			int fleshEntityNum;
 			vec3_t endPoint;
 
@@ -409,7 +409,7 @@ CG_Cvar_ClampInt
 Clamps a cvar between two integer values, returns qtrue if it had to.
 ================
 */
-qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max ) {
+qbool CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max ) {
 	if ( vmCvar->integer > max ) {
 		CG_Printf( "Allowed values are %d to %d.\n", min, max );
 

@@ -302,11 +302,11 @@ final fragment of a multi-part message, the entire thing will be
 copied out.
 =================
 */
-qboolean Netchan_Process( netchan_t *chan, msg_t *msg ) {
+qbool Netchan_Process( netchan_t *chan, msg_t *msg ) {
 	int			sequence;
 	int			qport;
 	int			fragmentStart, fragmentLength;
-	qboolean	fragmented;
+	qbool	fragmented;
 
 	// XOR unscramble all data in the packet after the header
 //	Netchan_UnScramblePacket( msg );
@@ -487,7 +487,7 @@ typedef struct {
 loopback_t	loopbacks[2];
 
 
-qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message)
+qbool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message)
 {
 	int		i;
 	loopback_t	*loop;

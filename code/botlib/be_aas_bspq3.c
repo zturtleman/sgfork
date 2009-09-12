@@ -168,7 +168,7 @@ int AAS_PointContents(vec3_t point)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_EntityCollision(int entnum,
+qbool AAS_EntityCollision(int entnum,
 					vec3_t start, vec3_t boxmins, vec3_t boxmaxs, vec3_t end,
 								int contentmask, bsp_trace_t *trace)
 {
@@ -189,7 +189,7 @@ qboolean AAS_EntityCollision(int entnum,
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_inPVS(vec3_t p1, vec3_t p2)
+qbool AAS_inPVS(vec3_t p1, vec3_t p2)
 {
 	return botimport.inPVS(p1, p2);
 } //end of the function AAS_InPVS
@@ -200,7 +200,7 @@ qboolean AAS_inPVS(vec3_t p1, vec3_t p2)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_inPHS(vec3_t p1, vec3_t p2)
+qbool AAS_inPHS(vec3_t p1, vec3_t p2)
 {
 	return qtrue;
 } //end of the function AAS_inPHS

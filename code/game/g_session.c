@@ -90,7 +90,7 @@ void G_ReadSessionData( gclient_t *client ) {
 
 	client->sess.sessionTeam = (team_t)sessionTeam;
 	client->sess.spectatorState = (spectatorState_t)spectatorState;
-	client->sess.teamLeader = (qboolean)teamLeader;
+	client->sess.teamLeader = (qbool)teamLeader;
 
 	//make all players spectators at start, to rechoose their weapons
 	if ( g_gametype.integer >= GT_RTP || g_gametype.integer == GT_DUEL){
@@ -116,7 +116,7 @@ G_InitSessionData
 Called on a first-time connect
 ================
 */
-void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
+void G_InitSessionData( gclient_t *client, char *userinfo, qbool isBot ) {
 	clientSession_t	*sess;
 	const char		*value;
 

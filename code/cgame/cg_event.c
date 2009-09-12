@@ -117,7 +117,7 @@ static void CG_Hit_Message( entityState_t *ent ){
 		int j;
 
 		if(ent->angles2[i] != -1) {
-			qboolean del = qfalse;
+			qbool del = qfalse;
 
 			// check if this location is already stored
 			for(j = 0; j < i; j++){

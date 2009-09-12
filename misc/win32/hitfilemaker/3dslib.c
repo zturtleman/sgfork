@@ -1,9 +1,9 @@
 #include <assert.h>
 #include "q3data.h"
 
-static void Load3DS( const char *filename, _3DS_t *p3DS, qboolean verbose );
+static void Load3DS( const char *filename, _3DS_t *p3DS, qbool verbose );
 
-static qboolean s_verbose;
+static qbool s_verbose;
 
 #define MAX_MATERIALS 100
 #define MAX_NAMED_OBJECTS 100
@@ -419,7 +419,7 @@ static void LoadEditChunk( FILE *fp, long thisChunkLen, _3DSEditChunk_t *pEC )
 	memcpy( pEC->pNamedObjects, namedObjects, numNamedObjects * sizeof( namedObjects[0] ) );
 }
 
-static void Load3DS( const char *filename, _3DS_t *p3DS, qboolean verbose )
+static void Load3DS( const char *filename, _3DS_t *p3DS, qbool verbose )
 {
 	FILE *fp;
 	unsigned short chunkID;
@@ -526,7 +526,7 @@ static void ComputeNormals( _3DSTriObject_t *pTO, triangle_t *pTris )
 /*
 ** void _3DS_LoadPolysets
 */
-void _3DS_LoadPolysets( const char *filename, polyset_t **ppPSET, int *numpsets, qboolean verbose )
+void _3DS_LoadPolysets( const char *filename, polyset_t **ppPSET, int *numpsets, qbool verbose )
 {
 	_3DS_t _3ds;
 	int numPolysets;

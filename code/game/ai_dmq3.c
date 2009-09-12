@@ -155,7 +155,7 @@ int BotOppositeTeam(bot_state_t *bs) {
 EntityIsDead
 ==================
 */
-qboolean EntityIsDead(aas_entityinfo_t *entinfo) {
+qbool EntityIsDead(aas_entityinfo_t *entinfo) {
 	playerState_t ps;
 
 	if (entinfo->number >= 0 && entinfo->number < MAX_CLIENTS) {
@@ -171,7 +171,7 @@ qboolean EntityIsDead(aas_entityinfo_t *entinfo) {
 EntityIsInvisible
 ==================
 */
-qboolean EntityIsInvisible(aas_entityinfo_t *entinfo) {
+qbool EntityIsInvisible(aas_entityinfo_t *entinfo) {
 	return qfalse;
 }
 
@@ -180,7 +180,7 @@ qboolean EntityIsInvisible(aas_entityinfo_t *entinfo) {
 EntityIsShooting
 ==================
 */
-qboolean EntityIsShooting(aas_entityinfo_t *entinfo) {
+qbool EntityIsShooting(aas_entityinfo_t *entinfo) {
 	if (entinfo->flags & EF_FIRING) {
 		return qtrue;
 	}
@@ -192,7 +192,7 @@ qboolean EntityIsShooting(aas_entityinfo_t *entinfo) {
 EntityIsChatting
 ==================
 */
-qboolean EntityIsChatting(aas_entityinfo_t *entinfo) {
+qbool EntityIsChatting(aas_entityinfo_t *entinfo) {
 	if (entinfo->flags & EF_TALK) {
 		return qtrue;
 	}
@@ -492,7 +492,7 @@ void BotChooseWeapon(bot_state_t *bs) {
 BotSetupForMovement
 ==================
 */
-qboolean BotAI_FindNearestNode(qboolean valid, bot_state_t *bs, vec3_t org, vec3_t node, float mindist, vec3_t avoid);
+qbool BotAI_FindNearestNode(qbool valid, bot_state_t *bs, vec3_t org, vec3_t node, float mindist, vec3_t avoid);
 void BotSetupForMovement(bot_state_t *bs) {
 	bot_initmove_t initmove;
 
@@ -642,7 +642,7 @@ void BotSetTeleportTime(bot_state_t *bs) {
 BotIsDead
 ==================
 */
-qboolean BotIsDead(bot_state_t *bs) {
+qbool BotIsDead(bot_state_t *bs) {
 	return (bs->cur_ps.pm_type == PM_DEAD);
 }
 
@@ -651,7 +651,7 @@ qboolean BotIsDead(bot_state_t *bs) {
 BotIsObserver
 ==================
 */
-qboolean BotIsObserver(bot_state_t *bs) {
+qbool BotIsObserver(bot_state_t *bs) {
 	char buf[MAX_INFO_STRING];
 	if (bs->cur_ps.pm_type == PM_SPECTATOR) return qtrue;
 	trap_GetConfigstring(CS_PLAYERS+bs->client, buf, sizeof(buf));
@@ -664,7 +664,7 @@ qboolean BotIsObserver(bot_state_t *bs) {
 BotIntermission
 ==================
 */
-qboolean BotIntermission(bot_state_t *bs) {
+qbool BotIntermission(bot_state_t *bs) {
 	//NOTE: we shouldn't be looking at the game code...
 	if (level.intermissiontime) return qtrue;
 	return (bs->cur_ps.pm_type == PM_FREEZE || bs->cur_ps.pm_type == PM_INTERMISSION);
@@ -675,7 +675,7 @@ qboolean BotIntermission(bot_state_t *bs) {
 BotInLavaOrSlime
 ==================
 */
-qboolean BotInLavaOrSlime(bot_state_t *bs) {
+qbool BotInLavaOrSlime(bot_state_t *bs) {
 	vec3_t feet;
 
 	VectorCopy(bs->origin, feet);
@@ -1180,7 +1180,7 @@ int BotSameTeam(bot_state_t *bs, int entnum) {
 InFieldOfVision
 ==================
 */
-qboolean InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles, int client)
+qbool InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles, int client)
 {
 	int i;
 	float diff, angle;
@@ -1244,7 +1244,7 @@ qboolean InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles, int client
 	return qtrue;
 }
 
-qboolean BotIsARealEnemy(int client, int other){
+qbool BotIsARealEnemy(int client, int other){
 	int c_team = level.clients[client].sess.sessionTeam;
 	int	o_team = level.clients[other].sess.sessionTeam;
 
@@ -1799,7 +1799,7 @@ void BotCheckBuy(bot_state_t *bs){
 	for(i=1, mark = -1, mark2 = -1; ; i++){
 		gitem_t *temp;
 		int j;
-		qboolean qcontinue = qfalse;
+		qbool qcontinue = qfalse;
 
 		item = bg_itemlist+i;
 
@@ -2622,7 +2622,7 @@ static void GetAvoidDir(int num, vec3_t origin, vec3_t maxs, vec3_t mins, vec3_t
 	vec3_t dir[4];
 	vec3_t pdir;
 	vec3_t maxs2, mins2;
-	qboolean sec = qfalse;
+	qbool sec = qfalse;
 
 	// look for other breakables in near environment
 	for(i=0;i<MAX_GENTITIES;i++){

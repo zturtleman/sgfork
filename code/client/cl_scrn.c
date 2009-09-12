@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 
-qboolean	scr_initialized;		// ready to draw
+qbool	scr_initialized;		// ready to draw
 
 cvar_t		*cl_timegraph;
 cvar_t		*cl_debuggraph;
@@ -197,8 +197,8 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void SCR_DrawStringExt( int x, int y, float size, const char *string, float *setColor, qboolean forceColor,
-		qboolean noColorEscape ) {
+void SCR_DrawStringExt( int x, int y, float size, const char *string, float *setColor, qbool forceColor,
+		qbool noColorEscape ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -242,7 +242,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 }
 
 
-void SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noColorEscape ) {
+void SCR_DrawBigString( int x, int y, const char *s, float alpha, qbool noColorEscape ) {
 	float	color[4];
 
 	color[0] = color[1] = color[2] = 1.0;
@@ -250,7 +250,7 @@ void SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noCol
 	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, qfalse, noColorEscape );
 }
 
-void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape ) {
+void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qbool noColorEscape ) {
 	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, qtrue, noColorEscape );
 }
 
@@ -263,8 +263,8 @@ Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
 ==================
 */
-void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor,
-		qboolean noColorEscape ) {
+void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qbool forceColor,
+		qbool noColorEscape ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;

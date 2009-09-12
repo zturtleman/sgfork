@@ -38,7 +38,7 @@ static void SV_Netchan_Encode( client_t *client, msg_t *msg ) {
 	long reliableAcknowledge, i, index;
 	byte key, *string;
 	int	srdc, sbit;
-	qboolean soob;
+	qbool soob;
 
 	if ( msg->cursize < SV_ENCODE_START ) {
 		return;
@@ -92,7 +92,7 @@ SV_Netchan_Decode
 static void SV_Netchan_Decode( client_t *client, msg_t *msg ) {
 	int serverId, messageAcknowledge, reliableAcknowledge;
 	int i, index, srdc, sbit;
-	qboolean soob;
+	qbool soob;
 	byte key, *string;
 
 	srdc = msg->readcount;
@@ -201,7 +201,7 @@ void SV_Netchan_Transmit( client_t *client, msg_t *msg) {	//int length, const by
 Netchan_SV_Process
 =================
 */
-qboolean SV_Netchan_Process( client_t *client, msg_t *msg ) {
+qbool SV_Netchan_Process( client_t *client, msg_t *msg ) {
 	int ret;
 	ret = Netchan_Process( &client->netchan, msg );
 	if (!ret)

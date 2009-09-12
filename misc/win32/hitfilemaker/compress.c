@@ -127,7 +127,7 @@ cblock_t BWT (cblock_t in)
 typedef struct hnode_s
 {
 	int			count;
-	qboolean	used;
+	qbool	used;
 	int			children[2];
 } hnode_t;
 

@@ -48,20 +48,20 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 void CL_CharEvent( int key ) {
 }
 
-void CL_Disconnect( qboolean showMainMenu ) {
+void CL_Disconnect( qbool showMainMenu ) {
 }
 
 void CL_MapLoading( void ) {
 }
 
-qboolean CL_GameCommand( void ) {
+qbool CL_GameCommand( void ) {
   return qfalse;
 }
 
-void CL_KeyEvent (int key, qboolean down, unsigned time) {
+void CL_KeyEvent (int key, qbool down, unsigned time) {
 }
 
-qboolean UI_GameCommand( void ) {
+qbool UI_GameCommand( void ) {
 	return qfalse;
 }
 
@@ -83,9 +83,9 @@ void CL_CDDialog( void ) {
 void CL_FlushMemory( void ) {
 }
 
-void CL_StartHunkUsers( qboolean rendererOnly ) {
+void CL_StartHunkUsers( qbool rendererOnly ) {
 }
 
 void CL_ShutdownAll(void) {}
 
-qboolean CL_CDKeyValidate( const char *key, const char *checksum ) { return qtrue; }
+qbool CL_CDKeyValidate( const char *key, const char *checksum ) { return qtrue; }

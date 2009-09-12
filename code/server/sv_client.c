@@ -151,7 +151,7 @@ void SV_GetChallenge(netadr_t from)
 	NET_OutOfBandPrint( NS_SERVER, challenge->adr, "challengeResponse %i %s", challenge->challenge, clientChallenge);
 }
 
-static qboolean SV_TrustedClient( char* ip, char *info ) {
+static qbool SV_TrustedClient( char* ip, char *info ) {
 
 	// look up the authorize server's IP if it has not been resolved before
 	if ( !svs.authorizeAddress.ip[0] && svs.authorizeAddress.type == NA_BAD ) {
@@ -267,7 +267,7 @@ Check whether a certain address is banned
 ==================
 */
 
-static qboolean SV_IsBanned(netadr_t *from, qboolean isexception)
+static qbool SV_IsBanned(netadr_t *from, qbool isexception)
 {
 	int index;
 	serverBan_t *curban;
@@ -1144,7 +1144,7 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 	int nClientChkSum[1024];
 	int nServerChkSum[1024];
 	const char *pPaks, *pArg;
-	qboolean bGood = qtrue;
+	qbool bGood = qtrue;
 
 	// if we are pure, we "expect" the client to load certain things from
 	// certain pk3 files, namely we want the client to have loaded the
@@ -1403,7 +1403,7 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 
 #ifdef USE_VOIP
 static
-void SV_UpdateVoipIgnore(client_t *cl, const char *idstr, qboolean ignore)
+void SV_UpdateVoipIgnore(client_t *cl, const char *idstr, qbool ignore)
 {
 	if ((*idstr >= '0') && (*idstr <= '9')) {
 		const int id = atoi(idstr);
@@ -1462,9 +1462,9 @@ SV_ExecuteClientCommand
 Also called by bot code
 ==================
 */
-void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
+void SV_ExecuteClientCommand( client_t *cl, const char *s, qbool clientOK ) {
 	ucmd_t	*u;
-	qboolean bProcessed = qfalse;
+	qbool bProcessed = qfalse;
 
 	Cmd_TokenizeString( s );
 
@@ -1493,10 +1493,10 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 SV_ClientCommand
 ===============
 */
-static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
+static qbool SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	int		seq;
 	const char	*s;
-	qboolean clientOk = qtrue;
+	qbool clientOk = qtrue;
 
 	seq = MSG_ReadLong( msg );
 	s = MSG_ReadString( msg );
@@ -1576,7 +1576,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qbool delta ) {
 	int			i, key;
 	int			cmdCount;
 	usercmd_t	nullcmd;
@@ -1675,7 +1675,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
 
 #ifdef USE_VOIP
 static
-qboolean SV_ShouldIgnoreVoipSender(const client_t *cl)
+qbool SV_ShouldIgnoreVoipSender(const client_t *cl)
 {
 	if (!sv_voip->integer)
 		return qtrue;  // VoIP disabled on this server.

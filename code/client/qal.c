@@ -109,7 +109,7 @@ LPALCCAPTURESAMPLES qalcCaptureSamples;
 
 static void *OpenALLib = NULL;
 
-static qboolean alinit_fail = qfalse;
+static qbool alinit_fail = qfalse;
 
 /*
 =================
@@ -139,7 +139,7 @@ static void *GPA(char *str)
 QAL_Init
 =================
 */
-qboolean QAL_Init(const char *libname)
+qbool QAL_Init(const char *libname)
 {
 	if(OpenALLib)
 		return qtrue;
@@ -340,7 +340,7 @@ void QAL_Shutdown( void )
 	qalcCaptureSamples = NULL;
 }
 #else
-qboolean QAL_Init(const char *libname)
+qbool QAL_Init(const char *libname)
 {
 	return qtrue;
 }

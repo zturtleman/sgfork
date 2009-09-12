@@ -6,7 +6,7 @@ int				byteimagewidth, byteimageheight;
 
 char		mip_prefix[1024];		// directory to dump the textures in
 
-qboolean	colormap_issued;
+qbool	colormap_issued;
 byte		colormap_palette[768];
 
 /*
@@ -282,7 +282,7 @@ byte	pixdata[256];
 int		d_red, d_green, d_blue;
 
 byte	palmap[32][32][32];
-qboolean	palmap_built;
+qbool	palmap_built;
 
 /*
 =============

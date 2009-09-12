@@ -134,7 +134,7 @@ passed to the renderer.
 
 void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 				   float orientation, float red, float green, float blue, float alpha,
-				   qboolean alphaFade, float radius, qboolean temporary, int duration ) {
+				   qbool alphaFade, float radius, qbool temporary, int duration ) {
 	vec3_t			axis[3];
 	float			texCoordScale;
 	vec3_t			originalPoints[4];

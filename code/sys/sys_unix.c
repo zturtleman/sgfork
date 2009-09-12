@@ -82,7 +82,7 @@ Sys_TestSysInstallPath
 =================
 */
 #define BASEPAK "sg_pak0.pk3"
-qboolean Sys_TestSysInstallPath(const char *path)
+qbool Sys_TestSysInstallPath(const char *path)
 {
 	char *testpath;
 	FILE *f;
@@ -249,7 +249,7 @@ void Sys_SnapVector( float *v )
 Sys_RandomBytes
 ==================
 */
-qboolean Sys_RandomBytes( byte *string, int len )
+qbool Sys_RandomBytes( byte *string, int len )
 {
 	FILE *fp;
 
@@ -301,7 +301,7 @@ Sys_LowPhysicalMemory
 TODO
 ==================
 */
-qboolean Sys_LowPhysicalMemory( void )
+qbool Sys_LowPhysicalMemory( void )
 {
 	return qfalse;
 }
@@ -428,11 +428,11 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 Sys_ListFiles
 ==================
 */
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs )
+char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qbool wantsubs )
 {
 	struct dirent *d;
 	DIR           *fdir;
-	qboolean      dironly = wantsubs;
+	qbool      dironly = wantsubs;
 	char          search[MAX_OSPATH];
 	int           nfiles;
 	char          **listCopy;

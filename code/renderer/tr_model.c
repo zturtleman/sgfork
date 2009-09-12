@@ -26,10 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	LL(x) x=LittleLong(x)
 
-static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *name );
-static qboolean R_LoadMD4 (model_t *mod, void *buffer, const char *name );
+static qbool R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *name );
+static qbool R_LoadMD4 (model_t *mod, void *buffer, const char *name );
 #ifdef RAVENMD4
-static qboolean R_LoadMDR (model_t *mod, void *buffer, int filesize, const char *name );
+static qbool R_LoadMDR (model_t *mod, void *buffer, int filesize, const char *name );
 #endif
 
 model_t	*loadmodel;
@@ -90,7 +90,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	} buf;
 	int			lod;
 	int			ident;
-	qboolean	loaded = qfalse;
+	qbool	loaded = qfalse;
 	qhandle_t	hModel;
 	int			numLoaded;
 	char		*fext, defex[] = "md3", filename[MAX_QPATH], namebuf[MAX_QPATH+20];
@@ -256,7 +256,7 @@ fail:
 R_LoadMD3
 =================
 */
-static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name ) {
+static qbool R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name ) {
 	int					i, j;
 	md3Header_t			*pinmodel;
     md3Frame_t			*frame;
@@ -415,7 +415,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 R_LoadMDR
 =================
 */
-static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char *mod_name ) 
+static qbool R_LoadMDR( model_t *mod, void *buffer, int filesize, const char *mod_name ) 
 {
 	int					i, j, k, l;
 	mdrHeader_t			*pinmodel, *mdr;
@@ -755,7 +755,7 @@ R_LoadMD4
 =================
 */
 
-static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
+static qbool R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 	int					i, j, k, lodindex;
 	md4Header_t			*pinmodel, *md4;
     md4Frame_t			*frame;

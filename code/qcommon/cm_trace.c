@@ -486,7 +486,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 	float		dist;
 	float		enterFrac, leaveFrac;
 	float		d1, d2;
-	qboolean	getout, startout;
+	qbool	getout, startout;
 	float		f;
 	cbrushside_t	*side, *leadside;
 	float		t;
@@ -1378,7 +1378,7 @@ void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t 
 						  const vec3_t origin, const vec3_t angles, int capsule ) {
 	trace_t		trace;
 	vec3_t		start_l, end_l;
-	qboolean	rotated;
+	qbool	rotated;
 	vec3_t		offset;
 	vec3_t		symetricSize[2];
 	vec3_t		matrix[3], transpose[3];

@@ -36,12 +36,12 @@ int			historyLine;	// the line being displayed from history buffer
 
 field_t		g_consoleField;
 field_t		chatField;
-qboolean	chat_team;
+qbool	chat_team;
 
 int			chat_playerNum;
 
 
-qboolean	key_overstrikeMode;
+qbool	key_overstrikeMode;
 
 int				anykeydown;
 qkey_t		keys[MAX_KEYS];
@@ -310,8 +310,8 @@ Handles horizontal scrolling and cursor blinking
 x, y, and width are in pixels
 ===================
 */
-void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, qboolean showCursor,
-		qboolean noColorEscape ) {
+void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, qbool showCursor,
+		qbool noColorEscape ) {
 	int		len;
 	int		drawLen;
 	int		prestep;
@@ -383,12 +383,12 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 	}
 }
 
-void Field_Draw( field_t *edit, int x, int y, int width, qboolean showCursor, qboolean noColorEscape ) 
+void Field_Draw( field_t *edit, int x, int y, int width, qbool showCursor, qbool noColorEscape ) 
 {
 	Field_VariableSizeDraw( edit, x, y, width, SMALLCHAR_WIDTH, showCursor, noColorEscape );
 }
 
-void Field_BigDraw( field_t *edit, int x, int y, int width, qboolean showCursor, qboolean noColorEscape ) 
+void Field_BigDraw( field_t *edit, int x, int y, int width, qbool showCursor, qbool noColorEscape ) 
 {
 	Field_VariableSizeDraw( edit, x, y, width, BIGCHAR_WIDTH, showCursor, noColorEscape );
 }
@@ -754,12 +754,12 @@ void Message_Key( int key ) {
 //============================================================================
 
 
-qboolean Key_GetOverstrikeMode( void ) {
+qbool Key_GetOverstrikeMode( void ) {
 	return key_overstrikeMode;
 }
 
 
-void Key_SetOverstrikeMode( qboolean state ) {
+void Key_SetOverstrikeMode( qbool state ) {
 	key_overstrikeMode = state;
 }
 
@@ -769,7 +769,7 @@ void Key_SetOverstrikeMode( qboolean state ) {
 Key_IsDown
 ===================
 */
-qboolean Key_IsDown( int keynum ) {
+qbool Key_IsDown( int keynum ) {
 	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return qfalse;
 	}
@@ -1126,7 +1126,7 @@ void CL_AddKeyUpCommands( int key, char *kb, unsigned time) {
 	int i;
 	char button[1024], *buttonPtr;
 	char	cmd[1024];
-	qboolean keyevent;
+	qbool keyevent;
 
 	if ( !kb ) {
 		return;
@@ -1168,7 +1168,7 @@ CL_KeyEvent
 Called by the system for both key up and key down events
 ===================
 */
-void CL_KeyEvent (int key, qboolean down, unsigned time) {
+void CL_KeyEvent (int key, qbool down, unsigned time) {
 	char	*kb;
 	char	cmd[1024];
 

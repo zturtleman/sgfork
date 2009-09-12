@@ -69,7 +69,7 @@ void PM_AddEvent( int newEvent ) {
 	BG_AddPredictableEventToPlayerstate( newEvent, 0, pm->ps );
 }
 
-void PM_FireWeapon(int anim, qboolean weapon2, qboolean altfire, qboolean delay){
+void PM_FireWeapon(int anim, qbool weapon2, qbool altfire, qbool delay){
 
 	if(weapon2){
 		BG_AddPredictableEventToPlayerstate( EV_FIRE_WEAPON2, anim, pm->ps );
@@ -108,7 +108,7 @@ void PM_PlayReloadSound2( int weapon ) {
 	BG_AddPredictableEventToPlayerstate( EV_RELOAD2, weapon, pm->ps );
 }
 
-int PM_AnimLength( int anim, qboolean weapon2) {
+int PM_AnimLength( int anim, qbool weapon2) {
 	int length;
 	int weapon = weapon2 ? pm->ps->weapon2 : pm->ps->weapon;
 
@@ -157,7 +157,7 @@ void PM_AddTouchEnt( int entityNum ) {
 PM_StartWeaponAnim
 ===================
 */
-static void PM_StartWeapon2Anim( int anim , qboolean reload, qboolean sec) {
+static void PM_StartWeapon2Anim( int anim , qbool reload, qbool sec) {
 
 	if(reload){
 		if(!sec)
@@ -170,7 +170,7 @@ static void PM_StartWeapon2Anim( int anim , qboolean reload, qboolean sec) {
 }
 
 
-static void PM_StartWeaponAnim( int anim, qboolean weapon2, qboolean reload, qboolean sec) {
+static void PM_StartWeaponAnim( int anim, qbool weapon2, qbool reload, qbool sec) {
 
 	// if weapon2 has to be animated
 	if(weapon2){
@@ -197,7 +197,7 @@ static void PM_ContinueWeapon2Anim( int anim) {
 		| anim;
 }
 
-static void PM_ContinueWeaponAnim( int anim , qboolean weapon2) {
+static void PM_ContinueWeaponAnim( int anim , qbool weapon2) {
 
 	if(weapon2){
 		PM_ContinueWeapon2Anim(anim);
@@ -514,7 +514,7 @@ static void PM_SetMovementDir( void ) {
 PM_CheckJump
 =============
 */
-static qboolean PM_CheckJump( void ) {
+static qbool PM_CheckJump( void ) {
 	if ( pm->ps->pm_flags & PMF_RESPAWNED ) {
 		return qfalse;		// don't allow jump until all buttons are up
 	}
@@ -558,7 +558,7 @@ static qboolean PM_CheckJump( void ) {
 PM_CheckWaterJump
 =============
 */
-static qboolean	PM_CheckWaterJump( void ) {
+static qbool	PM_CheckWaterJump( void ) {
 	vec3_t	spot;
 	int		cont;
 	vec3_t	flatforward;
@@ -1510,7 +1510,7 @@ PM_Footsteps
 static void PM_Footsteps( void ) {
 	float		bobmove;
 	int			old;
-	qboolean	footstep;
+	qbool	footstep;
 
 	//
 	// calculate speed and cycle to be used for
@@ -1806,7 +1806,7 @@ static void PM_FinishWeaponChange( void ) {
 	int		weapon;
 
 	int		weapon1, weapon2;
-	qboolean	remington_cocking_sound = qtrue;
+	qbool	remington_cocking_sound = qtrue;
 
 	weapon = pm->cmd.weapon;
 	if ( (weapon < WP_NONE || weapon >= WP_NUM_WEAPONS) && weapon != WP_AKIMBO ) {
@@ -1814,7 +1814,7 @@ static void PM_FinishWeaponChange( void ) {
 	}
 
 	if(weapon == WP_AKIMBO){
-		qboolean sec_pistol = (pm->ps->stats[STAT_FLAGS] & SF_SEC_PISTOL);
+		qbool sec_pistol = (pm->ps->stats[STAT_FLAGS] & SF_SEC_PISTOL);
 
 		//pm->ps->weapon2 = 0;
 
@@ -1958,18 +1958,18 @@ PM_ReloadStart
 Starts the reload
 ==============
 */
-static qboolean PM_ReloadStart( qboolean weapon2, int *weaponTime, int *weaponstate ){
+static qbool PM_ReloadStart( qbool weapon2, int *weaponTime, int *weaponstate ){
 	int weapon = weapon2 ? pm->ps->weapon2 : pm->ps->weapon;
 	int reload = weapon2 ? EF_RELOAD2 : EF_RELOAD;
-	qboolean reloading = (pm->ps->eFlags & reload) ? qtrue : qfalse ;
+	qbool reloading = (pm->ps->eFlags & reload) ? qtrue : qfalse ;
 	int clip = bg_weaponlist[weapon].clip;
 	int ammo = weapon;
 
 	int oldweaponstate = *weaponstate;
 	// if the anim has to be started later(akimbos)
 	int oldanim = weapon2 ? pm->ps->weapon2Anim : pm->ps->weaponAnim;
-	qboolean reloadsound = !pm->ps->weapon2; // start reloadsound later?
-	qboolean all_at_once;
+	qbool reloadsound = !pm->ps->weapon2; // start reloadsound later?
+	qbool all_at_once;
 
 	if(!weapon2 && pm->ps->stats[STAT_FLAGS] & SF_SEC_PISTOL &&
 		bg_weaponlist[pm->ps->weapon].wp_sort == WPS_PISTOL && pm->ps->weapon2)
@@ -2091,7 +2091,7 @@ static qboolean PM_ReloadStart( qboolean weapon2, int *weaponTime, int *weaponst
 PM_ReloadEnd
 ==============
 */
-static void PM_ReloadEnd( qboolean weapon2 ){
+static void PM_ReloadEnd( qbool weapon2 ){
 	int weapon = weapon2 ? pm->ps->weapon2 : pm->ps->weapon;
 	int reload = weapon2 ? EF_RELOAD2 : EF_RELOAD;
 	int clip = bg_weaponlist[weapon].clip;
@@ -2162,7 +2162,7 @@ static void PM_ReloadEnd( qboolean weapon2 ){
 PM_WeaponIdle
 =================
 */
-static void PM_WeaponIdle( int *weapon, int *weaponTime, int *weaponstate, qboolean weapon2 ) {
+static void PM_WeaponIdle( int *weapon, int *weaponTime, int *weaponstate, qbool weapon2 ) {
 	*weaponTime = 0;
 
 	if(*weaponstate != WEAPON_JUMPING)
@@ -2226,7 +2226,7 @@ PM_PlanarCheck
 checks if gatling can be built up here
 ====================
 */
-static qboolean PM_PlanarCheck ( void ){
+static qbool PM_PlanarCheck ( void ){
 	vec3_t origin, end;
 	vec3_t angles;
 	trace_t trace;
@@ -2286,7 +2286,7 @@ PM_WeaponAction
 Generates the weapon actions
 ==============
 */
-static void PM_WeaponAction( int *weapon, int *weaponTime, int *weaponstate, qboolean weapon2){
+static void PM_WeaponAction( int *weapon, int *weaponTime, int *weaponstate, qbool weapon2){
 	int		addTime, delay = 0;
 	int		reload = weapon2 ? EF_RELOAD2 : EF_RELOAD;
 	int		ammo = *weapon;
@@ -2816,7 +2816,7 @@ static void PM_Weapon( void ) {
 	// it can't work very nice, if you can't change weapon again. - iv
 	if ((pm->ps->weaponTime <= 0 || (pm->ps->weaponstate != WEAPON_FIRING)) &&
 		(pm->ps->weapon2Time <= 0 || (pm->ps->weapon2state != WEAPON_FIRING))) {
-		qboolean automatic = qfalse;
+		qbool automatic = qfalse;
 
 		// if chooseweapon == WP_AKIMBO and akimbos are already in
 		if(pm->cmd.weapon == WP_AKIMBO && pm->ps->weapon2){
@@ -2839,7 +2839,7 @@ static void PM_Weapon( void ) {
 			// In case, pm->cmd.weapon == WP_SEC_PISTOL,
 			// pm->ps->weapon != pm->cmd.weapon will always be true.
 			// Then, a change weapon will happen even if it can result in the same pistol type
-			qboolean left_pistol = (pm->cmd.weapon == WP_SEC_PISTOL);
+			qbool left_pistol = (pm->cmd.weapon == WP_SEC_PISTOL);
 			int weapon_pistol = 0;
 			if (left_pistol) {
 			// Detect a change to the pistol on the left holster
@@ -3030,7 +3030,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 		float pheight = ps->origin[2];
 		trace_t trace;
 		vec3_t mins, maxs;
-		qboolean goback = qfalse;
+		qbool goback = qfalse;
 
 		// disable normal movement
 		pm->ps->velocity[0] = pm->ps->velocity[1] = 0.0f;
@@ -3137,7 +3137,7 @@ static void PM_LadderMove( void ) {
 	//
 	trace_t trace;
 	vec3_t origin;
-	qboolean backwards =  qfalse;
+	qbool backwards =  qfalse;
 
 	VectorCopy(pm->ps->origin, origin);
 	origin[2] -= 20;
@@ -3208,7 +3208,7 @@ void CheckLadder( void )
 	trace_t trace;
 
 	// check if we should be backwards walking down the ladder
-	qboolean backwards = qfalse;
+	qbool backwards = qfalse;
 
 	VectorCopy(pm->ps->origin, origin);
 	origin[2] -= 30;

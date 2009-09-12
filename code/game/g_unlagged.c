@@ -132,7 +132,7 @@ G_TimeShiftClient
 Move a client back to where he was at the specified "time"
 =================
 */
-void G_TimeShiftClient( gentity_t *ent, int time, qboolean debug, gentity_t *debugger ) {
+void G_TimeShiftClient( gentity_t *ent, int time, qbool debug, gentity_t *debugger ) {
 	int		j, k;
 	char msg[2048];
 
@@ -320,7 +320,7 @@ except for "skip"
 void G_TimeShiftAllClients( int time, gentity_t *skip ) {
 	int			i;
 	gentity_t	*ent;
-	qboolean debug = ( skip != NULL && skip->client &&
+	qbool debug = ( skip != NULL && skip->client &&
 			skip->client->pers.debugDelag /*&& skip->s.weapon == WP_RAILGUN*/ );
 
 	// for every client
@@ -470,7 +470,7 @@ Advance the given entity frametime seconds, sliding as appropriate
 */
 #define	MAX_CLIP_PLANES	5
 
-qboolean G_PredictPlayerSlideMove( gentity_t *ent, float frametime ) {
+qbool G_PredictPlayerSlideMove( gentity_t *ent, float frametime ) {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

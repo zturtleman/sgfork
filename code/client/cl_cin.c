@@ -94,7 +94,7 @@ typedef struct {
 	char				fileName[MAX_OSPATH];
 	int					CIN_WIDTH, CIN_HEIGHT;
 	int					xpos, ypos, width, height;
-	qboolean			looping, holdAtEnd, dirty, alterGameState, silent, shader;
+	qbool			looping, holdAtEnd, dirty, alterGameState, silent, shader;
 	fileHandle_t		iFile;
 	e_status			status;
 	unsigned int		startTime;
@@ -118,7 +118,7 @@ typedef struct {
 	byte*				gray;
 	unsigned int		xsize, ysize, maxsize, minsize;
 
-	qboolean			half, smootheddouble, inMemory;
+	qbool			half, smootheddouble, inMemory;
 	long				normalBuffer0;
 	long				roq_flags;
 	long				roqF0;
@@ -1504,7 +1504,7 @@ void CIN_SetExtents (int handle, int x, int y, int w, int h) {
 	cinTable[handle].dirty = qtrue;
 }
 
-void CIN_SetLooping(int handle, qboolean loop) {
+void CIN_SetLooping(int handle, qbool loop) {
 	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return;
 	cinTable[handle].looping = loop;
 }
@@ -1593,7 +1593,7 @@ void CIN_DrawCinematic (int handle) {
 
 void CL_PlayCinematic_f(void) {
 	char	*arg, *s;
-	qboolean	holdatend;
+	qbool	holdatend;
 	int bits = CIN_system;
 
 	Com_DPrintf("CL_PlayCinematic_f\n");

@@ -271,7 +271,7 @@ WAYPOINT SYSTEM
 */
 /////////////////////////////
 #define SIZE 50
-qboolean ValidNode(vec3_t start, vec3_t end){
+qbool ValidNode(vec3_t start, vec3_t end){
 	int area1, area2;
 	int time;
 
@@ -295,9 +295,9 @@ void BotAI_GetForcePoint(bot_state_t *bs, vec3_t p){
 		VectorCopy(bs->force_point, p);*/
 }
 
-qboolean BotAI_FindNearestNode(qboolean valid, bot_state_t *bs, vec3_t org, vec3_t node, float mindist, vec3_t avoid){
+qbool BotAI_FindNearestNode(qbool valid, bot_state_t *bs, vec3_t org, vec3_t node, float mindist, vec3_t avoid){
 	int i, mark;
-	//qboolean valid = qfalse;
+	//qbool valid = qfalse;
 
 	VectorClear(node);
 
@@ -557,7 +557,7 @@ int TravelTime(vec3_t p1, vec3_t p2){
 }
 
 #define NUM_NODES 3
-static qboolean BotAI_FindNode(bot_state_t *bs, vec3_t waypoint){
+static qbool BotAI_FindNode(bot_state_t *bs, vec3_t waypoint){
 	int i, j, k, count;
 	int nodes[NUM_NODES];
 
@@ -715,7 +715,7 @@ int BotGetItemLongTermGoal(bot_state_t *bs, int tfl, bot_goal_t *goal) {
 	if (bs->ltg_time < FloatTime()) {
 		int return_value;
 		int count = 0;
-		qboolean valid;
+		qbool valid;
 //		int i;
 		vec3_t m1, m2;
 		VectorClear(m1);
@@ -1912,7 +1912,7 @@ int AINode_Seek_NBG(bot_state_t *bs) {
 	bot_goal_t goal;
 	vec3_t target, dir;
 	bot_moveresult_t moveresult;
-	qboolean override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
+	qbool override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
 
 	if (BotIsObserver(bs)) {
 		AIEnter_Observer(bs, "seek nbg: observer");
@@ -2066,7 +2066,7 @@ int AINode_Seek_LTG(bot_state_t *bs)
 	vec3_t target, dir;
 	bot_moveresult_t moveresult;
 	int range;
-	qboolean override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
+	qbool override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
 	//char buf[128];
 	//bot_goal_t tmpgoal;
 
@@ -2246,7 +2246,7 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	vec3_t target;
 	aas_entityinfo_t entinfo;
 	bot_moveresult_t moveresult;
-	qboolean override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
+	qbool override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
 
 	if (BotIsObserver(bs)) {
 		AIEnter_Observer(bs, "battle fight: observer");
@@ -2408,7 +2408,7 @@ int AINode_Battle_Chase(bot_state_t *bs)
 	vec3_t target, dir;
 	bot_moveresult_t moveresult;
 	float range;
-	qboolean override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
+	qbool override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
 
 	if (BotIsObserver(bs)) {
 		AIEnter_Observer(bs, "battle chase: observer");
@@ -2554,7 +2554,7 @@ int AINode_Battle_Retreat(bot_state_t *bs) {
 	vec3_t target, dir;
 	float attack_skill, range;
 	int areanum;
-	qboolean override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
+	qbool override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
 
 	if (BotIsObserver(bs)) {
 		AIEnter_Observer(bs, "battle retreat: observer");
@@ -2731,7 +2731,7 @@ int AINode_Battle_NBG(bot_state_t *bs) {
 	bot_moveresult_t moveresult;
 	float attack_skill;
 	vec3_t target, dir;
-	qboolean override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
+	qbool override = ((bs->flags & BFL_AVOID )||( bs->flags & BFL_ESCAPE));
 
 	if (BotIsObserver(bs)) {
 		AIEnter_Observer(bs, "battle nbg: observer");

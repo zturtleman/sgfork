@@ -567,7 +567,7 @@ CM_LoadMap
 Loads in the map and all submodels
 ==================
 */
-void CM_LoadMap( const char *name, qboolean clientload, int *checksum ) {
+void CM_LoadMap( const char *name, qbool clientload, int *checksum ) {
 	union {
 		int				*i;
 		void			*v;

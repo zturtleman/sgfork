@@ -106,7 +106,7 @@ SpotWouldTelefrag
 
 ================
 */
-qboolean SpotWouldTelefrag( gentity_t *spot ) {
+qbool SpotWouldTelefrag( gentity_t *spot ) {
 	int			i, num;
 	int			touch[MAX_GENTITIES];
 	gentity_t	*hit;
@@ -214,11 +214,11 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	int			numSpots, rnd, i, j, ignoreTeam;
 	gentity_t *ent_client;
 	gentity_t	*allSpot[64];
-	qboolean	telefragSpot[64];
+	qbool	telefragSpot[64];
 	int			availSpot[64];
 	int			numAllSpots = 0;
 	int			numAvailSpots;
-	qboolean perfectSpot = qfalse, telefrag;
+	qbool perfectSpot = qfalse, telefrag;
 	int developer;
 
 	numSpots = 0;
@@ -559,7 +559,7 @@ After sitting around for ten seconds, fall into the ground and dissapear
 =============
 */
 void BodySink( gentity_t *ent ) {
-	qboolean duel = (g_gametype.integer == GT_DUEL);
+	qbool duel = (g_gametype.integer == GT_DUEL);
 
 	// make sure no body is left at round restart
 	if((g_gametype.integer >= GT_RTP && g_round > ent->angle) ||
@@ -1201,7 +1201,7 @@ to the server machine, but qfalse on map changes and tournement
 restarts.
 ============
 */
-char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
+char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
 	char		*value;
 //	char		*areabits;
 	gclient_t	*client;
@@ -1365,7 +1365,7 @@ G_RestorePlayerStats
 restore the playerstats on Clienspawn
 ===========
 */
-static void G_RestorePlayerStats(gentity_t *ent, qboolean save){
+static void G_RestorePlayerStats(gentity_t *ent, qbool save){
 	int		i;
 	clientPersistant_t	saved;
 	clientSession_t		savedSess;
@@ -1374,8 +1374,8 @@ static void G_RestorePlayerStats(gentity_t *ent, qboolean save){
 	int		accuracy_hits, accuracy_shots;
 	int		savedEvents[MAX_PS_EVENTS];
 	int		eventSequence;
-	qboolean	realspec;
-	qboolean	won;
+	qbool	realspec;
+	qbool	won;
 	gclient_t	*client = ent->client;
 	int			wins = client->ps.stats[STAT_WINS];
 
@@ -1477,8 +1477,8 @@ void ClientSpawn(gentity_t *ent) {
 	char		userinfo[MAX_INFO_STRING];
 	int		flags;
 	int		min_money = 0;
-	qboolean	player_died;
-	qboolean	specwatch = ent->client->specwatch;
+	qbool	player_died;
+	qbool	specwatch = ent->client->specwatch;
 
 	index = ent - g_entities;
 	client = ent->client;

@@ -179,7 +179,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 	int		i;
 	float	dist;
 	cplane_t	*frust;
-	qboolean mightBeClipped = qfalse;
+	qbool mightBeClipped = qfalse;
 
 	if ( r_nocull->integer ) {
 		return CULL_CLIP;
@@ -563,7 +563,7 @@ void R_SetupFrustum (viewParms_t *dest, float xmin, float xmax, float ymax, floa
 R_SetupProjection
 ===============
 */
-void R_SetupProjection(viewParms_t *dest, float zProj, qboolean computeFrustum)
+void R_SetupProjection(viewParms_t *dest, float zProj, qbool computeFrustum)
 {
 	float	xmin, xmax, ymin, ymax;
 	float	width, height, stereoSep = r_stereoSeparation->value;
@@ -729,9 +729,9 @@ be moving and rotating.
 Returns qtrue if it should be mirrored
 =================
 */
-qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
+qbool R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 							 orientation_t *surface, orientation_t *camera,
-							 vec3_t pvsOrigin, qboolean *mirror ) {
+							 vec3_t pvsOrigin, qbool *mirror ) {
 	int			i;
 	cplane_t	originalPlane, plane;
 	trRefEntity_t	*e;
@@ -848,7 +848,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	return qfalse;
 }
 
-static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
+static qbool IsMirror( const drawSurf_t *drawSurf, int entityNum )
 {
 	int			i;
 	cplane_t	originalPlane, plane;
@@ -913,7 +913,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 **
 ** Determines if a surface is completely offscreen.
 */
-static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] ) {
+static qbool SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] ) {
 	float shortest = 100000000;
 	int entityNum;
 	int numTriangles;
@@ -1018,7 +1018,7 @@ R_MirrorViewBySurface
 Returns qtrue if another view has been rendered
 ========================
 */
-qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
+qbool R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 	vec4_t			clipDest[128];
 	viewParms_t		newParms;
 	viewParms_t		oldParms;

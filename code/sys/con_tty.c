@@ -40,9 +40,9 @@ called before and after a stdout or stderr output
 =============================================================
 */
 
-static qboolean stdin_active;
+static qbool stdin_active;
 // general flag to tell about tty console mode
-static qboolean ttycon_on = qfalse;
+static qbool ttycon_on = qfalse;
 static int ttycon_hide = 0;
 
 // some key codes that the terminal may be using, initialised on start up

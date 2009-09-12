@@ -74,7 +74,7 @@ fielddef_t *FindField(fielddef_t *defs, char *name)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean ReadNumber(source_t *source, fielddef_t *fd, void *p)
+qbool ReadNumber(source_t *source, fielddef_t *fd, void *p)
 {
 	token_t token;
 	int negative = qfalse;
@@ -189,7 +189,7 @@ qboolean ReadNumber(source_t *source, fielddef_t *fd, void *p)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean ReadChar(source_t *source, fielddef_t *fd, void *p)
+qbool ReadChar(source_t *source, fielddef_t *fd, void *p)
 {
 	token_t token;
 

@@ -154,7 +154,7 @@ Restart the server on a different map
 static void SV_Map_f( void ) {
 	char		*cmd;
 	char		*map;
-	qboolean	killBots, cheat;
+	qbool	killBots, cheat;
 	char		expanded[MAX_QPATH];
 	char		mapname[MAX_QPATH];
 
@@ -227,7 +227,7 @@ static void SV_MapRestart_f( void ) {
 	int			i;
 	client_t	*client;
 	char		*denied;
-	qboolean	isBot;
+	qbool	isBot;
 	int			delay;
 
 	// make sure we aren't restarting twice in the same frame
@@ -646,7 +646,7 @@ Remove a ban or an exception from the list.
 ==================
 */
 
-static qboolean SV_DelBanEntryFromList(int index)
+static qbool SV_DelBanEntryFromList(int index)
 {
 	if(index == serverBansCount - 1)
 		serverBansCount--;
@@ -669,7 +669,7 @@ Parse a CIDR notation type string and return a netadr_t and suffix by reference
 ==================
 */
 
-static qboolean SV_ParseCIDRNotation(netadr_t *dest, int *mask, char *adrstr)
+static qbool SV_ParseCIDRNotation(netadr_t *dest, int *mask, char *adrstr)
 {
 	char *suffix;
 	
@@ -714,7 +714,7 @@ Ban a user from being able to play on this server based on his ip address.
 ==================
 */
 
-static void SV_AddBanToList(qboolean isexception)
+static void SV_AddBanToList(qbool isexception)
 {
 	char *banstring;
 	char addy2[NET_ADDRSTRMAXLEN];
@@ -857,7 +857,7 @@ Remove a ban or an exception from the list.
 ==================
 */
 
-static void SV_DelBanFromList(qboolean isexception)
+static void SV_DelBanFromList(qbool isexception)
 {
 	int index, count = 0, todel, mask;
 	netadr_t ip;
@@ -1242,7 +1242,7 @@ SV_AddOperatorCommands
 ==================
 */
 void SV_AddOperatorCommands( void ) {
-	static qboolean	initialized;
+	static qbool	initialized;
 
 	if ( initialized ) {
 		return;

@@ -77,7 +77,7 @@ static int			numIPFilters;
 StringToFilter
 =================
 */
-static qboolean StringToFilter (char *s, ipFilter_t *f)
+static qbool StringToFilter (char *s, ipFilter_t *f)
 {
 	char	num[128];
 	int		i, j;
@@ -176,7 +176,7 @@ static void UpdateIPBans (void)
 G_FilterPacket
 =================
 */
-qboolean G_FilterPacket (char *from)
+qbool G_FilterPacket (char *from)
 {
 	int		i;
 	unsigned	in;
@@ -453,7 +453,7 @@ void Svcmd_KickBots_f(void){
 	}
 }
 
-void Svcmd_Mute( qboolean mute )
+void Svcmd_Mute( qbool mute )
 {
   gclient_t *cl;
   char buf[MAX_TOKEN_CHARS];
@@ -494,7 +494,7 @@ ConsoleCommand
 
 =================
 */
-qboolean	ConsoleCommand( void ) {
+qbool	ConsoleCommand( void ) {
 	char	cmd[MAX_TOKEN_CHARS];
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );

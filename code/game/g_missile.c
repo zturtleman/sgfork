@@ -250,7 +250,7 @@ void WhiskeyDie ( gentity_t *self, gentity_t *inflictor,
 	self->wait = level.time + WHISKEY_BURNTIME;
 }
 
-gentity_t *SetWhiskeyPool (gentity_t *self, vec3_t origin, vec3_t normal, qboolean fire) {
+gentity_t *SetWhiskeyPool (gentity_t *self, vec3_t origin, vec3_t normal, qbool fire) {
 	gentity_t	*pool;
 
 	pool = G_Spawn();
@@ -363,8 +363,8 @@ G_MissileImpact
 */
 void G_MissileImpact( gentity_t *ent, trace_t *trace, int shaderNum ) {
 	gentity_t		*other;
-	qboolean		hitClient = qfalse;
-	qboolean		hitKnife  = qfalse;
+	qbool		hitClient = qfalse;
+	qbool		hitKnife  = qfalse;
 	vec3_t			bottledirs[ALC_COUNT];
 	other = &g_entities[trace->entityNum];
 

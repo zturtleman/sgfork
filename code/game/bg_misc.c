@@ -2250,7 +2250,7 @@ Items can be picked up without actually touching their physical bounds to make
 grabbing them easier
 ============
 */
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
+qbool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
 	vec3_t		origin;
 
 	BG_EvaluateTrajectory( &item->pos, atTime, origin );
@@ -2277,7 +2277,7 @@ Returns false if the item should not be picked up.
 This needs to be the same for client side prediction and server use.
 ================
 */
-qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
+qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
 	gitem_t	*item;
 	int		belt = 1, i;
 
@@ -2681,7 +2681,7 @@ This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap ) {
+void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qbool snap ) {
 	int		i;
 
 	if(ps->pm_type == PM_SPECTATOR && !(ps->stats[STAT_FLAGS] & SF_BOT)){
@@ -2785,7 +2785,7 @@ This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap ) {
+void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qbool snap ) {
 	int		i;
 
 	if(ps->pm_type == PM_SPECTATOR && !(ps->stats[STAT_FLAGS] & SF_BOT)){
@@ -2924,7 +2924,7 @@ prefixInfo_t prefixInfo[NUM_PREFIXINFO] = {
 };
 
 // shoot-thru-walls code( STW wuahahahaha, damn shit)
-qboolean BG_ShootThruWall( float *damage,
+qbool BG_ShootThruWall( float *damage,
 						  vec3_t start, vec3_t muzzle, int surfaceFlags, vec3_t end,
 						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask )){
 	trace_t			tr;
@@ -3039,7 +3039,7 @@ void BG_StringRead(char *destination, char *source, int size) {
 
 void BG_ModifyEyeAngles( vec3_t origin, vec3_t viewangles,
 						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask ),
-						vec3_t legOffset, qboolean print){
+						vec3_t legOffset, qbool print){
 	vec3_t			forward, angles, start, temp;
 	float			pitch;
 	trace_t			tr;
@@ -3125,7 +3125,7 @@ int BG_SearchTypeWeapon(int type, int weapons, int wp_ignore){
 	return 0;
 }
 
-qboolean CheckPistols(playerState_t *ps, int *weapon){
+qbool CheckPistols(playerState_t *ps, int *weapon){
 
 	// can't have more than two pistols -> drop bad ones
 	int count = 0;
