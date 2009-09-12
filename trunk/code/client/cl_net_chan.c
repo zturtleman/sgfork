@@ -156,7 +156,7 @@ int newsize = 0;
 CL_Netchan_Process
 =================
 */
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg ) {
+qbool CL_Netchan_Process( netchan_t *chan, msg_t *msg ) {
 	int ret;
 
 	ret = Netchan_Process( chan, msg );

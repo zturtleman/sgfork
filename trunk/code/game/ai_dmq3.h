@@ -51,19 +51,19 @@ void BotUpdateBattleInventory(bot_state_t *bs, int enemy);
 //use holdable items during battle
 void BotBattleUseItems(bot_state_t *bs);
 //return true if the bot is dead
-qboolean BotIsDead(bot_state_t *bs);
+qbool BotIsDead(bot_state_t *bs);
 //returns true if the bot is in observer mode
-qboolean BotIsObserver(bot_state_t *bs);
+qbool BotIsObserver(bot_state_t *bs);
 //returns true if the bot is in the intermission
-qboolean BotIntermission(bot_state_t *bs);
+qbool BotIntermission(bot_state_t *bs);
 //returns true if the bot is in lava or slime
-qboolean BotInLavaOrSlime(bot_state_t *bs);
+qbool BotInLavaOrSlime(bot_state_t *bs);
 //returns true if the entity is dead
-qboolean EntityIsDead(aas_entityinfo_t *entinfo);
+qbool EntityIsDead(aas_entityinfo_t *entinfo);
 //returns true if the entity is invisible
-qboolean EntityIsInvisible(aas_entityinfo_t *entinfo);
+qbool EntityIsInvisible(aas_entityinfo_t *entinfo);
 //returns true if the entity is shooting
-qboolean EntityIsShooting(aas_entityinfo_t *entinfo);
+qbool EntityIsShooting(aas_entityinfo_t *entinfo);
 // set a user info key/value pair
 void BotSetUserInfo(bot_state_t *bs, char *key, char *value);
 // set the team status (offense, defense etc.)
@@ -108,8 +108,8 @@ int BotEnemyFlagCarrierVisible(bot_state_t *bs);
 //get the number of visible teammates and enemies
 void BotVisibleTeamMatesAndEnemies(bot_state_t *bs, int *teammates, int *enemies, float range);
 //returns true if within the field of vision for the given angles
-qboolean InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles, int client);
-qboolean BotIsARealEnemy(int client, int other);
+qbool InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles, int client);
+qbool BotIsARealEnemy(int client, int other);
 //returns true and sets the .enemy field when an enemy is found
 int BotFindEnemy(bot_state_t *bs, int curenemy);
 //returns a roam goal

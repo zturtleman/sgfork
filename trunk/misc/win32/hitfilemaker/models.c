@@ -344,7 +344,7 @@ typedef struct surf_header {
 	unsigned short	numVerts;
 } surf_header_t;
 
-qboolean is_tag;
+qbool is_tag;
 char tag_name[64];
 
 void WriteHitFile( char *filename)
@@ -547,7 +547,7 @@ typedef struct mesh_header_s {
 	short		length;
 } mesh_header_t;
 
-qboolean is_tag;
+qbool is_tag;
 char tag_name[64];
 
 #define	MAX_HITFILE 30000
@@ -809,7 +809,7 @@ void OpenModelFile( char *filename)
 	fclose(file);
 }
 
-void ConvertMD3ToHit(char *filename, char *tagname, qboolean tag_exists){
+void ConvertMD3ToHit(char *filename, char *tagname, qbool tag_exists){
 
 	is_tag = tag_exists;
 	if(is_tag){
@@ -1079,7 +1079,7 @@ void FinishModel ( int type )
 static void OrderSurfaces( void )
 {
 	int s;
-	extern qboolean g_stripify;
+	extern qbool g_stripify;
 
 	// go through each surface and find best strip/fans possible
 	for ( s = 0; s < g_data.model.numSurfaces; s++ )
@@ -1506,7 +1506,7 @@ void GrabFrame (const char *frame)
 	float		*frameNormals;
 	const char	*framefile;
 	polyset_t		*psets;
-	qboolean	 parentTagExists = qfalse;
+	qbool	 parentTagExists = qfalse;
 	int			 numpolysets;
 	int			numtags = 0;
 	int			tagcount;
@@ -1963,12 +1963,12 @@ void Cmd_3DSConvert()
 	Convert3DStoMD3( file );
 }
 
-static void ConvertASE( const char *filename, int type, qboolean grabAnims );
+static void ConvertASE( const char *filename, int type, qbool grabAnims );
 
 /*
 ** Cmd_ASEConvert
 */
-void Cmd_ASEConvert( qboolean grabAnims )
+void Cmd_ASEConvert( qbool grabAnims )
 {
 	char filename[1024];
 	int type = TYPE_ITEM;
@@ -2236,7 +2236,7 @@ static void BuildAnimationFromOAFs( const char *filename, ObjectAnimationFrame_t
 	for ( f = 0; f < numFrames; f++ )
 	{
 		ObjectAnimationFrame_t *pOAF = &oanims[f];
-		qboolean	parentTagExists = qfalse;
+		qbool	parentTagExists = qfalse;
 		md3Tag_t	tagParent;
 		int			numtags = 0;
 		md3Frame_t		*fr;
@@ -2440,7 +2440,7 @@ static void BuildAnimationFromOAFs( const char *filename, ObjectAnimationFrame_t
 	ClearModel();
 }
 
-static void ConvertASE( const char *filename, int type, qboolean grabAnims )
+static void ConvertASE( const char *filename, int type, qbool grabAnims )
 {
 	int i, j;
 	int numSurfaces;
@@ -2491,9 +2491,9 @@ static void ConvertASE( const char *filename, int type, qboolean grabAnims )
 	}
 	else if ( type == TYPE_PLAYER )
 	{
-		qboolean tagTorso = qfalse;
-		qboolean tagHead = qfalse;
-		qboolean tagWeapon = qfalse;
+		qbool tagTorso = qfalse;
+		qbool tagHead = qfalse;
+		qbool tagWeapon = qfalse;
 
 		//
 		// verify that all necessary tags exist

@@ -276,7 +276,7 @@ vmCvar_t		cg_button_turnleft[2];
 vmCvar_t		cg_button_turnright[2];*/
 
 // key list, which button is down?
-//qboolean	cg_keylist[K_LAST_KEY];
+//qbool	cg_keylist[K_LAST_KEY];
 
 vec3_t			ai_nodes[MAX_AINODES];
 vec3_t			ai_angles[MAX_AINODES];
@@ -1432,7 +1432,7 @@ static void CG_ClearTrackStats(void){
 		trackInfo[i].played = qfalse;
 	}
 }
-static qboolean CG_CheckTrackStats(void){
+static qbool CG_CheckTrackStats(void){
 	int i;
 	int count = 0;
 
@@ -1580,7 +1580,7 @@ char *CG_GetMenuBuffer(const char *filename) {
 // new hud stuff ( mission pack )
 // ==============================
 //
-qboolean CG_Asset_Parse(int handle) {
+qbool CG_Asset_Parse(int handle) {
 	pc_token_t token;
 	const char *tempStr;
 
@@ -1929,7 +1929,7 @@ void CG_ParseMenu(const char *menuFile) {
 	trap_PC_FreeSource(handle);
 }
 
-qboolean CG_Load_Menu(char **p) {
+qbool CG_Load_Menu(char **p) {
 	char *token;
 
 	token = COM_ParseExt(p, qtrue);
@@ -2022,7 +2022,7 @@ void CG_LoadMenus(const char *menuFile) {
 
 
 
-static qboolean CG_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, int key) {
+static qbool CG_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, int key) {
 	return qfalse;
 }
 

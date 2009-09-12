@@ -99,7 +99,7 @@ int sys_timeBase;
 int Sys_Milliseconds (void)
 {
 	int             sys_curtime;
-	static qboolean initialized = qfalse;
+	static qbool initialized = qfalse;
 
 	if (!initialized) {
 		sys_timeBase = timeGetTime();
@@ -143,7 +143,7 @@ void Sys_SnapVector( float *v )
 Sys_RandomBytes
 ================
 */
-qboolean Sys_RandomBytes( byte *string, int len )
+qbool Sys_RandomBytes( byte *string, int len )
 {
 	HCRYPTPROV  prov;
 
@@ -216,7 +216,7 @@ char *Sys_GetClipboardData( void )
 Sys_LowPhysicalMemory
 ==================
 */
-qboolean Sys_LowPhysicalMemory( void )
+qbool Sys_LowPhysicalMemory( void )
 {
 	MEMORYSTATUS stat;
 	GlobalMemoryStatus (&stat);
@@ -366,7 +366,7 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 strgtr
 ==============
 */
-static qboolean strgtr(const char *s0, const char *s1)
+static qbool strgtr(const char *s0, const char *s1)
 {
 	int l0, l1, i;
 
@@ -393,7 +393,7 @@ static qboolean strgtr(const char *s0, const char *s1)
 Sys_ListFiles
 ==============
 */
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs )
+char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qbool wantsubs )
 {
 	char		search[MAX_OSPATH];
 	int			nfiles;
@@ -578,7 +578,7 @@ void Sys_ErrorDialog( const char *error )
 }
 
 #ifndef DEDICATED
-static qboolean SDL_VIDEODRIVER_externallySet = qfalse;
+static qbool SDL_VIDEODRIVER_externallySet = qfalse;
 #endif
 
 /*

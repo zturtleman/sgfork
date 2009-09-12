@@ -60,7 +60,7 @@ kbutton_t	in_voiprecord;
 kbutton_t	in_buttons[16];
 
 
-qboolean	in_mlooking;
+qbool	in_mlooking;
 
 
 void IN_MLookDown( void ) {
@@ -633,7 +633,7 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-qboolean CL_ReadyToSendPacket( void ) {
+qbool CL_ReadyToSendPacket( void ) {
 	int		oldPacketNum;
 	int		delta;
 

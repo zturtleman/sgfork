@@ -142,7 +142,7 @@ Calculates intersection point of a line and a plane
 ===================
 */
 #define	SMALL	0.001
-static qboolean LineHitsPlane(vec3_t plane_org, vec3_t plane_normal,
+static qbool LineHitsPlane(vec3_t plane_org, vec3_t plane_normal,
 						  vec3_t line_org, vec3_t line_dir,
 						  vec3_t result){
 	float	s;
@@ -213,7 +213,7 @@ CheckIntersection
 Checks if cylinder was hit
 ======================
 */
-static qboolean CheckIntersection(vec3_t offset_origin, vec3_t offset_angles, hit_part_t *mesh,
+static qbool CheckIntersection(vec3_t offset_origin, vec3_t offset_angles, hit_part_t *mesh,
 				  lerpFrame_t *lerp, vec3_t start, vec3_t end){
 	vec3_t trace_dir, cyl_dir;
 	vec3_t trace_start, cyl_start, cyl_end;
@@ -319,7 +319,7 @@ by: Spoon
 manages the hit-detection
 ===============
 */
-static qboolean G_BuildHitModel(hit_data_t *data, vec3_t origin,
+static qbool G_BuildHitModel(hit_data_t *data, vec3_t origin,
 				   vec3_t angles, vec3_t torso_angles, vec3_t head_angles,
 				   lerpFrame_t *torso, lerpFrame_t *legs,
 				   vec3_t start, vec3_t end, int mesh){
@@ -555,7 +555,7 @@ Read a configuration file containing animation coutns and rates
 models/wq3_players/wq_male1/animation.cfg, etc
 ======================
 */
-static qboolean	G_ParseAnimationFile( const char *filename, hit_data_t *data ) {
+static qbool	G_ParseAnimationFile( const char *filename, hit_data_t *data ) {
 	char		*text_p, *prev;
 	int			len;
 	int			i;
@@ -706,7 +706,7 @@ G_OpenFileAiNode
 extern	vec3_t	ai_nodes[MAX_AINODES];
 extern	int		ai_nodecount;
 #define MAX_AINODEFILE 10000
-qboolean G_OpenFileAiNode(const char *filename){
+qbool G_OpenFileAiNode(const char *filename){
 	int				i;
 	fileHandle_t	file;
 	char			header[] = "AI-NODES";
@@ -818,7 +818,7 @@ typedef struct hit_data_s {
 } hit_data_t;*/
 
 #define HIT_DEBUG
-qboolean G_ParseHitFile(hit_data_t *hit_data, int part){
+qbool G_ParseHitFile(hit_data_t *hit_data, int part){
 
 	int				len, f, i;
 	fileHandle_t	file;
@@ -1078,7 +1078,7 @@ by: Spoon
 18.8.2001
 =================
 */
-qboolean G_LoadHitFiles(hit_data_t *hit_data){
+qbool G_LoadHitFiles(hit_data_t *hit_data){
 
 	//parse lower body
 	if(!G_ParseHitFile(hit_data, PART_LOWER)){
@@ -1159,7 +1159,7 @@ level.time should be between oldFrameTime and frameTime after exit
 void G_RunLerpFrame( lerpFrame_t *lf, int newAnimation, float speedScale) {
 	int			f, numFrames;
 	animation_t	*anim;
-	qboolean	newanim = qfalse;
+	qbool	newanim = qfalse;
 
 	// see if the animation sequence is switching
 	if ( newAnimation != lf->animationNumber || !lf->animation ) {
@@ -1244,7 +1244,7 @@ G_SwingAngles
 ==================
 */
 static void G_SwingAngles( float destination, float swingTolerance, float clampTolerance,
-					float speed, float *angle, qboolean *swinging ) {
+					float speed, float *angle, qbool *swinging ) {
 	float	swing;
 	float	move;
 	float	scale;

@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 static	vec3_t	forward, right, up;
 static	vec3_t	muzzle;
 static	vec3_t	endpos; // used for shoot thru walls code
-static	qboolean shootthru;
+static	qbool shootthru;
 
 #define NUM_NAILSHOTS 10
 
@@ -79,7 +79,7 @@ void weapon_knife_fire (gentity_t *ent) {
 CheckKnifeAttack
 ===============
 */
-qboolean CheckKnifeAttack( gentity_t *ent ) {
+qbool CheckKnifeAttack( gentity_t *ent ) {
 	trace_t		tr;
 	vec3_t		end;
 	gentity_t	*traceEnt;
@@ -522,7 +522,7 @@ SHOTGUN
 // client predicts same spreads
 #define	DEFAULT_SHOTGUN_DAMAGE	10
 
-qboolean ShotgunPellet( float r, float u, vec3_t start, vec3_t end, gentity_t *ent) {
+qbool ShotgunPellet( float r, float u, vec3_t start, vec3_t end, gentity_t *ent) {
 	trace_t		tr;
 	float		damage = bg_weaponlist[ent->client->ps.weapon].damage;
 	int			passent;
@@ -702,7 +702,7 @@ wall:
 }
 
 // this should match CG_ShotgunPattern
-int ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent, qboolean altfire ) {
+int ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent, qbool altfire ) {
 	int		i;
 	float		r, u;
 	float           spread_dist , spread_angle , angle_shift , current_angle_shift ;
@@ -892,7 +892,7 @@ int ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent, qbo
 	return playerhitcount;
 }
 
-void weapon_supershotgun_fire (gentity_t *ent, qboolean altfire) {
+void weapon_supershotgun_fire (gentity_t *ent, qbool altfire) {
 	gentity_t		*tent;
 	int				temp = ent->client->lasthurt_client;
 	int				playerhitcount;
@@ -997,7 +997,7 @@ void weapon_molotov_fire (gentity_t *ent) {
 LogAccuracyHit
 ===============
 */
-qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
+qbool LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 	if( !target->takedamage ) {
 		return qfalse;
 	}
@@ -1068,7 +1068,7 @@ void CalcMuzzlePointOrigin ( gentity_t *ent, vec3_t origin, vec3_t forward, vec3
 FireWeapon
 ===============
 */
-void FireWeapon( gentity_t *ent, qboolean altfire, int weapon ) {
+void FireWeapon( gentity_t *ent, qbool altfire, int weapon ) {
 	float spread = bg_weaponlist[weapon].spread;
 	float damage = bg_weaponlist[weapon].damage;
 

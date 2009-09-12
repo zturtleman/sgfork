@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "../client/snd_local.h"
 
-qboolean snd_inited = qfalse;
+qbool snd_inited = qfalse;
 
 cvar_t *s_sdlBits;
 cvar_t *s_sdlSpeed;
@@ -136,7 +136,7 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 SNDDMA_Init
 ===============
 */
-qboolean SNDDMA_Init(void)
+qbool SNDDMA_Init(void)
 {
 	char drivername[128];
 	SDL_AudioSpec desired;

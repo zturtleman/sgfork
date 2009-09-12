@@ -33,8 +33,8 @@ typedef struct {
 	char		*defaultString;
 	int			cvarFlags;
 	int			modificationCount;  // for tracking changes
-	qboolean	trackChange;	    // track this variable, and announce if changed
-  qboolean teamShader;        // track and if changed, update shader state
+	qbool	trackChange;	    // track this variable, and announce if changed
+  qbool teamShader;        // track and if changed, update shader state
 } cvarTable_t;
 
 gentity_t		g_entities[MAX_GENTITIES];
@@ -56,8 +56,8 @@ int			g_session;
 vmCvar_t	g_moneyRespawn;
 
 // bank robbery
-qboolean	g_goldescaped;
-qboolean	g_robbed;
+qbool	g_goldescaped;
+qbool	g_robbed;
 int			g_robteam;
 int			g_defendteam;
 
@@ -180,7 +180,7 @@ vmCvar_t	g_newShotgunPattern;
 vmCvar_t	g_roundNoMoveTime;
 
 
-qboolean b_sWaitingForPlayers = qfalse;
+qbool b_sWaitingForPlayers = qfalse;
 int i_sNextWaitPrint = 0;
 int i_sNextCount = 0;
 
@@ -502,7 +502,7 @@ void G_UpdateCvars( void ) {
 shaderInfo_t shaderInfo[MAX_BRUSHSIDES];
 int	shaderInfoNum;
 
-qboolean Keyword( char *key, char *token, const char* filename){
+qbool Keyword( char *key, char *token, const char* filename){
 	if(Q_stricmp(key, token)){
 		G_Printf( "\nno \"%s\" in %s\n", key, filename  );
 		return qfalse;
@@ -519,7 +519,7 @@ Read texture information of a map using map.tex
 not used anymore
 ======================
 */
-qboolean G_ParseTexFile(const char *filename){
+qbool G_ParseTexFile(const char *filename){
 	int	len, i;
 	fileHandle_t f;
 	char buf[MAX_TEXINFOFILE];
@@ -588,7 +588,7 @@ G_InitGame
 
 ============
 */
-qboolean G_OpenFileAiNode(const char *filename);
+qbool G_OpenFileAiNode(const char *filename);
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
 	char				map[64];
@@ -948,8 +948,8 @@ SortRanks
 */
 int QDECL SortRanks( const void *a, const void *b ) {
 	gclient_t	*ca, *cb;
-	qboolean a_realspec;
-	qboolean b_realspec;
+	qbool a_realspec;
+	qbool b_realspec;
 
 	ca = &level.clients[*(int *)a];
 	cb = &level.clients[*(int *)b];
@@ -1308,7 +1308,7 @@ or moved to a new level based on the "nextmap" cvar
 =============
 */
 void ClearMedals(void);
-void ClearDuelData(qboolean all);
+void ClearDuelData(qbool all);
 void ExitLevel (void) {
 	int		i;
 	gclient_t *cl;
@@ -1533,7 +1533,7 @@ void CheckIntermissionExit( void ) {
 ScoreIsTied
 =============
 */
-qboolean ScoreIsTied( void ) {
+qbool ScoreIsTied( void ) {
 	int		a, b;
 
 	if ( level.numPlayingClients < 2 ) {
@@ -2176,7 +2176,7 @@ void CheckRound(void){
 		// the round is finished
 		if (level.nextroundstart == -1 && level.warmupTime != -1) {	// the round has just been won
 			int loser = 0, winner = 0, i;
-			qboolean tied = qfalse;
+			qbool tied = qfalse;
 
 			if (TeamCount( -1, TEAM_RED ) && !TeamCount( -1, TEAM_BLUE )){
 				winner = TEAM_RED;
@@ -2341,19 +2341,19 @@ void CheckRound(void){
 ////////////////////
 */
 int			du_spawnlist[MAX_CLIENTS];
-qboolean	du_validround;
+qbool	du_validround;
 int			du_nextroundstart;
 int			du_introend;
 char		intermission_names[MAX_MAPPARTS][20];
 int			du_winnercount;
 vec3_t		du_introangles[MAX_CLIENTS];
-qboolean	du_vs_message;
-qboolean	du_cl_medals;
+qbool	du_vs_message;
+qbool	du_cl_medals;
 
 mappart_t		du_mapparts[MAX_MAPPARTS];
 clientmappart_t du_clientmapparts[MAX_CLIENTS];
 
-void ClearClients(qboolean all){
+void ClearClients(qbool all){
 	int i;
 
 	for(i = 0; i < MAX_CLIENTS; i++){
@@ -2402,7 +2402,7 @@ void ClearMedals(void){
 	du_cl_medals = qfalse;
 }
 
-void ClearDuelData(qboolean all){
+void ClearDuelData(qbool all){
 	int i;
 
 	for(i = 0; i < MAX_MAPPARTS; i++){
@@ -2848,7 +2848,7 @@ void CheckDuel( void ) {
 	// if no round is running pick some players and get it started
 	if(!du_validround && du_nextroundstart <= level.time && du_nextroundstart){
 		int lastmappart=0;
-		qboolean newround = du_cl_medals; // player's inventory will be reset
+		qbool newround = du_cl_medals; // player's inventory will be reset
 
 		ClearMedals();
 
@@ -3026,7 +3026,7 @@ void CheckDuel( void ) {
 		if(!Du_UsedMapparts()){
 			int i;
 			int player = -1;
-			qboolean real_winner = qtrue;
+			qbool real_winner = qtrue;
 
 			du_nextroundstart = level.time + 5000;
 			G_Printf("All duels have been finished.\n");
@@ -3095,7 +3095,7 @@ void CheckMapRestart( void ) {
 	if ( g_gametype.integer != GT_SINGLE_PLAYER && level.warmupTime != 0 && g_gametype.integer <GT_RTP &&
 		g_gametype.integer != GT_DUEL) {
 		int		counts[TEAM_NUM_TEAMS];
-		qboolean	notEnough = qfalse;
+		qbool	notEnough = qfalse;
 
 		if ( g_gametype.integer > GT_TEAM ) {
 			counts[TEAM_BLUE] = TeamCount( -1, TEAM_BLUE );

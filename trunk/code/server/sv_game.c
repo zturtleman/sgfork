@@ -152,7 +152,7 @@ SV_inPVS
 Also checks portalareas so that doors block sight
 =================
 */
-qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
+qbool SV_inPVS (const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
 	int		cluster;
@@ -182,7 +182,7 @@ SV_inPVSIgnorePortals
 Does NOT check portalareas
 =================
 */
-qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
+qbool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
 	int		cluster;
@@ -210,7 +210,7 @@ qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 SV_AdjustAreaPortalState
 ========================
 */
-void SV_AdjustAreaPortalState( sharedEntity_t *ent, qboolean open ) {
+void SV_AdjustAreaPortalState( sharedEntity_t *ent, qbool open ) {
 	svEntity_t	*svEnt;
 
 	svEnt = SV_SvEntityForGentity( ent );
@@ -226,7 +226,7 @@ void SV_AdjustAreaPortalState( sharedEntity_t *ent, qboolean open ) {
 SV_GameAreaEntities
 ==================
 */
-qboolean	SV_EntityContact( vec3_t mins, vec3_t maxs, const sharedEntity_t *gEnt, int capsule ) {
+qbool	SV_EntityContact( vec3_t mins, vec3_t maxs, const sharedEntity_t *gEnt, int capsule ) {
 	const float	*origin, *angles;
 	clipHandle_t	ch;
 	trace_t			trace;
@@ -878,7 +878,7 @@ SV_InitGameVM
 Called for both a full init and a restart
 ==================
 */
-static void SV_InitGameVM( qboolean restart ) {
+static void SV_InitGameVM( qbool restart ) {
 	int		i;
 
 	// start the entity parsing at the beginning
@@ -959,7 +959,7 @@ SV_GameCommand
 See if the current console command is claimed by the game
 ====================
 */
-qboolean SV_GameCommand( void ) {
+qbool SV_GameCommand( void ) {
 	if ( sv.state != SS_GAME ) {
 		return qfalse;
 	}

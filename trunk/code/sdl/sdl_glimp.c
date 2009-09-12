@@ -202,7 +202,7 @@ static void GLimp_DetectAvailableModes(void)
 GLimp_SetMode
 ===============
 */
-static int GLimp_SetMode( int mode, qboolean fullscreen )
+static int GLimp_SetMode( int mode, qbool fullscreen )
 {
 	const char*   glstring;
 	int sdlcolorbits;
@@ -431,7 +431,7 @@ static int GLimp_SetMode( int mode, qboolean fullscreen )
 GLimp_StartDriverAndSetMode
 ===============
 */
-static qboolean GLimp_StartDriverAndSetMode( int mode, qboolean fullscreen )
+static qbool GLimp_StartDriverAndSetMode( int mode, qbool fullscreen )
 {
 	rserr_t err;
 
@@ -476,7 +476,7 @@ static qboolean GLimp_StartDriverAndSetMode( int mode, qboolean fullscreen )
 	return qtrue;
 }
 
-static qboolean GLimp_HaveExtension(const char *ext)
+static qbool GLimp_HaveExtension(const char *ext)
 {
 	const char *ptr = Q_stristr( glConfig.extensions_string, ext );
 	if (ptr == NULL)
@@ -665,7 +665,7 @@ of OpenGL
 */
 void GLimp_Init( void )
 {
-	qboolean success = qtrue;
+	qbool success = qtrue;
 
 	r_allowSoftwareGL = ri.Cvar_Get( "r_allowSoftwareGL", "0", CVAR_LATCH );
 	r_sdlDriver = ri.Cvar_Get( "r_sdlDriver", "", CVAR_ROM );
@@ -730,9 +730,9 @@ void GLimp_EndFrame( void )
 
 	if( r_fullscreen->modified )
 	{
-		qboolean    fullscreen;
-		qboolean    needToToggle = qtrue;
-		qboolean    sdlToggled = qfalse;
+		qbool    fullscreen;
+		qbool    needToToggle = qtrue;
+		qbool    sdlToggled = qfalse;
 		SDL_Surface *s = SDL_GetVideoSurface( );
 
 		if( s )
@@ -842,9 +842,9 @@ static int GLimp_RenderThreadWrapper( void *arg )
 GLimp_SpawnRenderThread
 ===============
 */
-qboolean GLimp_SpawnRenderThread( void (*function)( void ) )
+qbool GLimp_SpawnRenderThread( void (*function)( void ) )
 {
-	static qboolean warned = qfalse;
+	static qbool warned = qfalse;
 	if (!warned)
 	{
 		Com_Printf("WARNING: You enable r_smp at your own risk!\n");
@@ -910,7 +910,7 @@ qboolean GLimp_SpawnRenderThread( void (*function)( void ) )
 }
 
 static volatile void    *smpData = NULL;
-static volatile qboolean smpDataReady;
+static volatile qbool smpDataReady;
 
 /*
 ===============
@@ -988,7 +988,7 @@ void GLimp_RenderThreadWrapper( void *arg )
 {
 }
 
-qboolean GLimp_SpawnRenderThread( void (*function)( void ) )
+qbool GLimp_SpawnRenderThread( void (*function)( void ) )
 {
 	ri.Printf( PRINT_WARNING, "ERROR: SMP support was disabled at compile time\n");
 	return qfalse;

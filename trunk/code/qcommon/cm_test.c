@@ -387,7 +387,7 @@ CM_AdjustAreaPortalState
 
 ====================
 */
-void	CM_AdjustAreaPortalState( int area1, int area2, qboolean open ) {
+void	CM_AdjustAreaPortalState( int area1, int area2, qbool open ) {
 	if ( area1 < 0 || area2 < 0 ) {
 		return;
 	}
@@ -416,7 +416,7 @@ CM_AreasConnected
 
 ====================
 */
-qboolean	CM_AreasConnected( int area1, int area2 ) {
+qbool	CM_AreasConnected( int area1, int area2 ) {
 #ifndef BSPC
 	if ( cm_noAreas->integer ) {
 		return qtrue;
@@ -486,7 +486,7 @@ int CM_WriteAreaBits (byte *buffer, int area)
 CM_BoundsIntersect
 ====================
 */
-qboolean CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 )
+qbool CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 )
 {
 	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||
@@ -506,7 +506,7 @@ qboolean CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t 
 CM_BoundsIntersectPoint
 ====================
 */
-qboolean CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point )
+qbool CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point )
 {
 	if (maxs[0] < point[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < point[1] - SURFACE_CLIP_EPSILON ||

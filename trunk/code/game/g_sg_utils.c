@@ -599,7 +599,7 @@ void BG_CopyLerpFrame(lerpFrame_t *org, lerpFrame_t *targ){
 	targ->yawing = org->yawing;
 }
 
-qboolean G_CanEntityBeActivated(gentity_t *player, gentity_t *target, qboolean exact){
+qbool G_CanEntityBeActivated(gentity_t *player, gentity_t *target, qbool exact){
 	trace_t tr;
 	vec3_t muzzle, forward, end;
 
@@ -629,7 +629,7 @@ qboolean G_CanEntityBeActivated(gentity_t *player, gentity_t *target, qboolean e
 	return qtrue;
 }
 
-void G_ModifyEyeAngles(vec3_t origin, vec3_t viewangles, qboolean print){
+void G_ModifyEyeAngles(vec3_t origin, vec3_t viewangles, qbool print){
 
 	// first change the CONTENTS_BODY to CONTENTS_SOLID
 	G_MoverContents(qtrue);

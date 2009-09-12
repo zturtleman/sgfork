@@ -194,8 +194,8 @@ typedef struct {
 	usercmd_t	cmd;
 	int			tracemask;			// collide against these types of surfaces
 	int			debugLevel;			// if set, diagnostic output will be printed
-	qboolean	noFootsteps;		// if the game is setup for no footsteps by the server
-	qboolean	gauntletHit;		// true if a gauntlet attack would actually hit something
+	qbool	noFootsteps;		// if the game is setup for no footsteps by the server
+	qbool	gauntletHit;		// true if a gauntlet attack would actually hit something
 
 	int			framecount;
 
@@ -942,7 +942,7 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw );
 int	BG_FindPlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps);
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
-qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
+qbool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
 
 
 // g_dmflags->integer flags
@@ -996,10 +996,10 @@ void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 
 void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps );
 
-void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap );
-void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap );
+void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qbool snap );
+void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qbool snap );
 
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
+qbool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 int BG_AnimLength( int anim, int weapon);
 void BG_SurfaceFlags2Prefix(int surfaceFlags, char	*prefix);
@@ -1174,8 +1174,8 @@ typedef struct hit_data_s {
 void BG_StringRead(char *destination, char *source, int size);
 void BG_ModifyEyeAngles( vec3_t origin, vec3_t viewangles,
 						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask ),
-						vec3_t legOffset, qboolean print);
-qboolean BG_ShootThruWall( float *damage, vec3_t start, vec3_t muzzle, int surfaceFlags, vec3_t end,
+						vec3_t legOffset, qbool print);
+qbool BG_ShootThruWall( float *damage, vec3_t start, vec3_t muzzle, int surfaceFlags, vec3_t end,
 						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask ));
 int BG_CountTypeWeapons(int type, int weapons);
 int BG_SearchTypeWeapon(int type, int weapons, int wp_ignore);
@@ -1184,7 +1184,7 @@ void BG_SetWhiskeyDrop(trajectory_t *tr, vec3_t org, vec3_t normal, vec3_t dir);
 void BG_DirsToEntityState(entityState_t *es, vec3_t bottledirs[ALC_COUNT]);
 void BG_EntityStateToDirs(entityState_t *es, vec3_t bottledirs[ALC_COUNT]);
 
-qboolean CheckPistols(playerState_t *ps, int *weapon);
+qbool CheckPistols(playerState_t *ps, int *weapon);
 void Com_PrintfVector(vec3_t vec);
 void Com_PrintfVectorInt(int vec[3]);
 int BG_MapPrefix(char *map, int gametype);

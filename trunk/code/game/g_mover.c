@@ -87,7 +87,7 @@ G_TryPushingEntity
 Returns qfalse if the move is blocked
 ==================
 */
-qboolean	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3_t amove ) {
+qbool	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3_t amove ) {
 	vec3_t		forward, right, up;
 	vec3_t		org, org2, move2;
 	gentity_t	*block;
@@ -181,7 +181,7 @@ otherwise riders would continue to slide.
 If qfalse is returned, *obstacle will be the blocking entity
 ============
 */
-qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle ) {
+qbool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle ) {
 	int			i, e;
 	gentity_t	*check;
 	vec3_t		mins, maxs;
@@ -748,7 +748,7 @@ void InitMover( gentity_t *ent ) {
 	float		distance;
 	float		light;
 	vec3_t		color;
-	qboolean	lightSet, colorSet;
+	qbool	lightSet, colorSet;
 	char		*sound;
 
 	// if the "model2" key is set, use a seperate model
@@ -1250,7 +1250,7 @@ void G_BreakableRespawn( gentity_t *ent){
 		vec3_t angles, dir;
 		vec3_t eye;
 		const float fov = 100;
-		qboolean cont = qfalse;
+		qbool cont = qfalse;
 		int j;
 
 		if (client->pers.connected != CON_CONNECTED)
@@ -1318,7 +1318,7 @@ void G_BreakableRespawn( gentity_t *ent){
 	SP_func_breakable(ent);
 }
 
-void G_MoverContents(qboolean change){
+void G_MoverContents(qbool change){
 	int i;
 	gentity_t *ent;
 
@@ -1880,7 +1880,7 @@ void SP_func_static( gentity_t *ent )
 	
 	float		light ;
 	vec3_t		color ;
-	qboolean	lightSet , colorSet ;
+	qbool	lightSet , colorSet ;
 	char		*value ;
 	char		tmp_char[32] ;
 	int		tmp_int ;

@@ -401,7 +401,7 @@ float	CG_MachinegunSpinAngle( centity_t *cent ) {
 	int		delta;
 	float	angle;
 	float	speed;
-	qboolean firing = ((cent->currentState.eFlags & EF_FIRING) /*&& !reloading*/);
+	qbool firing = ((cent->currentState.eFlags & EF_FIRING) /*&& !reloading*/);
 
 	// if this is the player which usese the gatling do prediction
 	if(cg.snap->ps.clientNum == cent->currentState.clientNum &&
@@ -452,7 +452,7 @@ CG_InitWeaponAnim
 =============
 */
 void CG_InitWeaponAnim(centity_t *cent, int weapon, int weaponAnim, lerpFrame_t *anim,
-					   qboolean weapon2){
+					   qbool weapon2){
 
 	int realanim = weaponAnim;
 	realanim &= ~ANIM_TOGGLEBIT;
@@ -491,7 +491,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weapon_t	weaponNum, weapon2Num;
 	weaponInfo_t	*weapon, *weapon2=NULL;
 	int i;
-	qboolean render = qtrue;
+	qbool render = qtrue;
 	centity_t	*nonPredictedCent;
 
 	if(ps && ps->weapon == WP_SHARPS && cg.snap->ps.stats[STAT_WP_MODE]==1)
@@ -1050,7 +1050,7 @@ void CG_DrawWeaponSelect( void ) {
 	int		x, y, w;
 	char	*name;
 	int		wp_sort;
-	qboolean akimbo, singlepistolSelect;
+	qbool akimbo, singlepistolSelect;
 	int		ammo, weapon;
 	float	ammowidth;
 	qhandle_t	clip;
@@ -1362,7 +1362,7 @@ void CG_DrawWeaponSelect( void ) {
 CG_WeaponSelectable
 ===============
 */
-static qboolean CG_WeaponSelectable( int i ) {
+static qbool CG_WeaponSelectable( int i ) {
 	if (bg_weaponlist[i].clip){
 		if ( !cg.snap->ps.ammo[i] && !cg.snap->ps.ammo[bg_weaponlist[i].clip]) {
 			return qfalse;
@@ -1390,10 +1390,10 @@ void CG_NextWeapon_f( void ) {
 	int		i, j, weapon;
 	int startnum;
 	// is it the first time weapon_f was called since the last wp-change?
-	qboolean first_time = !cg.markedweapon;
+	qbool first_time = !cg.markedweapon;
 
 	// has the player got one pistol in hand ?
-	qboolean singlepistolSelect = cg.weaponSelect != WP_AKIMBO
+	qbool singlepistolSelect = cg.weaponSelect != WP_AKIMBO
 		&& bg_weaponlist[ cg.weaponSelect ].wp_sort == WPS_PISTOL;
 
 	if ( !cg.snap ) {
@@ -1520,10 +1520,10 @@ void CG_PrevWeapon_f( void ) {
 	int		i, j, weapon;
 	int startnum;
 	// is it the first time weapon_f was called since the last wp-change?
-	qboolean first_time = !cg.markedweapon;
+	qbool first_time = !cg.markedweapon;
 
 	// has the player got one pistol in hand ?
-	qboolean singlepistolSelect = cg.weaponSelect != WP_AKIMBO
+	qbool singlepistolSelect = cg.weaponSelect != WP_AKIMBO
 		&& bg_weaponlist[ cg.weaponSelect ].wp_sort == WPS_PISTOL;
 
 	if ( !cg.snap ) {
@@ -1644,10 +1644,10 @@ void CG_Weapon_f( void ) {
 	int		i, weapon;
 	int		startnum;
 	// is it the first time weapon_f was called since the last wp-change?
-	qboolean first_time = !cg.markedweapon;
+	qbool first_time = !cg.markedweapon;
 
 	// has the player got one pistol in hand ?
-	qboolean singlepistolSelect = cg.weaponSelect != WP_AKIMBO
+	qbool singlepistolSelect = cg.weaponSelect != WP_AKIMBO
 		&& bg_weaponlist[ cg.weaponSelect ].wp_sort == WPS_PISTOL;
 
 	if ( !cg.snap ) {
@@ -1874,7 +1874,7 @@ CG_FireWeapon
 Caused by an EV_FIRE_WEAPON event
 ================
 */
-void CG_FireWeapon( centity_t *cent, qboolean altfire, int weapon ) {
+void CG_FireWeapon( centity_t *cent, qbool altfire, int weapon ) {
 	entityState_t *ent;
 	int				c;
 	weaponInfo_t	*weap;
@@ -1946,7 +1946,7 @@ CG_BottleBreak
 creates 4 gibs of the bottle
 ==============
 */
-void CG_BottleBreak(vec3_t org, vec3_t bottledir, qboolean fire, vec3_t dirs[ALC_COUNT]){
+void CG_BottleBreak(vec3_t org, vec3_t bottledir, qbool fire, vec3_t dirs[ALC_COUNT]){
 	int i;
 	vec3_t dir, origin;
 	vec3_t	temp;
@@ -2004,7 +2004,7 @@ Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir,
 					   impactSound_t soundType,
 					   int surfaceFlags, int shaderNum,
-					   qboolean fire, vec3_t bottledirs[ALC_COUNT],
+					   qbool fire, vec3_t bottledirs[ALC_COUNT],
 					   int entityNum) {
 	qhandle_t		mod;
 	qhandle_t		mark;
@@ -2015,8 +2015,8 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir,
 	float			light;
 	vec3_t			lightColor;
 	localEntity_t	*le;
-	qboolean		alphaFade;
-	qboolean		isSprite;
+	qbool		alphaFade;
+	qbool		isSprite;
 	int				duration;
 	int				i;
 
@@ -2197,7 +2197,7 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t origin2, vec3_t end, int skip
 	int sourceContentType, destContentType;
 	int	shaderNum;
 	float		damage = bg_weaponlist[weapon].damage;
-	qboolean	shootthru;
+	qbool	shootthru;
 	vec3_t		tr_start;
 	int shootcount = 0;
 
@@ -2585,7 +2585,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 CG_CalcMuzzlePoint
 ======================
 */
-static qboolean	CG_CalcMuzzlePoint( int entityNum, vec3_t muzzle ) {
+static qbool	CG_CalcMuzzlePoint( int entityNum, vec3_t muzzle ) {
 	vec3_t		forward;
 	centity_t	*cent;
 	int			anim;
@@ -2626,7 +2626,7 @@ CG_Bullet
 Renders bullet effects.
 ======================
 */
-void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum,
+void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qbool flesh, int fleshEntityNum,
 			   int weapon, int surfaceFlags, int shaderNum, int entityNum ) {
 	trace_t trace;
 	int sourceContentType, destContentType;

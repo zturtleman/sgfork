@@ -482,7 +482,7 @@ Sys_SigHandler
 */
 void Sys_SigHandler( int signal )
 {
-	static qboolean signalcaught = qfalse;
+	static qbool signalcaught = qfalse;
 
 	if( signalcaught )
 	{
@@ -515,7 +515,7 @@ int main( int argc, char **argv )
 #if defined DEDICATED
 	char *cv_name, *cv_value;
 	char *quser = NULL, *qjail = NULL;
-	qboolean qdaemon = qfalse;
+	qbool qdaemon = qfalse;
 #endif
 
 #ifndef DEDICATED

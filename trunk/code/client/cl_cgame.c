@@ -30,9 +30,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern	botlib_export_t	*botlib_export;
 
-extern qboolean loadCamera(const char *name);
+extern qbool loadCamera(const char *name);
 extern void startCamera(int time);
-extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
+extern qbool getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 /*
 ====================
@@ -58,7 +58,7 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 CL_GetUserCmd
 ====================
 */
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
+qbool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -87,7 +87,7 @@ int CL_GetCurrentCmdNumber( void ) {
 CL_GetParseEntityState
 ====================
 */
-qboolean	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
+qbool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
 	// can't return anything that hasn't been parsed yet
 	if ( parseEntityNumber >= cl.parseEntitiesNum ) {
 		Com_Error( ERR_DROP, "CL_GetParseEntityState: %i >= %i",
@@ -118,7 +118,7 @@ void	CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) {
 CL_GetSnapshot
 ====================
 */
-qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
+qbool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	clSnapshot_t	*clSnap;
 	int				i, count;
 
@@ -264,7 +264,7 @@ CL_GetServerCommand
 Set up argc/argv for the given command
 ===================
 */
-qboolean CL_GetServerCommand( int serverCommandNumber ) {
+qbool CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;
 	static char bigConfigString[BIG_INFO_STRING];
@@ -833,7 +833,7 @@ CL_GameCommand
 See if the current console command is claimed by the cgame
 ====================
 */
-qboolean CL_GameCommand( void ) {
+qbool CL_GameCommand( void ) {
 	if ( !cgvm ) {
 		return qfalse;
 	}

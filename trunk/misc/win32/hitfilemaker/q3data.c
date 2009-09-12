@@ -7,13 +7,13 @@
 #endif
 
 
-qboolean	g_verbose;
-qboolean	g_stripify = qtrue;
-qboolean	g_release;			// don't grab, copy output data to new tree
+qbool	g_verbose;
+qbool	g_stripify = qtrue;
+qbool	g_release;			// don't grab, copy output data to new tree
 char		g_releasedir[1024];	// c:\quake2\baseq2, etc
-qboolean	g_archive;			// don't grab, copy source data to new tree
+qbool	g_archive;			// don't grab, copy source data to new tree
 char		g_only[256];		// if set, only grab this cd
-qboolean	g_skipmodel;		// set true when a cd is not g_only
+qbool	g_skipmodel;		// set true when a cd is not g_only
 
 /*
 =======================================================
@@ -635,7 +635,7 @@ void ParseScript (void)
 
 //=======================================================
 
-void ConvertMD3ToHit(char *filename, char * tagname, qboolean tag_exists);
+void ConvertMD3ToHit(char *filename, char * tagname, qbool tag_exists);
 void ConvertMD3ToMD(char *filename);
 void OpenHitFile( char *filename);
 /*

@@ -58,7 +58,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 typedef struct {
 	entityState_t	s;				// communicated by server to clients
 
-	qboolean	linked;				// qfalse if not in any good cluster
+	qbool	linked;				// qfalse if not in any good cluster
 	int			linkcount;
 
 	int			svFlags;			// SVF_NOCLIENT, SVF_BROADCAST, etc
@@ -67,7 +67,7 @@ typedef struct {
 	// if SVF_CLIENTMASK is set, use bitmask for clients to send to (maxclients must be <= 32, up to the mod to enforce this)
 	int			singleClient;
 
-	qboolean	bmodel;				// if false, assume an explicit mins / maxs bounding box
+	qbool	bmodel;				// if false, assume an explicit mins / maxs bounding box
 									// only set by trap_SetBrushModel
 	vec3_t		mins, maxs;
 	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
@@ -188,7 +188,7 @@ typedef enum {
 
 	G_IN_PVS_IGNORE_PORTALS,	// ( const vec3_t p1, const vec3_t p2 );
 
-	G_ADJUST_AREA_PORTAL_STATE,	// ( gentity_t *ent, qboolean open );
+	G_ADJUST_AREA_PORTAL_STATE,	// ( gentity_t *ent, qbool open );
 
 	G_AREAS_CONNECTED,	// ( int area1, int area2 );
 
@@ -214,7 +214,7 @@ typedef enum {
 
 	G_GET_USERCMD,	// ( int clientNum, usercmd_t *cmd )
 
-	G_GET_ENTITY_TOKEN,	// qboolean ( char *buffer, int bufferSize )
+	G_GET_ENTITY_TOKEN,	// qbool ( char *buffer, int bufferSize )
 	// Retrieves the next string token from the entity spawn text, returning
 	// false when all tokens have been parsed.
 	// This should only be done at GAME_INIT time.
@@ -404,7 +404,7 @@ typedef enum {
 
 	GAME_SHUTDOWN,	// (void);
 
-	GAME_CLIENT_CONNECT,	// ( int clientNum, qboolean firstTime, qboolean isBot );
+	GAME_CLIENT_CONNECT,	// ( int clientNum, qbool firstTime, qbool isBot );
 	// return NULL if the client is allowed to connect, otherwise return
 	// a text string with the reason for denial
 
@@ -438,10 +438,10 @@ typedef struct shaderInfo_s {
 extern	shaderInfo_t shaderInfo[MAX_BRUSHSIDES];
 extern	int	shaderInfoNum;
 
-qboolean CG_ParseTexFile(const char *filename);
+qbool CG_ParseTexFile(const char *filename);
 extern	hit_data_t	hit_data;
 
-qboolean G_LoadHitFiles(hit_data_t *hit_data);
+qbool G_LoadHitFiles(hit_data_t *hit_data);
 
 #endif
 

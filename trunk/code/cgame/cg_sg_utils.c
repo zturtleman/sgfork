@@ -707,7 +707,7 @@ Generates Particles which will spawn if a bullet hits a surface
 ========================
 */
 void CG_LaunchImpactParticle( vec3_t origin, vec3_t dir, int surfaceFlags
-							 , int shaderNum, int weapon, qboolean flesh){
+							 , int shaderNum, int weapon, qbool flesh){
 	localEntity_t	*le;
 	int i,j;
 	vec3_t			spawnpoint;
@@ -1085,7 +1085,7 @@ void BuildHitModel(hit_data_t *data, vec3_t origin,
 #define PLAYER_SIZE_RIGHT 13
 #define PLAYER_SIZE_UP 70
 #define	STEP		   3
-qboolean CG_CheckPlayerVisible(vec3_t view, vec3_t player){
+qbool CG_CheckPlayerVisible(vec3_t view, vec3_t player){
 	vec3_t	start;
 //	vec3_t	end;
 	int		i, j;
@@ -1126,7 +1126,7 @@ qboolean CG_CheckPlayerVisible(vec3_t view, vec3_t player){
 	return qtrue;
 }
 
-void CG_PlayReloadSound(int weapon, centity_t *cent, qboolean sec){
+void CG_PlayReloadSound(int weapon, centity_t *cent, qbool sec){
 	sfxHandle_t sfx=0;
 
 	//Com_Printf("reloading %s\n", bg_weaponlist[weapon].name);
@@ -1331,7 +1331,7 @@ int CG_CullPointAndRadius(vec3_t pt, float radius) {
 	int		i;
 	float	dist;
 	cplane_t	*frust;
-	qboolean mightBeClipped = qfalse;
+	qbool mightBeClipped = qfalse;
 
 	if (sa_engine_inuse)
 		return trap_R_CullPointAndRadius( pt, radius );
@@ -1416,7 +1416,7 @@ NOTES:
 - if max_sight <= 0, this parameter is ignored
 ===============
 *//*
-qboolean CG_IsSpotVisible(vec3_t spot, vec_t max_sight) {
+qbool CG_IsSpotVisible(vec3_t spot, vec_t max_sight) {
 
 	vec3_t v, v_playerAxis;
 	vec2_t verticalPlane, horizontalPlane;
@@ -1475,12 +1475,12 @@ Perform frustum culling on bounding box
 Only keep last result when max_sight == 0.0
 ===============
 */
-qboolean CG_IsEntityVisible(centity_t *cent, vec_t max_sight) {
-	qboolean hasBounds;
+qbool CG_IsEntityVisible(centity_t *cent, vec_t max_sight) {
+	qbool hasBounds;
 	vec3_t origin;
 	vec3_t box_vertex[8];
 	vec_t distance;
-	qboolean visible=qtrue;
+	qbool visible=qtrue;
 	vec_t radius;
 
 	if (cent->visibleTime == cg.time && !max_sight)
@@ -1556,8 +1556,8 @@ For instance, only check its origin visibility
 Only keep last result when max_sight == 0.0
 ===============
 */
-qboolean CG_IsLocalEntityVisible(localEntity_t *lent, vec_t max_sight) {
-	qboolean visible;
+qbool CG_IsLocalEntityVisible(localEntity_t *lent, vec_t max_sight) {
+	qbool visible;
 	vec_t distance;
 
 	if (lent->visibleTime == cg.time && !max_sight)
@@ -1765,7 +1765,7 @@ The bounds index are in the following order.
 
 =================
 */
-qboolean CG_EntityVectors(centity_t *cent, vec3_t origin, vec3_t box_vertex[8]) {
+qbool CG_EntityVectors(centity_t *cent, vec3_t origin, vec3_t box_vertex[8]) {
 
 	float *vmodel;
 	vec3_t bmaxs, bmins;
@@ -1774,8 +1774,8 @@ qboolean CG_EntityVectors(centity_t *cent, vec3_t origin, vec3_t box_vertex[8]) 
 	vec3_t angles, r, vertex, rotate_origin={ 0.0f, 0.0f, 0.0f }, median, ext_xyz;
 	vec3_t matrix[3], transpose[3];
 	int i, x, zd, zu;
-	qboolean rotate = qfalse;
-	qboolean hasBounds = qtrue;
+	qbool rotate = qfalse;
+	qbool hasBounds = qtrue;
 
 	if (!origin)	// Output parameter origin have to be set
 		return qfalse;
@@ -1996,7 +1996,7 @@ or qfalse if the entity should be add to the scene
 
 // function pointer array
 
-qboolean ( * CG_Farclip_Tester[] )( vec3_t , vec3_t , float , float ) = {
+qbool ( * CG_Farclip_Tester[] )( vec3_t , vec3_t , float , float ) = {
         NULL ,
         CG_Farclip_Sphere ,
         CG_Farclip_Ellipse_X ,
@@ -2026,7 +2026,7 @@ qboolean ( * CG_Farclip_Tester[] )( vec3_t , vec3_t , float , float ) = {
 int CG_Farclip_Tester_Table_Size = sizeof( CG_Farclip_Tester ) / sizeof( void* );
 
 
-qboolean CG_Farclip_Sphere( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Sphere( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	dx = entite_vec3[0] - camera_vec3[0] ;
@@ -2035,7 +2035,7 @@ qboolean CG_Farclip_Sphere( vec3_t entite_vec3 , vec3_t camera_vec3 , float farc
 	return ( dx * dx + dy * dy + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Cube( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cube( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_dist )  return qtrue ;
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_dist )  return qtrue ;
@@ -2043,7 +2043,7 @@ qboolean CG_Farclip_Cube( vec3_t entite_vec3 , vec3_t camera_vec3 , float farcli
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Ellipse_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Ellipse_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	if ( ( farclip_alt_dist < 1 ) || ( farclip_dist < 1 ) )  return qtrue ;
@@ -2053,7 +2053,7 @@ qboolean CG_Farclip_Ellipse_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float f
 	return ( dx * dx + dy * dy + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Cylinder_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cylinder_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy ;
 	if ( abs( entite_vec3[2] - camera_vec3[2] ) > farclip_alt_dist )  return qtrue ;
@@ -2062,7 +2062,7 @@ qboolean CG_Farclip_Cylinder_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float 
 	return ( dx * dx + dy * dy ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Box_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Box_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_dist )  return qtrue ;
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_dist )  return qtrue ;
@@ -2070,7 +2070,7 @@ qboolean CG_Farclip_Box_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farcl
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Circle_Infinite_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Circle_Infinite_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy ;
 	dx = entite_vec3[0] - camera_vec3[0] ;
@@ -2078,14 +2078,14 @@ qboolean CG_Farclip_Circle_Infinite_Z( vec3_t entite_vec3 , vec3_t camera_vec3 ,
 	return ( dx * dx + dy * dy ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Square_Infinite_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Square_Infinite_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_dist )  return qtrue ;
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_dist )  return qtrue ;
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Cone_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cone_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	dx = entite_vec3[0] - camera_vec3[0] ;
@@ -2095,7 +2095,7 @@ qboolean CG_Farclip_Cone_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farc
 	return ( dx * dx + dy * dy ) > ( dz * dz ) ;
 }
 
-qboolean CG_Farclip_Pyramid_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Pyramid_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dz ;
 	// not usefull to test if farclip_dist > 0, cause it have been tested before calling this function
@@ -2108,7 +2108,7 @@ qboolean CG_Farclip_Pyramid_Z( vec3_t entite_vec3 , vec3_t camera_vec3 , float f
 
 
 
-qboolean CG_Farclip_Ellipse_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Ellipse_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	if ( ( farclip_alt_dist < 1 ) || ( farclip_dist < 1 ) )  return qtrue ;
@@ -2118,7 +2118,7 @@ qboolean CG_Farclip_Ellipse_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float f
 	return ( dx * dx + dy * dy + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Cylinder_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cylinder_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dy , dz ;
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_alt_dist )  return qtrue ;
@@ -2127,7 +2127,7 @@ qboolean CG_Farclip_Cylinder_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float 
 	return ( dy * dy + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Box_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Box_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_alt_dist )  return qtrue ;
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_dist )  return qtrue ;
@@ -2135,7 +2135,7 @@ qboolean CG_Farclip_Box_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farcl
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Circle_Infinite_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Circle_Infinite_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dy , dz ;
 	dy = entite_vec3[1] - camera_vec3[1] ;
@@ -2143,14 +2143,14 @@ qboolean CG_Farclip_Circle_Infinite_X( vec3_t entite_vec3 , vec3_t camera_vec3 ,
 	return ( dy * dy + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Square_Infinite_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Square_Infinite_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_dist )  return qtrue ;
 	if ( abs( entite_vec3[2] - camera_vec3[2] ) > farclip_dist )  return qtrue ;
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Cone_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cone_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	// not usefull to test if farclip_dist > 0, cause it have been tested before calling this function
@@ -2160,7 +2160,7 @@ qboolean CG_Farclip_Cone_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farc
 	return ( dy * dy + dz * dz ) > ( dx * dx ) ;
 }
 
-qboolean CG_Farclip_Pyramid_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Pyramid_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx ;
 	// not usefull to test if farclip_dist > 0, cause it have been tested before calling this function
@@ -2173,7 +2173,7 @@ qboolean CG_Farclip_Pyramid_X( vec3_t entite_vec3 , vec3_t camera_vec3 , float f
 
 
 
-qboolean CG_Farclip_Ellipse_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Ellipse_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	if ( ( farclip_alt_dist < 1 ) || ( farclip_dist < 1 ) )  return qtrue ;
@@ -2183,7 +2183,7 @@ qboolean CG_Farclip_Ellipse_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float f
 	return ( dx * dx + dy * dy + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Cylinder_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cylinder_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dz ;
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_alt_dist )  return qtrue ;
@@ -2192,7 +2192,7 @@ qboolean CG_Farclip_Cylinder_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float 
 	return ( dx * dx + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Box_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Box_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_dist )  return qtrue ;
 	if ( abs( entite_vec3[1] - camera_vec3[1] ) > farclip_alt_dist )  return qtrue ;
@@ -2200,7 +2200,7 @@ qboolean CG_Farclip_Box_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farcl
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Circle_Infinite_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Circle_Infinite_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dz ;
 	dx = entite_vec3[0] - camera_vec3[0] ;
@@ -2208,14 +2208,14 @@ qboolean CG_Farclip_Circle_Infinite_Y( vec3_t entite_vec3 , vec3_t camera_vec3 ,
 	return ( dx * dx + dz * dz ) > ( farclip_dist * farclip_dist ) ;
 }
 
-qboolean CG_Farclip_Square_Infinite_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Square_Infinite_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	if ( abs( entite_vec3[0] - camera_vec3[0] ) > farclip_dist )  return qtrue ;
 	if ( abs( entite_vec3[2] - camera_vec3[2] ) > farclip_dist )  return qtrue ;
 	return qfalse ;
 }
 
-qboolean CG_Farclip_Cone_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Cone_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dx , dy , dz ;
 	dx = entite_vec3[0] - camera_vec3[0] ;
@@ -2225,7 +2225,7 @@ qboolean CG_Farclip_Cone_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farc
 	return ( dx * dx + dz * dz ) > ( dy * dy ) ;
 }
 
-qboolean CG_Farclip_Pyramid_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
+qbool CG_Farclip_Pyramid_Y( vec3_t entite_vec3 , vec3_t camera_vec3 , float farclip_dist , float farclip_alt_dist )
 {
 	float dy ;
 	// not usefull to test if farclip_dist > 0, cause it have been tested before calling this function

@@ -1123,7 +1123,7 @@ void BotReadSessionData(bot_state_t *bs) {
 BotAISetupClient
 ==============
 */
-int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean restart) {
+int BotAISetupClient(int client, struct bot_settings_s *settings, qbool restart) {
 	char filename[MAX_PATH], name[MAX_PATH], gender[MAX_PATH];
 	bot_state_t *bs;
 	int errnum;
@@ -1219,7 +1219,7 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 BotAIShutdownClient
 ==============
 */
-int BotAIShutdownClient(int client, qboolean restart) {
+int BotAIShutdownClient(int client, qbool restart) {
 	bot_state_t *bs;
 
 	bs = botstates[client];

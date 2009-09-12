@@ -433,7 +433,7 @@ CG_DrawFlagModel
 Used for both the status bar and the scoreboard
 ================
 */
-void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D ) {
+void CG_DrawFlagModel( float x, float y, float w, float h, int team, qbool force2D ) {
 	qhandle_t		cm;
 	float			len;
 	vec3_t			origin, angles;
@@ -786,7 +786,7 @@ static float CG_DrawScores( float y ) {
 		}
 
 	} else {
-		qboolean	spectator;
+		qbool	spectator;
 
 		x = 640;
 		score = cg.snap->ps.persistant[PERS_SCORE];
@@ -1206,7 +1206,7 @@ for a few moments
 void CG_CenterPrint( const char *str, int y, int charWidth ) {
 	char	*s;
 	int i;
-	qboolean remove = qfalse;
+	qbool remove = qfalse;
 
 	// play sound (new)
 	trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_ANNOUNCER, cgs.media.bang[rand()%3] );
@@ -1785,8 +1785,8 @@ static void CG_DrawTeamVote(void) {
 
 void Menu_UpdatePosition(menuDef_t *menu);
 
-static qboolean CG_DrawScoreboard( void ) {
-	static qboolean firstTime = qtrue;
+static qbool CG_DrawScoreboard( void ) {
+	static qbool firstTime = qtrue;
 	float fade, *fadeColor;
 
 	if (menuScoreboard) {
@@ -1875,7 +1875,7 @@ static void CG_DrawIntermission( void ) {
 CG_DrawFollow
 =================
 */
-static qboolean CG_DrawFollow( void ) {
+static qbool CG_DrawFollow( void ) {
 	vec4_t		color, colorrect;
 	const char	*name;
 	char		health[4];
@@ -2048,7 +2048,7 @@ void CG_ClearFocusses(void){
 	}
 }
 
-static qboolean CG_CursorIsInRect(rectDef_t *rect){
+static qbool CG_CursorIsInRect(rectDef_t *rect){
 	if(cgs.cursorX >= rect->x &&
 		cgs.cursorX <= rect->x + rect->w &&
 		cgs.cursorY >= rect->y &&
@@ -2059,7 +2059,7 @@ static qboolean CG_CursorIsInRect(rectDef_t *rect){
 }
 
 // movement control disabled
-static qboolean Menu_IsKeyDown(char *cmd){
+static qbool Menu_IsKeyDown(char *cmd){
 	int i;
 
 	if(!Q_stricmp(cmd, "mouse1")){
@@ -2067,7 +2067,7 @@ static qboolean Menu_IsKeyDown(char *cmd){
 		// check if buy menu is open
 		if(cg.menu == MENU_BUY){
 			int j;
-			qboolean abort = qfalse;
+			qbool abort = qfalse;
 
 			//stats
 			if(cgs.gametype != GT_DUEL){
@@ -2184,7 +2184,7 @@ static void CG_SetupItemMenu(void){
 	gitem_t *item;
 	int	i;
 	int count = 0;
-	qboolean clone = qfalse; // second "cloned" pistol
+	qbool clone = qfalse; // second "cloned" pistol
 
 	item = bg_itemlist+1;
 
@@ -2299,7 +2299,7 @@ void CG_CloseBuyMenu(void){
 	trap_SendConsoleCommand( "-button8" );
 }
 
-static qboolean menu_exit( void ){
+static qbool menu_exit( void ){
 
 	if((trap_Key_IsDown(K_ESCAPE)||trap_Key_IsDown(K_MOUSE2)||
 		(trap_Key_IsDown(0+48) && !cg.menuitem))
@@ -2382,8 +2382,8 @@ static void CG_DrawBuyMenu( void ) {
 	int count;
 	int i;
 	gitem_t	*item;
-	qboolean numpressed = qfalse, ammo_numpressed = qfalse;
-	qboolean duel = (cgs.gametype == GT_DUEL);
+	qbool numpressed = qfalse, ammo_numpressed = qfalse;
+	qbool duel = (cgs.gametype == GT_DUEL);
 
 	if(cg_buydebug.integer){
 		if(trap_Key_IsDown('p') && !cg.oldbutton){
@@ -2525,7 +2525,7 @@ static void CG_DrawBuyMenu( void ) {
 		return;
 
 	if((Menu_IsKeyDown("mouse1") && !cg.oldbutton) || numpressed){
-		qboolean gatling = (cg.snap->ps.weapon == WP_GATLING &&
+		qbool gatling = (cg.snap->ps.weapon == WP_GATLING &&
 			cg.snap->ps.stats[STAT_GATLING_MODE]);
 
 		item = CG_GetBuyItem();

@@ -612,11 +612,11 @@ float G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, float
 	int direction = 0;
 
 	// sharps rifle can shoot thru boiler plate
-	qboolean sharps = (attacker->client->ps.weapon == WP_SHARPS);
+	qbool sharps = (attacker->client->ps.weapon == WP_SHARPS);
 	// knife doesnt make the dynamite explode
-	qboolean isknife  = (attacker->client->ps.weapon == WP_KNIFE);
+	qbool isknife  = (attacker->client->ps.weapon == WP_KNIFE);
 	// be sure, the target has dynamit in his hand
-	qboolean isdyn    = (targ->client->ps.weapon == WP_DYNAMITE);
+	qbool isdyn    = (targ->client->ps.weapon == WP_DYNAMITE);
 
 	vec3_t dynorigin;
 
@@ -830,7 +830,7 @@ By Tequila, TeamKill management inspired by Conq patch
 Return false when TK supported limit is not hit
 ============
 */
-static qboolean CheckTeamKills( gentity_t *attacker, gentity_t *targ, int mod ) {
+static qbool CheckTeamKills( gentity_t *attacker, gentity_t *targ, int mod ) {
 	if ( !g_maxteamkills.integer )
 		return qfalse;
 
@@ -1234,7 +1234,7 @@ Returns qtrue if the inflictor can directly damage the target.  Used for
 explosions and melee attacks.
 ============
 */
-qboolean CanDamage (gentity_t *targ, vec3_t origin) {
+qbool CanDamage (gentity_t *targ, vec3_t origin) {
 	vec3_t	dest;
 	trace_t	tr;
 	vec3_t	midpoint;
@@ -1309,7 +1309,7 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 G_RadiusDamage
 ============
 */
-qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
+qbool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, int mod) {
 	float		points, dist;
 	gentity_t	*ent;
@@ -1319,7 +1319,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 	vec3_t		v;
 	vec3_t		dir;
 	int			i, e;
-	qboolean	hitClient = qfalse;
+	qbool	hitClient = qfalse;
 
 	if ( radius < 1 ) {
 		radius = 1;

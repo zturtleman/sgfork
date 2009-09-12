@@ -36,7 +36,7 @@ int			cvar_numIndexes;
 #define FILE_HASH_SIZE		256
 static	cvar_t*		hashTable[FILE_HASH_SIZE];
 
-cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force);
+cvar_t *Cvar_Set2( const char *var_name, const char *value, qbool force);
 
 /*
 ================
@@ -64,7 +64,7 @@ static long generateHashValue( const char *fname ) {
 Cvar_ValidateString
 ============
 */
-static qboolean Cvar_ValidateString( const char *s ) {
+static qbool Cvar_ValidateString( const char *s ) {
 	if ( !s ) {
 		return qfalse;
 	}
@@ -196,11 +196,11 @@ Cvar_Validate
 ============
 */
 static const char *Cvar_Validate( cvar_t *var,
-    const char *value, qboolean warn )
+    const char *value, qbool warn )
 {
 	static char s[ MAX_CVAR_VALUE_STRING ];
 	float valuef;
-	qboolean changed = qfalse;
+	qbool changed = qfalse;
 
 	if( !var->validate )
 		return value;
@@ -437,7 +437,7 @@ void Cvar_Print( cvar_t *v ) {
 Cvar_Set2
 ============
 */
-cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force ) {
+cvar_t *Cvar_Set2( const char *var_name, const char *value, qbool force ) {
 	cvar_t	*var;
 
 //	Com_DPrintf( "Cvar_Set2: %s %s\n", var_name, value );
@@ -637,7 +637,7 @@ Cvar_Command
 Handles variable inspection and changing from the console
 ============
 */
-qboolean Cvar_Command( void ) {
+qbool Cvar_Command( void ) {
 	cvar_t	*v;
 
 	// check variables
@@ -1001,7 +1001,7 @@ void Cvar_InfoStringBuffer( int bit, char* buff, int buffsize ) {
 Cvar_CheckRange
 =====================
 */
-void Cvar_CheckRange( cvar_t *var, float min, float max, qboolean integral )
+void Cvar_CheckRange( cvar_t *var, float min, float max, qbool integral )
 {
 	var->validate = qtrue;
 	var->min = min;

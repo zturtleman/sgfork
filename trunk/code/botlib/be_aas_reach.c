@@ -784,7 +784,7 @@ unsigned short int AAS_BarrierJumpTravelTime(void)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_ReachabilityExists(int area1num, int area2num)
+qbool AAS_ReachabilityExists(int area1num, int area2num)
 {
 	aas_lreachability_t *r;
 

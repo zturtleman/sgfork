@@ -475,7 +475,7 @@ static void LAN_GetPingInfo( int n, char *buf, int buflen ) {
 LAN_MarkServerVisible
 ====================
 */
-static void LAN_MarkServerVisible(int source, int n, qboolean visible ) {
+static void LAN_MarkServerVisible(int source, int n, qbool visible ) {
 	if (n == -1) {
 		int count = MAX_OTHER_SERVERS;
 		serverInfo_t *server = NULL;
@@ -553,7 +553,7 @@ static int LAN_ServerIsVisible(int source, int n ) {
 LAN_UpdateVisiblePings
 =======================
 */
-qboolean LAN_UpdateVisiblePings(int source ) {
+qbool LAN_UpdateVisiblePings(int source ) {
 	return CL_UpdateVisiblePings_f(source);
 }
 
@@ -1080,7 +1080,7 @@ UI_GameCommand
 See if the current console command is claimed by the ui
 ====================
 */
-qboolean UI_GameCommand( void ) {
+qbool UI_GameCommand( void ) {
 	if ( !uivm ) {
 		return qfalse;
 	}

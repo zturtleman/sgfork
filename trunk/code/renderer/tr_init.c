@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "tr_local.h"
 
 glconfig_t  glConfig;
-qboolean    textureFilterAnisotropic = qfalse;
+qbool    textureFilterAnisotropic = qfalse;
 int         maxAnisotropy = 0;
 float       displayAspect = 0.0f;
 
@@ -292,7 +292,7 @@ vidmode_t r_vidModes[] =
 };
 static int	s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
-qboolean R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
+qbool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 	vidmode_t	*vm;
 	float			pixelAspect;
 
@@ -440,7 +440,7 @@ const void *RB_TakeScreenshotCmd( const void *data ) {
 R_TakeScreenshot
 ==================
 */
-void R_TakeScreenshot( int x, int y, int width, int height, char *name, qboolean jpeg ) {
+void R_TakeScreenshot( int x, int y, int width, int height, char *name, qbool jpeg ) {
 	static char	fileName[MAX_OSPATH]; // bad things if two screenshots per frame?
 	screenshotCommand_t	*cmd;
 
@@ -589,7 +589,7 @@ Doesn't print the pacifier message if there is a second arg
 void R_ScreenShot_f (void) {
 	char	checkname[MAX_OSPATH];
 	static	int	lastNumber = -1;
-	qboolean	silent;
+	qbool	silent;
 
 	if ( !strcmp( ri.Cmd_Argv(1), "levelshot" ) ) {
 		R_LevelShot();
@@ -642,7 +642,7 @@ void R_ScreenShot_f (void) {
 void R_ScreenShotJPEG_f (void) {
 	char		checkname[MAX_OSPATH];
 	static	int	lastNumber = -1;
-	qboolean	silent;
+	qbool	silent;
 
 	if ( !strcmp( ri.Cmd_Argv(1), "levelshot" ) ) {
 		R_LevelShot();
@@ -1141,7 +1141,7 @@ void R_Init( void ) {
 RE_Shutdown
 ===============
 */
-void RE_Shutdown( qboolean destroyWindow ) {
+void RE_Shutdown( qbool destroyWindow ) {
 
 	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
 

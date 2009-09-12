@@ -74,7 +74,7 @@ void	CG_InitLocalEntities( void ) {
 CG_FreeLocalEntity
 ==================
 */
-qboolean CG_FreeLocalEntity( localEntity_t *le ) {
+qbool CG_FreeLocalEntity( localEntity_t *le ) {
 	if ( !le->prev ) {
 		CG_Error( "CG_FreeLocalEntity: not active" );
 	}
@@ -94,7 +94,7 @@ qboolean CG_FreeLocalEntity( localEntity_t *le ) {
 	return qtrue;
 }
 
-qboolean CG_FreeLocalFire( localEntity_t *le ) {
+qbool CG_FreeLocalFire( localEntity_t *le ) {
 	if ( !le->prev ) {
 		CG_Error( "CG_FreeLocalEntity: not active" );
 	}
@@ -171,7 +171,7 @@ void CG_BloodTrail( localEntity_t *le ) {
 	vec3_t	newDelta;
 
 	localEntity_t	*blood;
-	qboolean whiskey = qfalse; // is it really blood or is it whiskey?
+	qbool whiskey = qfalse; // is it really blood or is it whiskey?
 	int				spawnTime = 250;
 
 	if(le->leFlags & LEF_WHISKEY){
@@ -399,7 +399,7 @@ CG_AddFragment
 void CG_AddFragment( localEntity_t *le ) {
 	vec3_t	newOrigin;
 	trace_t	trace;
-	qboolean visible = qtrue;
+	qbool visible = qtrue;
 
 	// check if we hit water
 	if(le->leFlags & LEF_WHISKEY){

@@ -53,7 +53,7 @@ typedef unsigned short sa_family_t;
 #	define socketError		WSAGetLastError( )
 
 static WSADATA	winsockdata;
-static qboolean	winsockInitialized = qfalse;
+static qbool	winsockInitialized = qfalse;
 
 #else
 
@@ -89,7 +89,7 @@ typedef int SOCKET;
 
 #endif
 
-static qboolean usingSocks = qfalse;
+static qbool usingSocks = qfalse;
 static int networkingEnabled = 0;
 
 static cvar_t	*net_enabled;
@@ -265,7 +265,7 @@ static struct addrinfo *SearchAddrInfo(struct addrinfo *hints, sa_family_t famil
 Sys_StringToSockaddr
 =============
 */
-static qboolean Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_len, sa_family_t family)
+static qbool Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_len, sa_family_t family)
 {
 	struct addrinfo hints, *res = NULL, *search = NULL;
 	struct addrinfo *hintsp;
@@ -350,7 +350,7 @@ static void Sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input
 Sys_StringToAdr
 =============
 */
-qboolean Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family ) {
+qbool Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family ) {
 	struct sockaddr_storage sadr;
 	sa_family_t fam;
 	
@@ -381,9 +381,9 @@ NET_CompareBaseAdrMask
 Compare without port, and up to the bit number given in netmask.
 ===================
 */
-qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
+qbool NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 {
-	qboolean differed;
+	qbool differed;
 	byte cmpmask, *addra, *addrb;
 	int curbyte;
 	
@@ -455,7 +455,7 @@ NET_CompareBaseAdr
 Compares without the port
 ===================
 */
-qboolean NET_CompareBaseAdr (netadr_t a, netadr_t b)
+qbool NET_CompareBaseAdr (netadr_t a, netadr_t b)
 {
 	return NET_CompareBaseAdrMask(a, b, -1);
 }
@@ -497,7 +497,7 @@ const char	*NET_AdrToStringwPort (netadr_t a)
 }
 
 
-qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
+qbool	NET_CompareAdr (netadr_t a, netadr_t b)
 {
 	if(!NET_CompareBaseAdr(a, b))
 		return qfalse;
@@ -514,7 +514,7 @@ qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
 }
 
 
-qboolean	NET_IsLocalAddress( netadr_t adr ) {
+qbool	NET_IsLocalAddress( netadr_t adr ) {
 	return adr.type == NA_LOOPBACK;
 }
 
@@ -531,7 +531,7 @@ Never called by the game logic, just the system event queing
 int	recvfromCount;
 #endif
 
-qboolean Sys_GetPacket( netadr_t *net_from, msg_t *net_message ) {
+qbool Sys_GetPacket( netadr_t *net_from, msg_t *net_message ) {
 	int 	ret;
 	struct sockaddr_storage from;
 	socklen_t	fromlen;
@@ -718,9 +718,9 @@ Sys_IsLANAddress
 LAN clients will have their rate var ignored
 ==================
 */
-qboolean Sys_IsLANAddress( netadr_t adr ) {
+qbool Sys_IsLANAddress( netadr_t adr ) {
 	int		index, run, addrsize;
-	qboolean differed;
+	qbool differed;
 	byte *compareadr, *comparemask, *compareip;
 
 	if( adr.type == NA_LOOPBACK ) {
@@ -1085,7 +1085,7 @@ void NET_OpenSocks( int port ) {
 	int					err;
 	struct hostent		*h;
 	int					len;
-	qboolean			rfc1929;
+	qbool			rfc1929;
 	unsigned char		buf[64];
 
 	usingSocks = qfalse;
@@ -1437,7 +1437,7 @@ void NET_OpenIP( void ) {
 NET_GetCvars
 ====================
 */
-static qboolean NET_GetCvars( void ) {
+static qbool NET_GetCvars( void ) {
 	int modified;
 
 #ifdef DEDICATED
@@ -1505,10 +1505,10 @@ static qboolean NET_GetCvars( void ) {
 NET_Config
 ====================
 */
-void NET_Config( qboolean enableNetworking ) {
-	qboolean	modified;
-	qboolean	stop;
-	qboolean	start;
+void NET_Config( qbool enableNetworking ) {
+	qbool	modified;
+	qbool	stop;
+	qbool	start;
 
 	// get any latched changes to cvars
 	modified = NET_GetCvars();

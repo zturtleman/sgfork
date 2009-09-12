@@ -128,7 +128,7 @@ static void S_ByteSwapRawSamples( int samples, int width, int s_channels, const 
 S_ReadRIFFHeader
 =================
 */
-static qboolean S_ReadRIFFHeader(fileHandle_t file, snd_info_t *info)
+static qbool S_ReadRIFFHeader(fileHandle_t file, snd_info_t *info)
 {
 	char dump[16];
 	int wav_format;

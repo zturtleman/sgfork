@@ -101,8 +101,8 @@ int			com_frameTime;
 int			com_frameMsec;
 int			com_frameNumber;
 
-qboolean	com_errorEntered;
-qboolean	com_fullyInitialized;
+qbool	com_errorEntered;
+qbool	com_fullyInitialized;
 
 char	com_errorMessage[MAXPRINTMSG];
 
@@ -150,7 +150,7 @@ A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 void QDECL Com_Printf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-  static qboolean opening_qconsole = qfalse;
+  static qbool opening_qconsole = qfalse;
 
 
 	va_start (argptr,fmt);
@@ -411,7 +411,7 @@ Check for "safe" on the command line, which will
 skip loading of q3config.cfg
 ===================
 */
-qboolean Com_SafeMode( void ) {
+qbool Com_SafeMode( void ) {
 	int		i;
 
 	for ( i = 0 ; i < com_numConsoleLines ; i++ ) {
@@ -470,9 +470,9 @@ Returns qtrue if any late commands were added, which
 will keep the demoloop from immediately starting
 =================
 */
-qboolean Com_AddStartupCommands( void ) {
+qbool Com_AddStartupCommands( void ) {
 	int		i;
-	qboolean	added;
+	qbool	added;
 
 	added = qfalse;
 	// quote every token, so args with semicolons can work
@@ -1603,7 +1603,7 @@ void Hunk_ClearToMark( void ) {
 Hunk_CheckMark
 =================
 */
-qboolean Hunk_CheckMark( void ) {
+qbool Hunk_CheckMark( void ) {
 	if( hunk_low.mark || hunk_high.mark ) {
 		return qtrue;
 	}
@@ -2372,8 +2372,8 @@ static void Com_DetectAltivec(void)
 {
 	// Only detect if user hasn't forcibly disabled it.
 	if (com_altivec->integer) {
-		static qboolean altivec = qfalse;
-		static qboolean detected = qfalse;
+		static qbool altivec = qfalse;
+		static qbool detected = qfalse;
 		if (!detected) {
 			altivec = ( Sys_GetProcessorFeatures( ) & CF_ALTIVEC );
 			detected = qtrue;
@@ -3033,7 +3033,7 @@ static char *Field_FindFirstSeparator( char *s )
 Field_Complete
 ===============
 */
-static qboolean Field_Complete( void )
+static qbool Field_Complete( void )
 {
 	int completionOffset;
 
@@ -3083,7 +3083,7 @@ Field_CompleteFilename
 ===============
 */
 void Field_CompleteFilename( const char *dir,
-		const char *ext, qboolean stripExt )
+		const char *ext, qbool stripExt )
 {
 	matchCount = 0;
 	shortestMatch[ 0 ] = 0;
@@ -3100,7 +3100,7 @@ Field_CompleteCommand
 ===============
 */
 void Field_CompleteCommand( char *cmd,
-		qboolean doCommands, qboolean doCvars )
+		qbool doCommands, qbool doCvars )
 {
 	int		completionArgument = 0;
 

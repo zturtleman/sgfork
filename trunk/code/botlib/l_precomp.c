@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "l_script.h"
 #include "l_precomp.h"
 
-typedef enum {qfalse, qtrue}	qboolean;
+typedef enum {qfalse, qtrue}	qbool;
 #endif //SCREWUP
 
 #ifdef BOTLIB

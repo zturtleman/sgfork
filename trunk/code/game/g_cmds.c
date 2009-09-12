@@ -96,7 +96,7 @@ void Cmd_Score_f( gentity_t *ent ) {
 CheatsOk
 ==================
 */
-qboolean	CheatsOk( gentity_t *ent ) {
+qbool	CheatsOk( gentity_t *ent ) {
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
@@ -198,7 +198,7 @@ void Cmd_Give_f (gentity_t *ent)
 	char		*name;
 	gitem_t		*it;
 	int			i;
-	qboolean	give_all;
+	qbool	give_all;
 	gentity_t		*it_ent;
 	trace_t		trace;
 
@@ -700,7 +700,7 @@ void StopFollowing( gentity_t *ent ) {
 	ent->client->ps.clientNum = ent - g_entities;
 }
 
-qboolean ChaseCam_CheckClient(int clientnum, gentity_t *ent){
+qbool ChaseCam_CheckClient(int clientnum, gentity_t *ent){
 
 	// can only follow connected clients
 	if ( level.clients[ clientnum ].pers.connected != CON_CONNECTED ) {
@@ -1104,7 +1104,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 Cmd_Say_f
 ==================
 */
-static void Cmd_Say_f( gentity_t *ent, int mode, qboolean arg0 ) {
+static void Cmd_Say_f( gentity_t *ent, int mode, qbool arg0 ) {
 	char		*p;
 
 	if ( trap_Argc () < 2 && !arg0 ) {
@@ -1161,7 +1161,7 @@ static void Cmd_Tell_f( gentity_t *ent ) {
 }
 
 
-static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly ) {
+static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qbool voiceonly ) {
 	int color;
 	char *cmd;
 
@@ -1194,7 +1194,7 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 	trap_SendServerCommand( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent->s.number, color, id));
 }
 
-void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qboolean voiceonly ) {
+void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool voiceonly ) {
 	int			j;
 	gentity_t	*other;
 
@@ -1383,7 +1383,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		char mapcycles[ MAX_STRING_CHARS ];
 		char buf[ 100 ];
 		char *token, *p;
-		qboolean match = qfalse;
+		qbool match = qfalse;
 
 		trap_Cvar_VariableStringBuffer( "g_mapcycles" , mapcycles, sizeof( mapcycles ) ) ;
 
@@ -1861,7 +1861,7 @@ void Cmd_DuGet_f ( gentity_t *ent){
 Cmd_BuyItem_f
 =================
 */
-void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
+void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 	gitem_t	*item;
 	char	arg1[MAX_STRING_TOKENS];
 	int		i;
@@ -1869,7 +1869,7 @@ void Cmd_BuyItem_f( gentity_t *ent, qboolean cgame) {
 	int		prize;
 	int		weapon;
 	playerState_t *ps = &ent->client->ps;
-	qboolean gatling = (ent->client->ps.weapon == WP_GATLING &&
+	qbool gatling = (ent->client->ps.weapon == WP_GATLING &&
 		ent->client->ps.stats[STAT_GATLING_MODE]);
 
 	if(ent->client->ps.stats[STAT_HEALTH] <= 0)

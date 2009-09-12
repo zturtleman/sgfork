@@ -44,7 +44,7 @@ by: Spoon
 18.8.2001
 =================
 */
-qboolean CG_LoadHitFiles(const char *modelName, clientInfo_t *ci){
+qbool CG_LoadHitFiles(const char *modelName, clientInfo_t *ci){
 #ifdef HIT_DATA
 	char filename[64];
 
@@ -117,7 +117,7 @@ shaderInfo_t shaderInfo[MAX_BRUSHSIDES];
 int	texInfoNum;
 int	shaderInfoNum;
 
-qboolean Keyword( char *key, char *token, const char* filename){
+qbool Keyword( char *key, char *token, const char* filename){
 	if(Q_stricmp(key, token)){
 		trap_Print( va( S_COLOR_RED "no \"%s\" in %s\n", key, filename ) );
 		return qfalse;
@@ -135,7 +135,7 @@ CG_ParseMusicFile
 Read length and path of present music track
 ======================
 */
-qboolean CG_ParseMusicFile(void){
+qbool CG_ParseMusicFile(void){
 	int	len, i;//, j;
 	fileHandle_t f;
 	char buf[MAX_TEXINFOFILE];
@@ -204,7 +204,7 @@ CG_ParseTexFile
 Read texture information of a map using map.tex
 ======================
 */
-qboolean CG_ParseTexFile(const char *filename){
+qbool CG_ParseTexFile(const char *filename){
 	int	len, i;//, j;
 	fileHandle_t f;
 	char buf[MAX_TEXINFOFILE];
@@ -312,7 +312,7 @@ Read a configuration file containing animation counts and rates
 models/wq3_players/wq_male1/animation.cfg, etc
 ======================
 */
-static qboolean	CG_ParseAnimationFile( const char *filename, clientInfo_t *ci ) {
+static qbool	CG_ParseAnimationFile( const char *filename, clientInfo_t *ci ) {
 	char		*text_p, *prev;
 	int			len;
 	int			i;
@@ -471,7 +471,7 @@ static qboolean	CG_ParseAnimationFile( const char *filename, clientInfo_t *ci ) 
 CG_RegisterClientSkin
 ==========================
 */
-static qboolean	CG_RegisterClientSkin( clientInfo_t *ci, const char *modelName, const char *skinName ) {
+static qbool	CG_RegisterClientSkin( clientInfo_t *ci, const char *modelName, const char *skinName ) {
 	char filename[MAX_QPATH];
 
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/holster_%s.skin", modelName, skinName );
@@ -579,7 +579,7 @@ static qboolean	CG_RegisterClientSkin( clientInfo_t *ci, const char *modelName, 
 CG_RegisterClientModelname
 ==========================
 */
-static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelName, const char *skinName ) {
+static qbool CG_RegisterClientModelname( clientInfo_t *ci, const char *modelName, const char *skinName ) {
 	char	filename[MAX_QPATH*2];
 	Com_sprintf( filename, sizeof( filename ), "models/wq3_players/%s/lower.md3", modelName );
 	ci->legsModel = trap_R_RegisterModel( filename );
@@ -788,7 +788,7 @@ static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
 CG_ScanForExistingClientInfo
 ======================
 */
-static qboolean CG_ScanForExistingClientInfo( clientInfo_t *ci ) {
+static qbool CG_ScanForExistingClientInfo( clientInfo_t *ci ) {
 	int		i;
 	clientInfo_t	*match;
 
@@ -1108,7 +1108,7 @@ void CG_NewClientInfo( int clientNum ) {
 	// scan for an existing clientinfo that matches this modelname
 	// so we can avoid loading checks if possible
 	if ( !CG_ScanForExistingClientInfo( &newInfo ) ) {
-		qboolean	forceDefer;
+		qbool	forceDefer;
 
 		forceDefer = trap_MemoryRemaining() < 4000000;
 
@@ -1413,7 +1413,7 @@ CG_SwingAngles
 ==================
 */
 static void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
-					float speed, float *angle, qboolean *swinging ) {
+					float speed, float *angle, qbool *swinging ) {
 	float	swing;
 	float	move;
 	float	scale;
@@ -1804,7 +1804,7 @@ Returns the Z component of the surface being shadowed
 ===============
 */
 #define	SHADOW_DISTANCE		128
-static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane, vec3_t pos ) {
+static qbool CG_PlayerShadow( centity_t *cent, float *shadowPlane, vec3_t pos ) {
 	vec3_t		end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
 	trace_t		trace;
 	float		alpha;
@@ -2014,8 +2014,8 @@ void CG_Turret( centity_t *cent ){
 	int				time = cg.time;
 	centity_t		*player = &cg_entities[cent->currentState.eventParm];
 	int				eFlags = player->currentState.eFlags;
-	qboolean		thisplayer= qfalse;
-	qboolean		reload = qfalse;
+	qbool		thisplayer= qfalse;
+	qbool		reload = qfalse;
 
 	memset( &tripod, 0, sizeof(tripod) );
 	memset( &middle, 0, sizeof(middle) );
@@ -2416,7 +2416,7 @@ adds holster with pistols to the player
 */
 static int CG_AddHolster(refEntity_t *holster, refEntity_t *legs, centity_t *cent,
 						  clientInfo_t *ci, int h_pistol, int renderfx, float shadowPlane,
-						  qboolean left){
+						  qbool left){
 	int i;
 
 
@@ -2637,10 +2637,10 @@ void CG_Player( centity_t *cent ) {
 	refEntity_t		money;
 	int				clientNum;
 	int				renderfx;
-	qboolean		shadow;
+	qbool		shadow;
 	float			shadowPlane;
 	int				h_pistol = -1; //biggest wp-num of holstered pistols
-	qboolean		addguns = cg_addguns.integer;
+	qbool		addguns = cg_addguns.integer;
 
 	// the client number is stored in clientNum.  It can't be derived
 	// from the entity number, because a single client may have
@@ -2732,7 +2732,7 @@ void CG_Player( centity_t *cent ) {
 		trajectory_t tr;
 		trace_t trace;
 		vec3_t pos, mins, maxs;
-		//qboolean fall = qfalse;
+		//qbool fall = qfalse;
 		const float startheight = legs.origin[2];
 		int type = anim == BOTH_FALL ? 1 : -1;
 
@@ -2778,7 +2778,7 @@ void CG_Player( centity_t *cent ) {
 			float f_frame, factor;
 			int deltaTime;
 			animation_t *anim_d = &ci->animations[BOTH_DEATH_LAND];
-			qboolean end = qfalse;
+			qbool end = qfalse;
 
 			deltaTime = cg.time - cent->landtime;
 			factor = (float)deltaTime/( (float)anim_d->frameLerp*(float)(anim_d->numFrames-1) );

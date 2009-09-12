@@ -191,7 +191,7 @@ void CG_SelectPrevPlayer( void ) {
 }
 
 
-static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
+static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qbool draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
 	vec3_t		angles;
@@ -241,7 +241,7 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	}
 }
 
-static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
+static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qbool draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
 	vec3_t		angles;
@@ -296,7 +296,7 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 
 
 
-static void CG_DrawPlayerHead(rectDef_t *rect, qboolean draw2D) {
+static void CG_DrawPlayerHead(rectDef_t *rect, qbool draw2D) {
 	vec3_t		angles;
 	float		size, stretch;
 	float		frac;
@@ -418,7 +418,7 @@ static void CG_DrawPlayerStatus( rectDef_t *rect ) {
 }
 
 
-static void CG_DrawSelectedPlayerName( rectDef_t *rect, float scale, vec4_t color, qboolean voice, int textStyle) {
+static void CG_DrawSelectedPlayerName( rectDef_t *rect, float scale, vec4_t color, qbool voice, int textStyle) {
 	clientInfo_t *ci;
   ci = cgs.clientinfo + ((voice) ? cgs.currentVoiceClient : sortedTeamPlayers[CG_GetSelectedPlayer()]);
   if (ci) {
@@ -510,7 +510,7 @@ static void CG_DrawRoundtime( rectDef_t *rect, float scale, vec4_t color, qhandl
 	CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, s, 0, 0, textStyle);
 }
 
-static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
+static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qbool draw2D) {
 	int		value;
   vec3_t origin, angles;
 
@@ -533,7 +533,7 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 
 }
 
-static void CG_DrawSelectedPlayerHead( rectDef_t *rect, qboolean draw2D, qboolean voice ) {
+static void CG_DrawSelectedPlayerHead( rectDef_t *rect, qbool draw2D, qbool voice ) {
 	clipHandle_t	cm;
 	clientInfo_t	*ci;
 	float			len;
@@ -706,7 +706,7 @@ float CG_GetValue(int ownerDraw) {
 
 // THINKABOUTME: should these be exclusive or inclusive..
 //
-qboolean CG_OwnerDrawVisible(int flags) {
+qbool CG_OwnerDrawVisible(int flags) {
 
 	if (flags & CG_SHOW_TEAMINFO) {
 		return (cg_currentSelectedPlayer.integer == numSortedTeamPlayers);
@@ -1242,7 +1242,7 @@ static void CG_DrawCameraInfo(rectDef_t *rect,vec4_t textColor) {
 	}
 }
 
-static void CG_DrawTeamOverlay(rectDef_t *rect, qboolean right, qboolean upper) {
+static void CG_DrawTeamOverlay(rectDef_t *rect, qbool right, qbool upper) {
 	int w, h, xx;
 	int i, j, len;
 	const char *p;
@@ -1415,7 +1415,7 @@ static void CG_DrawTeamOverlay(rectDef_t *rect, qboolean right, qboolean upper) 
 static void CG_DrawDeathMessages(rectDef_t *rect, vec4_t textColor) {
 	int length[2], width, n, i;
 	qhandle_t	weapon;
-	qboolean	iscolor;
+	qbool	iscolor;
 	float x, y;
 
 	if (cg_paused.integer)
@@ -2566,7 +2566,7 @@ void CG_EventHandling(int type) {
 
 
 
-void CG_KeyEvent(int key, qboolean down) {
+void CG_KeyEvent(int key, qbool down) {
 	if(cg.oldbutton && !down){
 		cg.oldbutton = qfalse;
 	}

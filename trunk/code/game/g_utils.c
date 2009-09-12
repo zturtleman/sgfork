@@ -48,7 +48,7 @@ G_FindConfigstringIndex
 
 ================
 */
-int G_FindConfigstringIndex( char *name, int start, int max, qboolean create ) {
+int G_FindConfigstringIndex( char *name, int start, int max, qbool create ) {
 	int		i;
 	char	s[MAX_STRING_CHARS];
 
@@ -403,7 +403,7 @@ gentity_t *G_Spawn( void ) {
 G_EntitiesFree
 =================
 */
-qboolean G_EntitiesFree( void ) {
+qbool G_EntitiesFree( void ) {
 	int			i;
 	gentity_t	*e;
 
@@ -639,7 +639,7 @@ ignoreTeam can be TEAM_RED or TEAM_BLUE for team games that use
 spawnpoints that are spread out (unlike CTF), or -1 otherwise.
 ================
 */
-qboolean G_IsAnyClientWithinRadius( const vec3_t org, float rad, int ignoreTeam ) {
+qbool G_IsAnyClientWithinRadius( const vec3_t org, float rad, int ignoreTeam ) {
 	int length, i, j;
 	float radSqr;
 	vec_t diff;

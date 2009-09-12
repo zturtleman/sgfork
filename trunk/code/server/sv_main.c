@@ -493,7 +493,7 @@ Redirect all printfs
 ===============
 */
 static void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
-	qboolean	valid;
+	qbool	valid;
 	unsigned int time;
 	char		remaining[1024];
 	// TTimo - scaled down to accumulate, but not overflow anything network wise, print wise etc.
@@ -774,7 +774,7 @@ static void SV_CheckTimeouts( void ) {
 SV_CheckPaused
 ==================
 */
-static qboolean SV_CheckPaused( void ) {
+static qbool SV_CheckPaused( void ) {
 	int		count;
 	client_t	*cl;
 	int		i;

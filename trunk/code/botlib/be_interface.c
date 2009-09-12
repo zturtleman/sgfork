@@ -85,7 +85,7 @@ int Sys_MilliSeconds(void)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean ValidClientNumber(int num, char *str)
+qbool ValidClientNumber(int num, char *str)
 {
 	if (num < 0 || num > botlibglobals.maxclients)
 	{
@@ -102,7 +102,7 @@ qboolean ValidClientNumber(int num, char *str)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean ValidEntityNumber(int num, char *str)
+qbool ValidEntityNumber(int num, char *str)
 {
 	if (num < 0 || num > botlibglobals.maxentities)
 	{
@@ -118,7 +118,7 @@ qboolean ValidEntityNumber(int num, char *str)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean BotLibSetup(char *str)
+qbool BotLibSetup(char *str)
 {
 	if (!botlibglobals.botlibsetup)
 	{
