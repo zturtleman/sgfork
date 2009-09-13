@@ -1033,6 +1033,15 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	char		location[64];
 
   if( ent->client->pers.punished & AP_MUTED )
+  {
+    G_LogPrintf( "%s tried to speak.\n", ent->client->pers.netname );
+    trap_SendServerCommand( ent-g_entities,
+        "print \"You are not allowed to speak.\n\"" );
+    return;
+  }
+
+  if( g_tourney.integer && ( mode != SAY_TEAM || !ent->health
+        || ent->client->sess.sessionTeam == TEAM_SPECTATOR ) )
     return;
 
 	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM )
@@ -1135,20 +1144,18 @@ static void Cmd_Tell_f( gentity_t *ent ) {
 	char		*p;
 	char		arg[MAX_TOKEN_CHARS];
 
-	if ( trap_Argc () < 2 ) {
+	if ( trap_Argc() < 2 )
 		return;
-	}
 
 	trap_Argv( 1, arg, sizeof( arg ) );
 	targetNum = atoi( arg );
-	if ( targetNum < 0 || targetNum >= level.maxclients ) {
+
+	if ( targetNum < 0 || targetNum >= level.maxclients )
 		return;
-	}
 
 	target = &g_entities[targetNum];
-	if ( !target || !target->inuse || !target->client ) {
+	if ( !target || !target->inuse || !target->client )
 		return;
-	}
 
 	p = ConcatArgs( 2 );
 
@@ -2050,31 +2057,6 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 	ent->client->ps.stats[STAT_MONEY] -= prize;
 }
 
-void Cmd_PrivateMessage( gentity_t *ent )
-{
-  gentity_t *dest;
-  int argc = trap_Argc( );
-  char buf[30];
-  char args[255];
-  int i;
-
-  trap_Argv( 1, buf, sizeof(buf) );
-  dest = &g_entities[ atoi(buf) ];
-  Com_sprintf( buf, sizeof(buf), "" );
-
-  for( i=2; i <= trap_Argc( ); i++ )
-  {
-    trap_Argv( i, buf, sizeof( buf ) );
-    Q_strcat( args, sizeof(args), " " );
-    Q_strcat( args, sizeof(args), buf );
-  }
-
-  trap_SendServerCommand( dest->client->ps.clientNum,
-      va( "print \"%s (prv): ^6%s\n\"", ent->client->pers.netname, args ) );
-  G_LogPrintf( "Private Message: %s to %s: %s", ent->client->pers.netname,
-      dest->client->pers.netname, args );
-}
-
 /*
 =================
 ClientCommand
@@ -2156,7 +2138,7 @@ void ClientCommand( int clientNum ) {
 	else if (Q_stricmp (cmd, "dropweapon") == 0)
 		Cmd_DropWeapon_f( ent, 0 );
   else if( !Q_stricmp( cmd, "mp" ) )
-    Cmd_PrivateMessage( ent );
+    Cmd_Tell_f( ent );
 	else if (Q_stricmp(cmd, "buy" ) == 0)
 		Cmd_BuyItem_f (ent, qfalse);
 	else if (Q_stricmp(cmd, "cg_buy" ) == 0)
