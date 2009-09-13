@@ -1061,6 +1061,7 @@ void ClientUserinfoChanged( int clientNum ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname,
 				client->pers.netname) );
+      G_LogPrintf( "Nick change: %s to %s_n", oldname, client->pers.netname );
 		}
 	}
 
@@ -1206,6 +1207,7 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
 //	char		*areabits;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
+  char *ip;
 	gentity_t	*ent;
 
 	ent = &g_entities[ clientNum ];
@@ -1216,8 +1218,9 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
  	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
  	// recommanding PB based IP / GUID banning, the builtin system is pretty limited
  	// check to see if they are on the banned IP list
-	value = Info_ValueForKey (userinfo, "ip");
-	if ( G_FilterPacket( value ) ) {
+	ip = Info_ValueForKey (userinfo, "ip");
+	if ( G_FilterPacket( ip ) ) {
+    G_LogPrintf( "Banned ip \'%s\' tried to connect.\n", ip );
 		return "You are banned from this server.";
 	}
 
@@ -1225,10 +1228,12 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
   // NOTE: local client <-> "ip" "localhost"
   //   this means this client is not running in our current process
 	if ( !isBot && (strcmp(value, "localhost") != 0)) {
+    ent->client->pers.ip = ip;
 		// check for a password
 		value = Info_ValueForKey (userinfo, "password");
 		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
 			strcmp( g_password.string, value) != 0) {
+      G_LogPrintf( "%s tried to brute force server's password.\n", ip );
 			return "Invalid password";
 		}
 	}
@@ -1769,6 +1774,9 @@ void ClientSpawn(gentity_t *ent) {
 	// remove this in every case
 	client->ps.pm_flags &= ~PMF_FOLLOW;
 	client->ps.pm_flags &= ~PMF_SUICIDE;
+
+  G_LogPrintf( "ClientSpawn: %s%s spawns\n",
+      client->pers.netname, vtos(ent->s.origin) );
 }
 
 

@@ -77,6 +77,24 @@ char *Sys_DefaultHomePath(void)
 }
 
 /*
+================
+Sys_GetTime
+================
+*/
+void Sys_GetTime( char *fmt, char *dest )
+{
+  time_t timer;
+  char buf[30];
+
+  if( !dest )
+    return;
+
+  timer = time( 0 );
+  strftime( dest, sizeof( dest ),
+      (!fmt[0]) ? "%Y-%m-%d %H:%M:%S" : fmt, localtime( &timer ) );
+}
+
+/*
 =================
 Sys_TestSysInstallPath
 =================

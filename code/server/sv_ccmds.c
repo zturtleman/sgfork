@@ -1155,6 +1155,14 @@ void SV_Heartbeat_f( void ) {
 	svs.nextHeartbeatTime = -9999999;
 }
 
+void SV_Date_f( void )
+{
+  qtime_t time;
+
+  Com_RealTime( &time );
+  Com_Printf( "%i/%i/%i %i:%i:%i\n", time.tm_mday, time.tm_mon, time.tm_year,
+      time.tm_hour, time.tm_min, time.tm_sec );
+}
 
 /*
 ===========
@@ -1250,6 +1258,7 @@ void SV_AddOperatorCommands( void ) {
 	initialized = qtrue;
 
 	Cmd_AddCommand ("heartbeat", SV_Heartbeat_f);
+  Cmd_AddCommand ("date", SV_Date_f );
 	Cmd_AddCommand ("kick", SV_Kick_f);
 	Cmd_AddCommand ("banUser", SV_Ban_f);
 	Cmd_AddCommand ("banClient", SV_BanNum_f);

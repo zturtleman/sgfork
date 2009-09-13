@@ -648,7 +648,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			trap_GetServerinfo( serverinfo, sizeof( serverinfo ) );
 
 			G_LogPrintf("------------------------------------------------------------\n" );
-			G_LogPrintf("InitGame: %s\n", serverinfo );
+			G_LogPrintf("G_InitGame: %s\n", serverinfo );
+      trap_RealTime( &level.qtime );
+      G_Printf( "G_InitGame: Started game on %i/%i/%i at %i:%i:%i\n",
+        level.qtime.tm_mday, level.qtime.tm_mon, level.qtime.tm_year, level.qtime.tm_hour,
+        level.qtime.tm_min, level.qtime.tm_sec );
 		}
 	} else {
 		G_Printf( "Not logging to disk.\n" );
@@ -1364,23 +1368,29 @@ Print to the logfile with a time stamp if it is open
 void QDECL G_LogPrintf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		string[1024];
-	int			min, tens, sec;
+  char    buf[30];
+  int     len;
+  int     min, tens, sec;
 
-	sec = level.time / 1000;
+  sec = level.time / 1000;
 
-	min = sec / 60;
-	sec -= min * 60;
-	tens = sec / 10;
-	sec -= tens * 10;
+  min = sec / 60;
+  sec -= min * 60;
+  tens = sec / 10;
+  sec -= tens * 10;
 
-	Com_sprintf( string, sizeof(string), "%3i:%i%i ", min, tens, sec );
+	Com_sprintf( buf, sizeof(buf), "%i:%i:%i (%i:%i%i) ", level.qtime.tm_hour,
+      level.qtime.tm_min, level.qtime.tm_sec, min, tens, sec );
+
+  Com_sprintf( string, sizeof(string), "%s", buf );
+  len = strlen(buf);
 
 	va_start( argptr, fmt );
-	Q_vsnprintf(string + 7, sizeof(string) - 7, fmt, argptr);
+	Q_vsnprintf(string + len, sizeof(string) - len, fmt, argptr);
 	va_end( argptr );
 
 	if ( g_dedicated.integer ) {
-		G_Printf( "%s", string + 7 );
+		G_Printf( "%s", string + len );
 	}
 
 	if ( !level.logFile ) {
@@ -2088,6 +2098,8 @@ void Countdown(int endtime, int step){
 		if(countdown == 1){
 			int i;
 
+      G_LogPrintf( "Countdown: End of warmup\n" );
+
 			// bank robbery
 			if(g_gametype.integer == GT_BR){
 
@@ -2101,17 +2113,11 @@ void Countdown(int endtime, int step){
 				}
 
 			// duel
-			} else if(g_gametype.integer == GT_DUEL){
-
-				trap_SendServerCommand( -1, "cp \"DRAW!\"" );
-
-			// normal round teamplay
-			} else {
-
-				trap_SendServerCommand( -1, "cp \"FIGHT!\"" );
-
-
 			}
+      else if(g_gametype.integer == GT_DUEL)
+				trap_SendServerCommand( -1, "cp \"DRAW!\"" );
+      else
+				trap_SendServerCommand( -1, "cp \"FIGHT!\"" );
 
 			for( i = 0; i < level.maxclients; i++){
 
@@ -3471,6 +3477,8 @@ void G_RunFrame( int levelTime ) {
 	level.previousTime = level.time;
 	level.time = levelTime;
 	msec = level.time - level.previousTime;
+  
+  trap_RealTime( &level.qtime );
 
 	// get any cvar changes
 	G_UpdateCvars();

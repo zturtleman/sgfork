@@ -301,6 +301,7 @@ typedef struct {
 //unlagged - client options
 	// these correspond with variables in the userinfo string
 	int			delag;
+  char    *ip;
 	int			debugDelag;
 	int			cmdTimeNudge;
 //unlagged - client options
@@ -541,6 +542,7 @@ typedef struct {
 	char		*spawnVars[MAX_SPAWN_VARS][2];	// key / value pairs
 	int			numSpawnVarChars;
 	char		spawnVarChars[MAX_SPAWN_VARS_CHARS];
+  qtime_t qtime;
 
 	// intermission state
 	int			intermissionQueued;		// intermission was qualified, but
