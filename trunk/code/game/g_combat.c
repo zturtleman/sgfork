@@ -924,22 +924,25 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		return;
 	}
 
+  trap_RealTime( &level.qtime );
+
 	// the intermission has allready been qualified for, so don't
 	// allow any extra scoring
-	if ( level.intermissionQueued ) {
+	if ( level.intermissionQueued )
 		return;
-	}
-	if ( !inflictor ) {
+
+	if ( !inflictor )
 		inflictor = &g_entities[ENTITYNUM_WORLD];
-	}
-	if ( !attacker ) {
+
+	if ( !attacker )
 		attacker = &g_entities[ENTITYNUM_WORLD];
-	}
 
 	// shootable doors / buttons don't actually have any health
 	if ( targ->s.eType == ET_MOVER ) {
 		if ( targ->use && targ->moverState == MOVER_POS1 ) {
 			targ->use( targ, inflictor, attacker );
+      G_LogPrintf( "G_Damage: %s (%s) shoots on a shootable object (%s)\n",
+          attacker->client->pers.netname, vtos(attacker->s.origin), vtos(targ->s.origin) );
 		}
 		return;
 	}
@@ -959,6 +962,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	if ( client ) {
 		if ( client->noclip ) {
+      G_LogPrintf( "G_Damage: %s (%s) couldn't be shoot at because he used /noclip.\n",
+          client->pers.netname, vtos(targ->s.origin) );
 			return;
 		}
 	}
@@ -1002,6 +1007,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 		// check for godmode
 		if ( targ->flags & FL_GODMODE ) {
+      G_LogPrintf( "%s couldn't be shoot because he used godmode\n", targ->client->pers.netname );
 			return;
 		}
 	}

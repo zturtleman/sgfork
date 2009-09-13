@@ -230,6 +230,7 @@ typedef enum {
 
 	// 1.32
 	G_FS_SEEK,
+  G_GET_LOCALTIME, // ( char *fmt, char *dest )
 
 	BOTLIB_SETUP = 200,				// ( void );
 	BOTLIB_SHUTDOWN,				// ( void );

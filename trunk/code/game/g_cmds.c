@@ -948,6 +948,7 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		SetTeam( ent, "spectator" );
 	}
 
+  G_LogPrintf( "Cmd_Follow_f: %s follows %s\n", level.clients[i].pers.netname );
 	ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
 	ent->client->sess.spectatorClient = i;
 }
