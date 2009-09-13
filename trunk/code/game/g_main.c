@@ -156,6 +156,7 @@ vmCvar_t	g_version;
 vmCvar_t	g_url;
 vmCvar_t	g_breakspawndelay;
 vmCvar_t	g_forcebreakrespawn;
+vmCvar_t  g_tourney;
 
 //unlagged - server options
 vmCvar_t	g_delagHitscan;
@@ -313,7 +314,8 @@ static cvarTable_t		gameCvarTable[] = {
 
 	// If g_breakspawndelay == 0, use BREAK_RESPAWN_TIME instead in g_mover.c
 	{ &g_breakspawndelay, "g_breakspawndelay", "0", 0, 0, qtrue },
-	{ &g_forcebreakrespawn, "g_forcebreakrespawn", "0", 0, 0, qtrue }
+	{ &g_forcebreakrespawn, "g_forcebreakrespawn", "0", 0, 0, qtrue },
+  { &g_tourney, "g_tourney", "0", 0, 0, qtrue },
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );

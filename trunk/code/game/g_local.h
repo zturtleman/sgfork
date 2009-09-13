@@ -968,6 +968,7 @@ extern	vmCvar_t	g_url;
 // time elapsed for breakable item to respawn
 extern	vmCvar_t	g_breakspawndelay;
 extern	vmCvar_t	g_forcebreakrespawn;
+extern  vmCvar_t  g_tourney;
 
 //hit data
 extern	hit_data_t	hit_data;
