@@ -1,5 +1,5 @@
-#summary the page consists of links to SGFork guidelines documents.
-#labels Phase-Implementation,Phase-QA,Phase-Support,Phase-Deploy
+#summary SGFork guidelines documentation.
+#labels Phase-Deploy,Phase-QA,Phase-Support,Featured
 
 = Introduction =
 
