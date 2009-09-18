@@ -129,7 +129,7 @@ if [ "$PLATFORM" = "mingw32" ]
 then
   BUILD_DIR=build/release-mingw32-${ARCH}
   [ "$BASE_HOME_DIR" = "" ] && BASE_HOME_DIR=$PWD
-  [ "$SDIR" = "" ] && BINARY_HOME_DIR=$BASE_HOME_DIR
+  [ "$BINARY_HOME_DIR" = "" ] && BINARY_HOME_DIR=$BASE_HOME_DIR
   MAINBINARY="smokinguns.x86.exe"
   DEDIBINARY="smokinguns_dedicated.x86.exe"
 elif [ "$PLATFORM" = "linux" ]
@@ -138,7 +138,7 @@ then
   MAINBINARY="smokinguns.${ARCH}"
   DEDIBINARY="smokinguns_dedicated.${ARCH}"
   [ "$BASE_HOME_DIR" = "" ] && BASE_HOME_DIR=$HOME/.smokinguns/base
-  [ "$SDIR" = "" ] && SDIR=$HOME/smokinguns
+  [ "$BINARY_HOME_DIR" = "" ] && BINARY_HOME_DIR=$HOME/smokinguns
 fi
 
 if [ `basename $PWD` = "tools" ]
