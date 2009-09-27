@@ -859,6 +859,12 @@ void Cmd_Team_f( gentity_t *ent ) {
 			if(ent->client->sess.sessionTeam == TEAM_BLUE ||
 				ent->client->sess.sessionTeam == TEAM_BLUE_SPECTATOR)
 				return;
+      else if( g_blueteamcount.integer >= g_maxteamplayers.integer )
+      {
+        trap_SendServerCommand( ent-g_entities, "print \"Too many players in that team.\n\"" );
+        return;
+      }
+
 			ent->teamchange = qtrue;
 			SetTeam( ent, "bluespec");
 		}
@@ -867,6 +873,11 @@ void Cmd_Team_f( gentity_t *ent ) {
 			if(ent->client->sess.sessionTeam == TEAM_RED ||
 				ent->client->sess.sessionTeam == TEAM_RED_SPECTATOR)
 				return;
+      else if( g_redteamcount.integer >= g_maxteamplayers.integer )
+      {
+        trap_SendServerCommand( ent-g_entities, "print \"Too many players in that team.\n\"" );
+        return;
+      }
 
 			ent->teamchange = qtrue;
 			SetTeam( ent, "redspec");
@@ -877,10 +888,18 @@ void Cmd_Team_f( gentity_t *ent ) {
 
 			switch(ran){
 			case 0:
-				SetTeam(ent, "redspec");
+        if( g_redteamcount.integer >= g_maxteamplayers.integer
+            && g_blueteamcount.integer < g_maxteamplayers.integer )
+          SetTeam(ent, "bluespec" );
+        else
+				  SetTeam(ent, "redspec");
 				break;
 			case 1:
-				SetTeam(ent, "bluespec");
+        if( g_blueteamcount.integer >= g_maxteamplayers.integer
+            && g_redteamcount.integer < g_maxteamplayers.integer )
+          SetTeam(ent, "redspec" );
+        else
+				  SetTeam(ent, "bluespec");
 				break;
 			}
 		} else {
