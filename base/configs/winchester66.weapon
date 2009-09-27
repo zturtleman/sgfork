@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 37
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 106
+numFrames = 10
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 94
+numFrames = 10
+loopFrames = 0
+frameLerp = 70
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 43
+numFrames = 22
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 65
+numFrames = 31
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 69
+numFrames = 27
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+spread = 250.0f
+damage = 44.0f
+range = 1050
+addTime = 0
+count = 0
+clipAmmo = 12
+clip = WP_CART_CLIP
+maxAmmo = 12
+v_model = "models/weapons2/winch66/v_winchester66.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/winch66_"
+snd_reload = "sound/weapons/rifle_reload1.wav"
+name = "Winchester 1866"
+path = "models/weapons2/winch66/"
+wp_sort = WPS_GUN

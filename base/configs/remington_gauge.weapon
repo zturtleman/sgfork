@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 48
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 261
+numFrames = 4
+loopFrames = 0
+frameLerp = 70
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 47
+numFrames = 1
+loopFrames = 0
+frameLerp = 50
+initialLerp = 50
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 49
+numFrames = 12
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 73
+numFrames = 12
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 86
+numFrames = 93
+loopFrames = 0
+frameLerp = 35
+initialLerp = 35
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 61
+numFrames = 12
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 179
+numFrames = 82
+loopFrames = 0
+frameLerp = 35
+initialLerp = 35
+reversed = 0
+flipflop = 0
+
+spread = 450.0f
+damage = 17.0f
+range = 800
+addTime = 200
+count = 6
+clipAmmo = 2
+clip = WP_SHELLS_CLIP
+maxAmmo = 12
+v_model = "models/weapons2/remgauge/v_remgauge.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/shotgun_"
+snd_reload = 0
+name = "Remingtion 12 Gauge"
+path = "models/weapons2/remgauge/"
+wp_sort = WPS_GUN

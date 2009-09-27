@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 37
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 108
+numFrames = 10
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 37
+numFrames = 1
+loopFrames = 0
+frameLerp = 25
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 43
+numFrames = 11
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 53
+numFrames = 54
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 108
+numFrames = 10
+loopFrames = 0
+frameLerp = 60
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 108
+numFrames = 10
+loopFrames = 0
+frameLerp = 60
+initialLerp = 0
+reversed = 1
+flipflop = 0
+
+spread = 100
+damage = 65.0f
+range = 1500
+addTime = 0
+count = 0
+clipAmmo = 1
+clip = WP_CART_CLIP
+maxAmmo = 12
+v_model = "models/weapons2/sharps/v_sharps.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/sharps_"
+snd_reload = "sound/weapons/sharps_reload.wav"
+name = "Sharps Rifle"
+path = "models/weapons2/sharps/"
+wp_sort = WPS_GUN

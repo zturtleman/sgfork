@@ -1734,7 +1734,13 @@ void CG_PositionViewWeaponOnTag( refEntity_t *entity, const refEntity_t *parent,
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
 
-
+//
+// cg_parse.c
+//
+void Weapons_GetInfos( void );
+int BG_AnimNumByName( char *anim );
+int BG_WeaponNumByName( char *wp );
+char *Weapons_FileForWeapon( int wp_num );
 
 //
 // cg_weapons.c
