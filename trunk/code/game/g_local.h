@@ -888,6 +888,7 @@ extern	vmCvar_t	g_timelimit;
 extern	vmCvar_t	g_scorelimit;
 extern	vmCvar_t	g_friendlyFire;
 extern	vmCvar_t	g_maxteamkills;
+extern  vmCvar_t  g_maxteamplayers;
 extern	vmCvar_t	g_teamkillsforgettime;
 extern	vmCvar_t	g_teamkillschecktime;
 extern	vmCvar_t	g_password;

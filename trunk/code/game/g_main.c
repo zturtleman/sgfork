@@ -95,6 +95,7 @@ vmCvar_t	g_timelimit;
 vmCvar_t	g_scorelimit;
 vmCvar_t	g_friendlyFire;
 vmCvar_t	g_maxteamkills;
+vmCvar_t  g_maxteamplayers;
 vmCvar_t	g_teamkillsforgettime;
 vmCvar_t	g_teamkillschecktime;
 vmCvar_t	g_password;
@@ -221,6 +222,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_friendlyFire, "g_friendlyFire", "1", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_maxteamkills, "g_maxteamkills", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+  { &g_maxteamplayers, "g_maxteamplayers", "10", CVAR_ARCHIVE, 0, qtrue },
 	{ &g_teamkillsforgettime, "g_teamkillsforgettime", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_teamkillschecktime, "g_teamkillschecktime", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
