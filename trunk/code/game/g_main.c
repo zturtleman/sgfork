@@ -318,7 +318,7 @@ static cvarTable_t		gameCvarTable[] = {
   { &g_tourney, "g_tourney", "0", 0, 0, qtrue },
 };
 
-static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
+static int numCvars = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
 
 
 void G_InitGame( int levelTime, int randomSeed, int restart );
@@ -460,7 +460,7 @@ void G_RegisterCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;
 
-	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
+	for ( i = 0, cv = gameCvarTable ; i < numCvars ; i++, cv++ ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar )
@@ -485,7 +485,7 @@ void G_UpdateCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;
 
-	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
+	for ( i = 0, cv = gameCvarTable ; i < numCvars ; i++, cv++ ) {
 		if ( cv->vmCvar ) {
 			trap_Cvar_Update( cv->vmCvar );
 
@@ -748,6 +748,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// general initialization
 	G_FindTeams();
+
+	G_Printf("-----------------------------------\n");
+  G_Printf( "Configuring weapons.\n" );
+  Weapons_GetInfos( );
 
 	// make sure we have flags for CTF, etc
 	SaveRegisteredItems();

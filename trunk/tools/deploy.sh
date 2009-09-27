@@ -8,6 +8,7 @@ UIPAKNAME="sgfork-ui.pk3"
 SCRIPTSPAKNAME="sgfork-scripts.pk3"
 GFXPAKNAME="sgfork-gfx.pk3"
 MENUPAKNAME="sgfork-menu.pk3"
+CONFIGSPAKNAME="sgfork-configs.pk3"
 PWD=`pwd`
 MAINBINARY=
 DEDIBINARY=
@@ -18,7 +19,7 @@ BINARY_HOME_DIR=
 [ "$USE_CLIENT" = "" ]    && USE_CLIENT=0
 [ "$USE_SMP" = "" ]       && USE_SMP=0
 [ "$USE_QVMS" = "" ]      && USE_QVMS=0
-[ "$USE_PK3" = "" ]       && USE_PK3=1
+[ "$USE_PK3" = "" ]       && USE_PK3=0
 
 
 usage( )
@@ -106,9 +107,9 @@ fi
 
 if [ "$USE_PK3" = "0" ]
 then
-  USE_GFX=0 USE_SCRIPTS=0 USE_UI=0 USE_MENU=0
+  USE_GFX=0 USE_SCRIPTS=0 USE_UI=0 USE_MENU=0 USE_CONFIGS=0
 else
-  USE_GFX=1 USE_SCRIPTS=1 USE_UI=1 USE_MENU=1
+  USE_GFX=1 USE_SCRIPTS=1 USE_UI=1 USE_MENU=1 USE_CONFIGS=1
 fi
 
 ARCH=`uname -m | sed -e s/i.86/i386/`
@@ -184,6 +185,13 @@ then
   cd base/
   zip -r $MENUPAKNAME menu/
   mv $MENUPAKNAME "$BASE_HOME_DIR"
+  cd ..
+fi
+if [ "$USE_CONFIGS" = "1" ]
+then
+  cd base/
+  zip -r $CONFIGSPAKNAME configs/
+  mv $CONFIGSPAKNAME "$BASE_HOME_DIR"
   cd ..
 fi
 

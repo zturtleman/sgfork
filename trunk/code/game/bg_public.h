@@ -73,6 +73,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
 
+#if defined QAGAME
+#define BG_Error G_Error
+#elif defined CGAME
+#define BG_Error CG_Error
+#endif
+
 typedef enum {
 	GT_FFA,				// free for all
 	GT_DUEL,		// duelling mode
@@ -872,21 +878,21 @@ typedef enum {
 
 typedef struct wpinfo_s {
 	animation_t	animations[NUM_WP_ANIMATIONS];
-	const	float	spread;
-	const	float	damage;
-	const	int		range;
-	const	int		addTime;
-	const	int		count;
-	const	int		clipAmmo;	//ammo that fits in the weapon
-	const	int		clip;
-	const int		maxAmmo;	// maximum of holdable ammo
-	const	char	*v_model;
-	const	char	*v_barrel;
-	const	char	*snd_fire;
-	const	char	*snd_reload;
-	const	char	*name;
-	const	char	*path;
-	const	int		wp_sort;
+	float	spread;
+	float	damage;
+	int		range;
+	int		addTime;
+	int		count;
+	int		clipAmmo;	//ammo that fits in the weapon
+	int		clip;
+	int		maxAmmo;	// maximum of holdable ammo
+	char	v_model[MAX_QPATH];
+	char	v_barrel[MAX_QPATH];
+	char	snd_fire[MAX_QPATH];
+	char	snd_reload[MAX_QPATH];
+	char	name[100];
+	char	path[MAX_QPATH];
+	int		wp_sort;
 } wpinfo_t;
 
 typedef enum {
@@ -930,7 +936,7 @@ typedef struct gitem_s {
 
 // included in both the game dll and the client
 extern	gitem_t	bg_itemlist[];
-extern	wpinfo_t bg_weaponlist[];
+extern	wpinfo_t bg_weaponlist[WP_NUM_WEAPONS];
 extern	int		bg_numItems;
 
 gitem_t	*BG_FindItem( const char *pickupName );
@@ -1199,3 +1205,13 @@ extern vec3_t gatling_mins;
 extern vec3_t gatling_maxs;
 extern vec3_t gatling_mins2;
 extern vec3_t gatling_maxs2;
+
+extern const char *wp_fileNames[];
+extern const char *weapon_numNames[];
+extern const char *weapon_animName[];
+extern const char *weapon_sortNames[];
+extern void Weapons_GetInfos( void );
+extern int BG_WeaponNumByName( char *wp );
+extern int BG_AnimNumByName( char *anim );
+extern char *Weapons_FileForWeapon( int wp_num );
+

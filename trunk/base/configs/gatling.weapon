@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 26
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 1
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 0
+numFrames = 26
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 0
+numFrames = 1
+loopFrames = 0
+frameLerp = 10
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 0
+numFrames = 43
+loopFrames = 0
+frameLerp = 32
+initialLerp = 32
+reversed = 0
+flipflop = 1
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 1
+loopFrames = 0
+frameLerp = 10
+initialLerp = 10
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+spread = 125
+damage = 44
+range = 1350
+addTime = 200
+count = 0
+clipAmmo = 25
+clip = WP_GATLING_CLIP
+maxAmmo = 2
+v_model = "models/weapons2/gatling/v_gatling.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/gatling_"
+snd_reload = "sound/weapons/gatling_reload.wav"
+name = "Gatling Gun"
+path = "models/weapons2/gatling/"
+wp_sort = WPS_GUN

@@ -1,3 +1,5 @@
 #!/bin/sh
 
-./deploy.sh --pk3 --qvms $*
+cd tools
+./deploy.sh --qvms $*
+cd ..

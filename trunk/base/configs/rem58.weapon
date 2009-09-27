@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 37
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 251
+numFrames = 10
+loopFrames = 0
+frameLerp = 40
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 189
+numFrames = 42
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 43
+numFrames = 26
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 231
+numFrames = 20
+loopFrames = 0
+frameLerp = 14
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 69
+numFrames = 120
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+spread = 300.0f
+damage = 23.0f
+range = 600
+addTime = -180
+count = 0
+clipAmmo = 6
+clip = WP_BULLETS_CLIP
+maxAmmo = 24
+v_model = "models/weapons2/remington58/v_remington58.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/rem58_"
+snd_reload = "sound/weapons/rem58_reload.wav"
+name = "Remington58"
+path = "models/weapons2/remington58/"
+wp_sort = WPS_PISTOL

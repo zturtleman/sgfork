@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 37
+loopFrames = 0
+frameLerp = 27
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 104
+numFrames = 10
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 94
+numFrames = 10
+loopFrames = 0
+frameLerp = 100
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 39
+numFrames = 24
+loopFrames = 0
+frameLerp = 32
+initialLerp = 10
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 63
+numFrames = 31
+loopFrames = 0
+frameLerp = 50
+initialLerp = 50
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 70
+numFrames = 24
+loopFrames = 0
+frameLerp = 50
+initialLerp = 50
+reversed = 0
+flipflop = 0
+
+spread = 300.0f
+damage = 11.25f
+range = 800
+addTime = 0
+count = 6
+clipAmmo = 5
+clip = WP_SHELLS_CLIP
+maxAmmo = 12
+v_model = "models/weapons2/winch97/v_winch97.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/winch97_"
+snd_reload = "sound/weapons/winch97_reload1.wav"
+name = "Winchester 1897"
+path = "models/weapons2/winch97/"
+wp_sort = WPS_GUN

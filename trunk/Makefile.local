@@ -76,6 +76,7 @@ SDK_Q3CGOBJ = \
   $(B)/$(SDK_GAMENAME)/cgame/bg_pmove.o \
   $(B)/$(SDK_GAMENAME)/cgame/bg_slidemove.o \
   $(B)/$(SDK_GAMENAME)/cgame/bg_lib.o \
+  $(B)/$(SDK_GAMENAME)/cgame/bg_parse.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_consolecmds.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_newdraw.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_draw.o \
@@ -117,6 +118,7 @@ SDK_Q3GOBJ = \
   $(B)/$(SDK_GAMENAME)/game/ai_vcmd.o \
   $(B)/$(SDK_GAMENAME)/game/bg_misc.o \
   $(B)/$(SDK_GAMENAME)/game/bg_pmove.o \
+  $(B)/$(SDK_GAMENAME)/game/bg_parse.o \
   $(B)/$(SDK_GAMENAME)/game/bg_slidemove.o \
   $(B)/$(SDK_GAMENAME)/game/bg_lib.o \
   $(B)/$(SDK_GAMENAME)/game/g_active.o \
@@ -126,8 +128,8 @@ SDK_Q3GOBJ = \
   $(B)/$(SDK_GAMENAME)/game/g_cmds.o \
   $(B)/$(SDK_GAMENAME)/game/g_combat.o \
   $(B)/$(SDK_GAMENAME)/game/g_items.o \
-  $(B)/$(SDK_GAMENAME)/game/g_mem.o \
   $(B)/$(SDK_GAMENAME)/game/g_misc.o \
+  $(B)/$(SDK_GAMENAME)/game/g_mem.o \
   $(B)/$(SDK_GAMENAME)/game/g_missile.o \
   $(B)/$(SDK_GAMENAME)/game/g_mover.o \
   $(B)/$(SDK_GAMENAME)/game/g_session.o \

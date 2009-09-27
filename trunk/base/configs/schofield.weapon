@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 37
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 207
+numFrames = 10
+loopFrames = 0
+frameLerp = 40
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 144
+numFrames = 42
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 43
+numFrames = 26
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 187
+numFrames = 20
+loopFrames = 0
+frameLerp = 14
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 69
+numFrames = 74
+loopFrames = 0
+frameLerp = 50
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+spread = 350.0f
+damage = 30.0f
+range = 600
+addTime = -210
+count = 0
+clipAmmo = 6
+clip = WP_BULLETS_CLIP
+maxAmmo = 24
+v_model = "models/weapons2/schofield/v_schofield.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/schof_"
+snd_reload = "sound/weapons/schof_reload.wav"
+name = "Smith&Wesson Schofield"
+path = "models/weapons2/schofield/"
+wp_sort = WPS_PISTOL

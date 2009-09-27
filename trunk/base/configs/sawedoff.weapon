@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 20
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 161
+numFrames = 6
+loopFrames = 0
+frameLerp = 50
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 19
+numFrames = 1
+loopFrames = 50
+frameLerp = 50
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 20
+numFrames = 14
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 20
+numFrames = 14
+loopFrames = 0
+frameLerp = 35
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 34
+numFrames = 66
+loopFrames = 0
+frameLerp = 35
+initialLerp = 35
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 100
+numFrames = 62
+loopFrames = 0
+frameLerp = 35
+initialLerp = 35
+reversed = 0
+flipflop = 0
+
+spread = 1300.0f
+damage = 15.3f
+range = 1500
+addTime = 0
+count = 0
+clipAmmo = 1
+clip = WP_CART_CLIP
+maxAmmo = 12
+v_model = "models/weapons2/sawedoff/v_sawedoff.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/shotgun_"
+snd_reload = 0
+name = "Sawed Off Shotgun"
+path = "models/weapons2/sawedoff/"
+wp_sort = WPS_GUN
