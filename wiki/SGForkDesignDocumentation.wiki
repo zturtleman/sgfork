@@ -11,3 +11,4 @@ Main section:
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMTRnaHc4bTVkOQ&hl=en Understanding of complete standalone]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMWhzbmN3d2Zm&hl=en Match cycle description]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMmRjZjg0cmQ3&hl=en SGFork anti-camp system]
+  * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfNmQ1N3pyd2Zx&hl=en vanilla SG locational damage description]
