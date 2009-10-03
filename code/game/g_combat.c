@@ -52,13 +52,9 @@ Adds score to both the client and his team
 ============
 */
 void AddScore( gentity_t *ent, vec3_t origin, int score ) {
-	if ( !ent->client ) {
+	if ( !ent->client || level.warmupTime )
 		return;
-	}
-	// no scoring during pre-match warmup
-	if ( level.warmupTime ) {
-		return;
-	}
+
 	// show score plum
 	ScorePlum(ent, origin, score);
 	//
@@ -70,22 +66,21 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 
 void AddScoreRTPTeam( int team, int score ) {
 	// no scoring during pre-match warmup
-	if ( level.warmupTime) {
+	if ( level.warmupTime)
 		return;
-	}
 
 	level.teamScores[ team] += score;
 	CalculateRanks();
 }
 
 void AddScoreRTP( gentity_t *ent, int score ) {
-	if ( !ent->client ) {
+	if ( !ent->client )
 		return;
-	}
+
 	// no scoring during pre-match warmup
-	if ( level.warmupTime) {
+	if ( level.warmupTime)
 		return;
-	}
+
 //	ent->client->ps.persistant[PERS_SCORE] += score;
 //	if (g_gametype.integer == GT_TEAM)
 	level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
@@ -104,7 +99,6 @@ void TossClientItems( gentity_t *self ) {
 	float		angle;
 	int			i;
 	gentity_t	*drop;
-
 	gentity_t	*sec_pistol_drop;
 
 	// in duel, no items will be  dropped
@@ -122,7 +116,6 @@ void TossClientItems( gentity_t *self ) {
 
 		// find the item type for this weapon
 		item = BG_FindItemForWeapon( i );
-
 		angle += 66.6f;
 
 		// spawn the item
@@ -179,14 +172,13 @@ void TossClientItems( gentity_t *self ) {
 				continue;
 
 			if ( self->client->ps.powerups[ i ] ) {
-
 				if(i == PW_GOLD)
 					item = BG_FindItemForClassname("item_money");
 				else
 					continue;
-				if ( !item ) {
+				if ( !item )
 					continue;
-				}
+
 				drop = Drop_Item( self, item, angle );
 				// decide how many seconds it has left
 				drop->count = 1;
@@ -219,11 +211,11 @@ void LookAtKiller( gentity_t *self, gentity_t *attacker ) {
 	vec3_t		dir;
 	vec3_t		angles;
 
-	if ( attacker && attacker != self ) {
+	if ( attacker && attacker != self )
 		VectorSubtract (attacker->s.pos.trBase, self->s.pos.trBase, dir);
-    } else {
+  else
 		return; //if client doesnt have killer
-	}
+
 	//small hack. grapplePoint isnt used when player dead, so we use it to tell the client
 	//where to turn. A better solution would be if we could add a new variable to playerstate
 	//which is communicated between the client and the server.
@@ -318,13 +310,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	char		*killerName, *obit;
 	int fallanim = 0;
 
-	if ( self->client->ps.pm_type == PM_DEAD ) {
+	if ( self->client->ps.pm_type == PM_DEAD )
 		return;
-	}
 
-	if ( level.intermissiontime ) {
+	if ( level.intermissiontime )
 		return;
-	}
 
 //unlagged - backward reconciliation #2
 	// make sure the body shows up in the client's current position
@@ -338,9 +328,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killer = attacker->s.number;
 		if ( attacker->client ) {
 			killerName = attacker->client->pers.netname;
-		} else {
+		} else
 			killerName = "<non-client>";
-		}
 	} else {
 		killer = ENTITYNUM_WORLD;
 		killerName = "<world>";
@@ -353,9 +342,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) ) {
 		obit = "<bad obituary>";
-	} else {
+	} else
 		obit = modNames[meansOfDeath];
-	}
 
 	G_LogPrintf("Kill: %i %i %i: %s killed %s by %s\n",
 		killer, self->s.number, meansOfDeath, killerName,
@@ -375,20 +363,17 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (attacker && attacker->client) {
 		attacker->client->lastkilled_client = self->s.number;
 
-		if ( attacker == self || OnSameTeam (self, attacker ) ) {
+		if ( attacker == self || OnSameTeam (self, attacker ) )
 			AddScore( attacker, self->r.currentOrigin, -1 );
-		} else {
+		else
 			AddScore( attacker, self->r.currentOrigin, 1 );
-		}
-	} else {
+	} else
 		AddScore( self, self->r.currentOrigin, -1 );
-	}
 
 	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
 	contents = trap_PointContents( self->r.currentOrigin, -1 );
-	if ( !( contents & CONTENTS_NODROP )) {
+	if ( !( contents & CONTENTS_NODROP ))
 		TossClientItems( self );
-	}
 
 	Cmd_Score_f( self );		// show scores
 	// send updated scores to any clients that are following this one,
@@ -397,15 +382,12 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		gclient_t	*client;
 
 		client = &level.clients[i];
-		if ( client->pers.connected != CON_CONNECTED ) {
+		if ( client->pers.connected != CON_CONNECTED
+        || client->sess.sessionTeam < TEAM_SPECTATOR )
 			continue;
-		}
-		if ( client->sess.sessionTeam < TEAM_SPECTATOR ) {
-			continue;
-		}
-		if ( client->sess.spectatorClient == self->s.number ) {
+
+		if ( client->sess.spectatorClient == self->s.number )
 			Cmd_Score_f( g_entities + i );
-		}
 	}
 
 	self->takedamage = qfalse;	// cannot be gibbed
@@ -425,9 +407,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 
 	self->s.loopSound = 0;
-
 	self->r.maxs[2] = -8;
-
 	self->client->respawnTime = level.time + 3000;
 
 	// check if we can play a special falloff animation
@@ -463,9 +443,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			// see if there is space behind the player to fall down
 			trap_Trace(&trace, pos, mins, maxs, pos, self->client->ps.clientNum, MASK_SHOT);
 
-			if(!trace.allsolid && !trace.startsolid){
+			if(!trace.allsolid && !trace.startsolid)
 				fallanim = BOTH_FALL_BACK;
-			}
 		}
 		// at last check if we can get a direct line to the falling-down-position
 		trap_Trace(&trace, self->client->ps.origin, mins2, maxs2, pos, -1, MASK_SHOT);
@@ -480,9 +459,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	// for the no-blood option, we need to prevent the health
 	// from going to gib level
-	if ( self->health <= GIB_HEALTH ) {
+	if ( self->health <= GIB_HEALTH )
 		self->health = GIB_HEALTH+1;
-	}
 
 	self->client->ps.legsAnim =
 		( ( self->client->ps.legsAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
@@ -535,9 +513,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			if(level.clients[i].ps.clientNum == victim->client->ps.clientNum)
 				continue;
 
-			if(level.clients[i].ps.persistant[PERS_SCORE] > victim->client->ps.persistant[PERS_SCORE]){
+			if(level.clients[i].ps.persistant[PERS_SCORE] > victim->client->ps.persistant[PERS_SCORE])
 				rank ++;
-			}
 		}
 
 		//give the attacker the money
@@ -549,9 +526,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			const float	factor = (float)players/4;
 			float	factor2 = factor -1;
 
-			if(factor2<0) {
+			if(factor2<0)
 				factor2 = 1;
-			} else {
+			else {
 				factor2 = factor2/5;
 				factor2 += 1;
 			}
@@ -601,26 +578,20 @@ G_LocationDamage
 float G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, float take, int *mod) {
 	vec3_t bulletPath;
 	vec3_t bulletAngle;
-
 	int clientRotation;
 	int bulletRotation;	// Degrees rotation around client.
 				// used to check Back of head vs. Face
 	int impactRotation;
-
 	//safe location from hit-detection
 	int location = targ->client->lasthurt_location;
 	int direction = 0;
-
 	// sharps rifle can shoot thru boiler plate
 	qbool sharps = (attacker->client->ps.weapon == WP_SHARPS);
 	// knife doesnt make the dynamite explode
 	qbool isknife  = (attacker->client->ps.weapon == WP_KNIFE);
 	// be sure, the target has dynamit in his hand
 	qbool isdyn    = (targ->client->ps.weapon == WP_DYNAMITE);
-
 	vec3_t dynorigin;
-
-
 	gentity_t *tent;
 
 	// First things first.  If we're not damaging them, why are we here?
@@ -920,15 +891,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	int			knockback;
 	int			max;
 
-	if (!targ->takedamage) {
-		return;
-	}
-
-  trap_RealTime( &level.qtime );
-
-	// the intermission has allready been qualified for, so don't
-	// allow any extra scoring
-	if ( level.intermissionQueued )
+	if( !targ->takedamage 
+      || level.intermissionQueued)
 		return;
 
 	if ( !inflictor )
@@ -968,11 +932,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 	}
 
-	if ( !dir ) {
+	if ( !dir )
 		dflags |= DAMAGE_NO_KNOCKBACK;
-	} else {
+	else
 		VectorNormalize(dir);
-	}
 
 	knockback = damage/1.5;
 	if(attacker->client){
@@ -982,25 +945,20 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			knockback *= 6;
 	}
 	//allow full knockback if it's a dynamite
-	if ( knockback > 200 && mod != MOD_DYNAMITE) {
+	if ( knockback > 200 && mod != MOD_DYNAMITE)
 		knockback = 200;
-	}
-	if ( targ->flags & FL_NO_KNOCKBACK ) {
+	if ( targ->flags & FL_NO_KNOCKBACK )
 		knockback = 0;
-	}
-	if ( dflags & DAMAGE_NO_KNOCKBACK ) {
+	if ( dflags & DAMAGE_NO_KNOCKBACK )
 		knockback = 0;
-	}
 
 	// check for completely getting out of the damage
 	if ( !(dflags & DAMAGE_NO_PROTECTION) ) {
-
 		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
 		// if the attacker was on the same team
 		if ( targ != attacker && OnSameTeam (targ, attacker)  ) {
-			if ( !g_friendlyFire.integer ) {
+			if ( !g_friendlyFire.integer )
 				return;
-			}
 			// Can be used later in case of TK limit reached to protect the last victim
 			hsave = targ->health;
 		}
@@ -1021,11 +979,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// the total will be turned into screen blends and view angle kicks
 	// at the end of the frame
 	if ( client && inflictor) {
-		if ( attacker ) {
+		if ( attacker )
 			client->ps.persistant[PERS_ATTACKER] = attacker->s.number;
-		} else {
+		else
 			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
-		}
+
 		client->damage_blood += take;
 		client->damage_knockback += knockback;
 		if ( dir ) {
@@ -1327,9 +1285,8 @@ qbool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float r
 	int			i, e;
 	qbool	hitClient = qfalse;
 
-	if ( radius < 1 ) {
+	if ( radius < 1 )
 		radius = 1;
-	}
 
 	for ( i = 0 ; i < 3 ; i++ ) {
 		mins[i] = origin[i] - radius;
@@ -1358,16 +1315,15 @@ qbool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float r
 		}
 
 		dist = VectorLength( v );
-		if ( dist >= radius ) {
+		if ( dist >= radius )
 			continue;
-		}
 
 		points = damage * ( 1.0 - dist / radius );
 
 		if( CanDamage (ent, origin) ) {
-			if( LogAccuracyHit( ent, attacker ) ) {
+			if( LogAccuracyHit( ent, attacker ) )
 				hitClient = qtrue;
-			}
+
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
