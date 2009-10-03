@@ -38,9 +38,8 @@ void G_KnifeThink( gentity_t *self ) {
 	trap_Trace(&trace, self->r.currentOrigin, self->r.mins,self->r.maxs, self->s.origin2,
 		self->r.ownerNum, mask);
 
-	if(trace.fraction == 1){
+	if(trace.fraction == 1)
 		self->s.groundEntityNum = -1;
-	}
 
 	if(level.time > self->wait)
 		G_FreeEntity(self);
@@ -170,9 +169,8 @@ void WhiskeyBurn( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	if(self->s.apos.trDelta[0] == 0.0f)
 		return;
 
-	if ( !other->takedamage ) {
+	if ( !other->takedamage )
 		return;
-	}
 
 	// player already has been burned by another flame
 	if(other->timestamp > level.time)
@@ -182,9 +180,7 @@ void WhiskeyBurn( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 	// play sound
 	G_Sound( other, CHAN_AUTO, self->noise_index );
-
 	dflags = 0;
-
 	G_Damage (other, NULL, self->parent, NULL, NULL, 10+rand()%6, dflags, MOD_MOLOTOV);
 
 	if(other->client)
@@ -225,12 +221,10 @@ void WhiskeyThink( gentity_t *self){
 			}
 
 			// make the dynamite explode
-			if(hit->r.contents & CONTENTS_TRIGGER2 && hit->takedamage){
+			if(hit->r.contents & CONTENTS_TRIGGER2 && hit->takedamage)
 				G_Damage (hit, self, self->parent, NULL, NULL, 100, 0, MOD_MOLOTOV);
-			}
 		}
 	}
-
 	self->nextthink = level.time + 100;
 }
 
@@ -293,7 +287,6 @@ gentity_t *SetWhiskeyPool (gentity_t *self, vec3_t origin, vec3_t normal, qbool 
 
 	// normal(important for later marks on the ground
 	VectorCopy(normal, pool->s.angles2);
-
 	trap_LinkEntity(pool);
 
 	return pool;
@@ -387,9 +380,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace, int shaderNum ) {
 				hitClient = qtrue;
 			}
 			BG_EvaluateTrajectoryDelta( &ent->s.pos, level.time, velocity );
-			if ( VectorLength( velocity ) == 0 ) {
+			if ( VectorLength( velocity ) == 0 )
 				velocity[2] = 1;	// stepped on a grenade
-			}
 			// you can't make dynamite exploding by using a knife
 			if(!(ent->s.weapon == WP_KNIFE && other->s.weapon == WP_DYNAMITE &&
 				other->s.eType == ET_ITEM)){
@@ -436,11 +428,10 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace, int shaderNum ) {
 	} else if ( other->takedamage && other->client ) {
 		G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ) );
 		ent->s.otherEntityNum = other->s.number;
-	} else if( trace->surfaceFlags & SURF_METAL ) {
+	} else if( trace->surfaceFlags & SURF_METAL )
 		G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ) );
-	} else {
+	else
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
-	}
 
 	if(Q_stricmp(ent->classname, "knife")){
 		ent->freeAfterEvent = qtrue;
@@ -490,9 +481,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace, int shaderNum ) {
 	}
 
 	// spawn alcohol missiles
-	if(!Q_stricmp(ent->classname, "molotov")){
+	if(!Q_stricmp(ent->classname, "molotov"))
 		BottleBreak( ent, trace->endpos, trace->plane.normal, bottledirs);
-	}
 
 	trap_LinkEntity( ent );
 }
@@ -513,13 +503,12 @@ void G_RunMissile( gentity_t *ent ) {
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
 
 	// if this missile bounced off an invulnerability sphere
-	if ( ent->target_ent ) {
+	if ( ent->target_ent )
 		passent = ent->target_ent->s.number;
-	}
-	else {
+	else
 		// ignore interactions with the missile owner
 		passent = ent->r.ownerNum;
-	}
+ 
 	// trace a line from the previous position to the current position
 	shaderNum = trap_Trace_New2( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask );
 	traceEnt = &g_entities[tr.entityNum];
@@ -529,14 +518,12 @@ void G_RunMissile( gentity_t *ent ) {
 		trap_Trace_New( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask );
 		tr.fraction = 0;
 	}
-	else {
+	else
 		VectorCopy( tr.endpos, ent->r.currentOrigin );
-	}
 
 	trap_LinkEntity( ent );
 
 	if ( tr.fraction != 1 ) {
-
 		VectorCopy(origin, ent->s.origin2);
 
 		// never explode or bounce on sky
@@ -549,12 +536,11 @@ void G_RunMissile( gentity_t *ent ) {
 			// if its a dynamite or molotov let it move 10 seconds before deleting it
 			if(ent->s.weapon == WP_DYNAMITE || ent->s.weapon == WP_MOLOTOV
 				|| ent->s.weapon == WP_KNIFE){
-
-				if(ent->mappart >= level.time && ent->mappart){
+				if(ent->mappart >= level.time && ent->mappart)
 					goto think;
-				} else if(ent->mappart){
+				else if(ent->mappart)
 					ent->mappart = 0;
-				} else {
+				else {
 					ent->mappart = level.time + 5000;
 					goto think;
 				}
@@ -563,9 +549,8 @@ void G_RunMissile( gentity_t *ent ) {
 			return;
 		}
 		G_MissileImpact( ent, &tr, shaderNum );
-		if ( ent->s.eType != ET_MISSILE && ent->s.eType != ET_ITEM) {
+		if ( ent->s.eType != ET_MISSILE && ent->s.eType != ET_ITEM)
 			return;		// exploded
-		}
 	}
 think:
 	// check think function after bouncing
@@ -723,7 +708,6 @@ gentity_t *fire_dynamite (gentity_t *self, vec3_t start, vec3_t dir, int speed) 
 	bolt->think = G_Suck;
 
 	if (self->client ) {
-
 		// dynamite(variable) lifetime
 		if(self->client->ps.stats[STAT_WP_MODE]){
 			bolt->nextthink = level.time + G_AnimLength(WP_ANIM_ALT_FIRE, WP_DYNAMITE)
@@ -745,9 +729,8 @@ gentity_t *fire_dynamite (gentity_t *self, vec3_t start, vec3_t dir, int speed) 
 		if (self->client->ps.stats[STAT_WP_MODE] >= 0){
 			bolt->classname = "grenadeno";
 			bolt->s.apos.trDelta[0] = 0;
-		} else { //needed to check the missilesound on or off
+		} else //needed to check the missilesound on or off
 			bolt->s.apos.trDelta[0] = bolt->nextthink;//it's burning down the house
-		}
 	} else {
 		bolt->nextthink = level.time + 2500;
 		bolt->think = G_ExplodeMissile;

@@ -37,13 +37,11 @@ void SP_info_player_deathmatch( gentity_t *ent ) {
 	int		i;
 
 	G_SpawnInt( "nobots", "0", &i);
-	if ( i ) {
+	if ( i )
 		ent->flags |= FL_NO_BOTS;
-	}
 	G_SpawnInt( "nohumans", "0", &i );
-	if ( i ) {
+	if ( i )
 		ent->flags |= FL_NO_HUMANS;
-	}
 }
 
 /*QUAKED info_player_start (1 0 0) (-16 -16 -24) (16 16 32)
@@ -122,7 +120,6 @@ qbool SpotWouldTelefrag( gentity_t *spot ) {
 		if ( hit->client) {
 			return qtrue;
 		}
-
 	}
 
 	return qfalse;
@@ -234,9 +231,8 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 			}
 		}
 
-		if ( telefrag && g_gametype.integer != GT_DUEL) {
+		if ( telefrag && g_gametype.integer != GT_DUEL)
 			continue;
-		}
 
 		if(spot->mappart == mappart && g_gametype.integer == GT_DUEL && !spot->used){
 			// if this is a trio player, find a trio-spawnpoint
@@ -452,34 +448,6 @@ Chooses a player start, deathmatch start, etc
 */
 gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client ) {
 	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, mappart, client );
-
-	/*
-	gentity_t	*spot;
-	gentity_t	*nearestSpot;
-
-	nearestSpot = SelectNearestDeathmatchSpawnPoint( avoidPoint );
-
-	spot = SelectRandomDeathmatchSpawnPoint ( );
-	if ( spot == nearestSpot ) {
-		// roll again if it would be real close to point of death
-		spot = SelectRandomDeathmatchSpawnPoint ( );
-		if ( spot == nearestSpot ) {
-			// last try
-			spot = SelectRandomDeathmatchSpawnPoint ( );
-		}
-	}
-
-	// find a single player start spot
-	if (!spot) {
-		G_Error( "Couldn't find a spawn point" );
-	}
-
-	VectorCopy (spot->s.origin, origin);
-	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
-
-	return spot;
-	*/
 }
 
 /*
@@ -584,9 +552,8 @@ void BodySink( gentity_t *ent ) {
 
 	ent->nextthink = level.time + 50;
 
-	if(!duel){
+	if(!duel)
 		ent->s.pos.trBase[2] -= 1;
-	}
 }
 
 /*
@@ -628,9 +595,9 @@ void CopyToBodyQue( gentity_t *ent ) {
 		body->s.pos.trType = TR_GRAVITY;
 		body->s.pos.trTime = level.time;
 		VectorCopy( ent->client->ps.velocity, body->s.pos.trDelta );
-	} else {
+	} else
 		body->s.pos.trType = TR_STATIONARY;
-	}
+
 	body->s.event = 0;
 
 	if(g_gametype.integer != GT_DUEL || !ent->client->specwatch){
@@ -676,7 +643,6 @@ void CopyToBodyQue( gentity_t *ent ) {
 			break;
 		}
 	} else {
-
 		body->s.torsoAnim = ent->s.torsoAnim;
 		body->s.legsAnim = LEGS_IDLE;
 	}
@@ -704,7 +670,6 @@ void CopyToBodyQue( gentity_t *ent ) {
 
 	if( g_gametype.integer == GT_DUEL)
 		body->angle = g_session;
-
 
 	VectorCopy ( body->s.pos.trBase, body->r.currentOrigin );
 	trap_LinkEntity (body);
@@ -755,24 +720,16 @@ team_t TeamCount( int ignoreClientNum, int team ) {
 	int		count = 0;
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( i == ignoreClientNum ) {
-			continue;
-		}
-		if ( level.clients[i].pers.connected == CON_DISCONNECTED ) {
-			continue;
-		}
-
-		if ( (g_gametype.integer >= GT_RTP || g_gametype.integer == GT_DUEL) &&
-			level.clients[i].pers.connected != CON_CONNECTED )
+		if ( i == ignoreClientNum 
+        || level.clients[i].pers.connected == CON_DISCONNECTED 
+        || (g_gametype.integer >= GT_RTP || g_gametype.integer == GT_DUEL) &&
+              level.clients[i].pers.connected != CON_CONNECTED
+        || (g_gametype.integer == GT_DUEL && team == TEAM_SPECTATOR &&
+              g_entities[i].client->realspec) )
 			continue;
 
-		if(g_gametype.integer == GT_DUEL && team == TEAM_SPECTATOR &&
-			g_entities[i].client->realspec)
-			continue;
-
-		if ( level.clients[i].sess.sessionTeam == team ) {
+		if ( level.clients[i].sess.sessionTeam == team )
 			count++;
-		}
 	}
 
 	return count;
@@ -783,26 +740,17 @@ int MappartCount( int ignoreClientNum, int team ) {
 	int		count = 0;
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( i == ignoreClientNum ) {
-			continue;
-		}
-		if ( level.clients[i].pers.connected == CON_DISCONNECTED ) {
-			continue;
-		}
-
-		if ( (g_gametype.integer >= GT_RTP || g_gametype.integer == GT_DUEL) &&
-			level.clients[i].pers.connected != CON_CONNECTED )
+		if( i == ignoreClientNum
+      || level.clients[i].pers.connected == CON_DISCONNECTED 
+      || (g_gametype.integer >= GT_RTP || g_gametype.integer == GT_DUEL)
+            && level.clients[i].pers.connected != CON_CONNECTED 
+      || (g_gametype.integer == GT_DUEL && team == TEAM_SPECTATOR
+            && g_entities[i].client->realspec) )
 			continue;
 
-		if(g_gametype.integer == GT_DUEL && team == TEAM_SPECTATOR &&
-			g_entities[i].client->realspec)
-			continue;
-
-		if ( level.clients[i].sess.sessionTeam == team ) {
+		if ( level.clients[i].sess.sessionTeam == team )
 			count++;
-		}
 	}
-
 	return count;
 }
 
@@ -817,15 +765,14 @@ int TeamLeader( int team ) {
 	int		i;
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[i].pers.connected == CON_DISCONNECTED ) {
+		if ( level.clients[i].pers.connected == CON_DISCONNECTED )
 			continue;
-		}
+
 		if ( level.clients[i].sess.sessionTeam == team ) {
 			if ( level.clients[i].sess.teamLeader )
 				return i;
 		}
 	}
-
 	return -1;
 }
 
@@ -842,16 +789,15 @@ team_t PickTeam( int ignoreClientNum ) {
 	counts[TEAM_BLUE] = TeamCount( ignoreClientNum, TEAM_BLUE );
 	counts[TEAM_RED] = TeamCount( ignoreClientNum, TEAM_RED );
 
-	if ( counts[TEAM_BLUE] > counts[TEAM_RED] ) {
+	if ( counts[TEAM_BLUE] > counts[TEAM_RED] )
 		return TEAM_RED;
-	}
-	if ( counts[TEAM_RED] > counts[TEAM_BLUE] ) {
+  else if ( counts[TEAM_RED] > counts[TEAM_BLUE] )
 		return TEAM_BLUE;
-	}
+ 
 	// equal team count, so join the team with the lowest score
-	if ( level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED] ) {
+	if ( level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED] )
 		return TEAM_RED;
-	}
+
 	return TEAM_BLUE;
 }
 
@@ -865,9 +811,8 @@ Forces a client's skin (for teamplay)
 static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) {
 	char *p;
 
-	if ((p = Q_strrchr(model, '/')) != 0) {
+	if ((p = Q_strrchr(model, '/')) != 0)
 		*p = 0;
-	}
 
 	Q_strcat(model, MAX_QPATH, "/");
 	Q_strcat(model, MAX_QPATH, skin);
@@ -895,9 +840,8 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 
 	while( 1 ) {
 		ch = *in++;
-		if( !ch ) {
+		if( !ch )
 			break;
-		}
 
 		// don't allow leading spaces
 		if( colorlessLen == 0 && ch == ' ' ) {
@@ -907,9 +851,8 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 		// check colors
 		if( ch == Q_COLOR_ESCAPE ) {
 			// solo trailing carat is not a color prefix
-			if( !*in ) {
+			if( !*in )
 				break;
-			}
 
 			// don't allow black in a name, period
 			if( ColorIndex(*in) == 0 ) {
@@ -918,9 +861,8 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 			}
 
 			// make sure room in dest for both chars
-			if( len > outSize - 2 ) {
+			if( len > outSize - 2 )
 				break;
-			}
 
 			*out++ = ch;
 			*out++ = *in++;
@@ -932,20 +874,18 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 		// don't count spaces in colorlessLen
 		if( ch == ' ' ) {
 			spaces++;
-			if( spaces > 3 ) {
+			if( spaces > 3 )
 				continue;
-			}
+ 
 			*out++ = ch;
 			len++;
 			continue;
 		}
-		else {
+		else
 			spaces = 0;
-		}
 
-		if( len > outSize - 1 ) {
+		if( len > outSize - 1 )
 			break;
-		}
 
 		*out++ = ch;
 		colorlessLen++;
@@ -954,9 +894,8 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 	*out = 0;
 
 	// don't allow empty names
-	if( *p == 0 || colorlessLen == 0 ) {
+	if( *p == 0 || colorlessLen == 0 )
 		Q_strncpyz( p, "UnnamedPlayer", outSize );
-	}
 }
 
 
@@ -993,32 +932,28 @@ void ClientUserinfoChanged( int clientNum ) {
 	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check for malformed or illegal info strings
-	if ( !Info_Validate(userinfo) ) {
+	if ( !Info_Validate(userinfo) )
 		strcpy (userinfo, "\\name\\badinfo");
-	}
 
 	// check for local client
 	s = Info_ValueForKey( userinfo, "ip" );
-	if ( !strcmp( s, "localhost" ) ) {
+	if ( !strcmp( s, "localhost" ) )
 		client->pers.localClient = qtrue;
-	}
 
 	// check the item prediction
 	s = Info_ValueForKey( userinfo, "cg_predictItems" );
-	if ( !atoi( s ) ) {
+	if ( !atoi( s ) )
 		client->pers.predictItemPickup = qfalse;
-	} else {
+	else
 		client->pers.predictItemPickup = qtrue;
-	}
 
 //unlagged - client options
 	// see if the player has opted out
 	s = Info_ValueForKey( userinfo, "cg_delag" );
-	if ( !atoi( s ) ) {
+	if ( !atoi( s ) )
 		client->pers.delag = 0;
-	} else {
+	else
 		client->pers.delag = atoi( s );
-	}
 
 	// see if the player is nudging his shots
 	s = Info_ValueForKey( userinfo, "cg_cmdTimeNudge" );
@@ -1026,12 +961,10 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	// see if the player wants to debug the backward reconciliation
 	s = Info_ValueForKey( userinfo, "cg_debugDelag" );
-	if ( !atoi( s ) ) {
+	if ( !atoi( s ) )
 		client->pers.debugDelag = qfalse;
-	}
-	else {
+	else
 		client->pers.debugDelag = qtrue;
-	}
 
 	// see if the player is simulating incoming latency
 	s = Info_ValueForKey( userinfo, "cg_latentSnaps" );
@@ -1051,26 +984,23 @@ void ClientUserinfoChanged( int clientNum ) {
 	s = Info_ValueForKey (userinfo, "name");
 	ClientCleanName( s, client->pers.netname, sizeof(client->pers.netname) );
 
-	if ( client->sess.sessionTeam >= TEAM_SPECTATOR ) {
-		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
+	if( client->sess.sessionTeam >= TEAM_SPECTATOR
+      && client->sess.spectatorState == SPECTATOR_SCOREBOARD )
 			Q_strncpyz( client->pers.netname, "scoreboard", sizeof(client->pers.netname) );
-		}
-	}
 
-	if ( client->pers.connected == CON_CONNECTED ) {
-		if ( strcmp( oldname, client->pers.netname ) ) {
-			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname,
-				client->pers.netname) );
-      G_LogPrintf( "Nick change: %s to %s_n", oldname, client->pers.netname );
-		}
-	}
+  if ( client->pers.connected == CON_CONNECTED
+      && strcmp( oldname, client->pers.netname ) ) {
+    trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname,
+          client->pers.netname) );
+    G_LogPrintf( "Nick change: %s to %s_n", oldname, client->pers.netname );
+  }
 
 	// set max health
 	health = atoi( Info_ValueForKey( userinfo, "handicap" ) );
 	client->pers.maxHealth = health;
-	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > 100 ) {
+	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > 100 )
 		client->pers.maxHealth = 100;
-	}
+
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 
 	// set model
@@ -1095,54 +1025,22 @@ void ClientUserinfoChanged( int clientNum ) {
 				team = TEAM_BLUE_SPECTATOR;
 			else
 				team = TEAM_BLUE;
-		} else {
+		} else
 			// pick the team with the least number of players
 			team = PickTeam( clientNum );
-		}
 
 		if(client->sess.sessionTeam == TEAM_SPECTATOR)
 			client->sess.sessionTeam = team;
 	}
-	else {
+	else
 		team = client->sess.sessionTeam;
-	}
 
-/*	NOTE: all client side now
-
-	// team
-	switch( team ) {
-	case TEAM_RED:
-		ForceClientSkin(client, model, "red");
-//		ForceClientSkin(client, headModel, "red");
-		break;
-	case TEAM_BLUE:
-		ForceClientSkin(client, model, "blue");
-//		ForceClientSkin(client, headModel, "blue");
-		break;
-	}
-	// don't ever use a default skin in teamplay, it would just waste memory
-	// however bots will always join a team but they spawn in as spectator
-	if ( g_gametype.integer >= GT_TEAM && team == TEAM_SPECTATOR) {
-		ForceClientSkin(client, model, "red");
-//		ForceClientSkin(client, headModel, "red");
-	}
-*/
 	// teamInfo
 	s = Info_ValueForKey( userinfo, "teamoverlay" );
-	if ( ! *s || atoi( s ) != 0 ) {
+	if ( ! *s || atoi( s ) != 0 )
 		client->pers.teamInfo = qtrue;
-	} else {
+	else 
 		client->pers.teamInfo = qfalse;
-	}
-	/*
-	s = Info_ValueForKey( userinfo, "cg_pmove_fixed" );
-	if ( !*s || atoi( s ) == 0 ) {
-		client->pers.pmoveFixed = qfalse;
-	}
-	else {
-		client->pers.pmoveFixed = qtrue;
-	}
-	*/
 
 	// team task (0 = none, 1 = offence, 2 = defence)
 	teamTask = atoi(Info_ValueForKey(userinfo, "teamtask"));
@@ -1257,12 +1155,11 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
 	if( isBot ) {
 		ent->r.svFlags |= SVF_BOT;
 		ent->inuse = qtrue;
-		if( !G_BotConnect( clientNum, !firstTime ) ) {
+		if( !G_BotConnect( clientNum, !firstTime ) )
 			return "BotConnectfailed";
-		}
-		if(g_gametype.integer == GT_DUEL){
+
+		if(g_gametype.integer == GT_DUEL)
 			ent->client->realspec = qfalse;
-		}
 	}
 
 	// get and distribute relevent paramters
@@ -1270,31 +1167,22 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
 	ClientUserinfoChanged( clientNum );
 
 	// don't do the "xxx connected" messages if they were carried over from previous level
-	if ( firstTime ) {
+	if ( firstTime )
 		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
-	}
 
 	if ( g_gametype.integer >= GT_TEAM &&
-		client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		client->sess.sessionTeam != TEAM_SPECTATOR )
 		BroadcastTeamChange( client, -1 );
-	}
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
-	// for statistics
-//	client->areabits = areabits;
-//	if ( !client->areabits )
-//		client->areabits = G_Alloc( (trap_AAS_PointReachabilityAreaIndex( NULL ) + 7) / 8 );
-
 //unlagged - backward reconciliation #5
 	// announce it
-	if ( g_delagHitscan.integer ) {
+	if ( g_delagHitscan.integer )
 		trap_SendServerCommand( clientNum, "print \"This server is Unlagged: full lag compensation is ON!\n\"" );
-	}
-	else {
+	else
 		trap_SendServerCommand( clientNum, "print \"This server is Unlagged: full lag compensation is OFF!\n\"" );
-	}
 //unlagged - backward reconciliation #5
 
 	return NULL;
@@ -1350,11 +1238,9 @@ void ClientBegin( int clientNum ) {
 	// locate ent at a spawn point
 	ClientSpawn( ent );
 
-	if ( client->sess.sessionTeam < TEAM_SPECTATOR ) {
-		if ( g_gametype.integer != GT_DUEL  ) {
+	if( client->sess.sessionTeam < TEAM_SPECTATOR && g_gametype.integer != GT_DUEL )
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
-		}
-	}
+
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
 	// count current clients and rank for scoreboard
@@ -1396,13 +1282,14 @@ static void G_RestorePlayerStats(gentity_t *ent, qbool save){
 
 	accuracy_hits = client->accuracy_hits;
 	accuracy_shots = client->accuracy_shots;
-	for ( i = 0 ; i < MAX_PERSISTANT ; i++ ) {
+
+	for ( i = 0 ; i < MAX_PERSISTANT ; i++ )
 		persistant[i] = client->ps.persistant[i];
-	}
+
 	// also save the predictable events otherwise we might get double or dropped events
-	for (i = 0; i < MAX_PS_EVENTS; i++) {
+	for (i = 0; i < MAX_PS_EVENTS; i++)
 		savedEvents[i] = client->ps.events[i];
-	}
+
 	eventSequence = client->ps.eventSequence;
 
 	// save important data
@@ -1414,35 +1301,33 @@ static void G_RestorePlayerStats(gentity_t *ent, qbool save){
 		int weapon2 = client->ps.weapon2;
 
 		// make copies
-		for(i = 0; i < MAX_WEAPONS; i++){
+		for(i = 0; i < MAX_WEAPONS; i++)
 			ammo[i] = client->ps.ammo[i];
-		}
-		for(i = 0; i < MAX_STATS; i++){
+
+		for(i = 0; i < MAX_STATS; i++)
 			stats[i] = client->ps.stats[i];
-		}
-		for(i = 0; i < MAX_POWERUPS; i++){
+
+		for(i = 0; i < MAX_POWERUPS; i++)
 			powerups[i] = client->ps.powerups[i];
-		}
 
 		// reset client
 		memset (client, 0, sizeof(*client));
 
 		// use copies
-		for(i = 0; i < MAX_WEAPONS; i++){
+		for(i = 0; i < MAX_WEAPONS; i++)
 			client->ps.ammo[i] = ammo[i];
-		}
-		for(i = 0; i < MAX_STATS; i++){
+
+		for(i = 0; i < MAX_STATS; i++)
 			client->ps.stats[i] = stats[i];
-		}
-		for(i = 0; i < MAX_POWERUPS; i++){
+
+		for(i = 0; i < MAX_POWERUPS; i++)
 			client->ps.powerups[i] = powerups[i];
-		}
+
 		client->ps.weapon = weapon;
 		client->ps.weapon2 = weapon2;
-
-	} else {
-		memset (client, 0, sizeof(*client));
 	}
+  else 
+		memset (client, 0, sizeof(*client));
 
 	client->pers = saved;
 	client->sess = savedSess;
@@ -1455,12 +1340,12 @@ static void G_RestorePlayerStats(gentity_t *ent, qbool save){
 	client->won = won;
 	client->ps.stats[STAT_WINS] = wins;
 
-	for ( i = 0 ; i < MAX_PERSISTANT ; i++ ) {
+	for ( i = 0 ; i < MAX_PERSISTANT ; i++ )
 		client->ps.persistant[i] = persistant[i];
-	}
-	for (i = 0; i < MAX_PS_EVENTS; i++) {
+
+	for (i = 0; i < MAX_PS_EVENTS; i++)
 		client->ps.events[i] = savedEvents[i];
-	}
+
 	client->ps.eventSequence = eventSequence;
 }
 
@@ -1493,9 +1378,8 @@ void ClientSpawn(gentity_t *ent) {
 	else
 		player_died = client->player_died;
 
-	if(!ent->mappart && g_gametype.integer == GT_DUEL){
+	if(!ent->mappart && g_gametype.integer == GT_DUEL)
 		ent->mappart = rand()%g_maxmapparts+1;
-	}
 
 	// find a spawn point
 	// do it before setting health back up, so farthest
@@ -1541,16 +1425,14 @@ void ClientSpawn(gentity_t *ent) {
 
 			// Tim needs to prevent bots from spawning at the initial point
 			// on q3dm0...
-			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
+			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) )
 				continue;	// try again
-			}
+      
 			// just to be symetric, we have a nohumans option...
-			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) ) {
+			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) )
 				continue;	// try again
-			}
 
 			break;
-
 		} while ( 1 );
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
@@ -1592,16 +1474,15 @@ void ClientSpawn(gentity_t *ent) {
 	trap_GetUserinfo( index, userinfo, sizeof(userinfo) );
 	// set max health
 	client->pers.maxHealth = atoi( Info_ValueForKey( userinfo, "handicap" ) );
-	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > 100 ) {
+	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > 100 )
 		client->pers.maxHealth = 100;
-	}
+
 	// clear entity values
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 	client->ps.eFlags = flags;
 
-	for(i=DM_HEAD_1;i<=DM_LEGS_2;i++){
+	for(i=DM_HEAD_1;i<=DM_LEGS_2;i++)
 		client->ps.powerups[i] = 0;
-	}
 
 	ent->s.groundEntityNum = ENTITYNUM_NONE;
 	ent->client = &level.clients[index];
@@ -1670,9 +1551,7 @@ void ClientSpawn(gentity_t *ent) {
 	SetClientViewAngle( ent, spawn_angles );
 
 	if ( ent->client->sess.sessionTeam >= TEAM_SPECTATOR ) {
-
 	} else {
-
 		if ( g_gametype.integer == GT_DUEL )  {
 			min_money = DU_MIN_MONEY ;
 		}
@@ -1706,7 +1585,6 @@ void ClientSpawn(gentity_t *ent) {
 			client->ps.weapon2 = 0;
 			client->pers.cmd.weapon = WP_NONE;
 		} else if(g_gametype.integer < GT_RTP || player_died){
-
 			client->ps.weapon = WP_REM58;
 			client->ps.weapon2 = 0;
 		}
@@ -1802,9 +1680,8 @@ void ClientDisconnect( int clientNum ) {
 	G_RemoveQueuedBotBegin( clientNum );
 
 	ent = g_entities + clientNum;
-	if ( !ent->client ) {
+	if ( !ent->client )
 		return;
-	}
 
 	// stop any following clients
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
@@ -1842,9 +1719,8 @@ void ClientDisconnect( int clientNum ) {
 
 	CalculateRanks();
 
-	if ( ent->r.svFlags & SVF_BOT ) {
+	if ( ent->r.svFlags & SVF_BOT )
 		BotAIShutdownClient( clientNum, qfalse );
-	}
 }
 
 
