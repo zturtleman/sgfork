@@ -12,3 +12,5 @@ Main section:
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMWhzbmN3d2Zm&hl=en Match cycle description]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMmRjZjg0cmQ3&hl=en SGFork anti-camp system]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfNmQ1N3pyd2Zx&hl=en vanilla SG locational damage description]
+  * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMThmenZ6ejdjaA&hl=en SGFork UI description]
+  * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfNGM3azZrc2c1&hl=en SGFork competitive security description]
