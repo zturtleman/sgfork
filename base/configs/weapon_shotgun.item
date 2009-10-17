@@ -1,0 +1,12 @@
+classname = "weapon_shotgun"
+pickup_sound = "sound/misc/w_pickup.wav"
+world_model = < "models/weapons2/remgauge/e_remington.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/remington"
+xyrelation = "3.000000"
+quantity = "2"
+giType = "IT_WEAPON"
+giTag = "WP_REMINGTON_GAUGE"
+prize = "24"
+weapon_sort = "WS_SHOTGUN"
+precaches = ""
+sounds = ""

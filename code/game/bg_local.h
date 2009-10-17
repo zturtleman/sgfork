@@ -73,6 +73,12 @@ extern	float	pm_flyaccelerate;
 extern	float	pm_friction;
 extern	float	pm_waterfriction;
 extern	float	pm_flightfriction;
+extern  float pm_ladderScale;
+extern  float pm_reloadScale;
+extern  float pm_ladderAnimation;
+extern  float pm_spectatorfriction;
+extern  float pm_ladderfriction;
+extern  float pm_ladderAccelerate;
 
 extern	int		c_pmove;
 

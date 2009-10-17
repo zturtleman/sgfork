@@ -33,24 +33,24 @@ pmove_t		*pm;
 pml_t		pml;
 
 // movement parameters
-float  pm_stopspeed = PM_STOPSPEED;
-float  pm_duckScale = PM_DUCKSCALE;
-float  pm_swimScale = PM_SWIMSCALE;
-float  pm_wadeScale = PM_WADESCALE;
-float  pm_ladderScale = PM_LADDERSCALE;  // Set the max movement speed to 80% of normal
-float  pm_reloadScale = PM_RELOADSCALE;
+float  pm_stopspeed;
+float  pm_duckScale;
+float  pm_swimScale;
+float  pm_wadeScale;
+float  pm_ladderScale;  // Set the max movement speed to 80% of normal
+float  pm_reloadScale;
 
-float  pm_accelerate = PM_ACCELERATE;
-float  pm_airaccelerate = PM_AIRACCELERATE;
-float  pm_wateraccelerate = PM_WATERACCELERATE;
-float  pm_flyaccelerate = PM_FLYACCELERATE;
-float  pm_ladderAccelerate = PM_LADDERACCELERATE;  // The acceleration to friction ratio is 1:1
+float  pm_accelerate;
+float  pm_airaccelerate;
+float  pm_wateraccelerate;
+float  pm_flyaccelerate;
+float  pm_ladderAccelerate;  // The acceleration to friction ratio is 1:1
 
-float  pm_friction = PM_FRICTON;
-float  pm_waterfriction = PM_WATERFRICTION;
-float  pm_flightfriction = PM_FLIGHTFRICTION;
-float  pm_spectatorfriction = PM_SPECFRICTION;
-float  pm_ladderfriction = PM_LADDERFRICTION;  // Friction is high enough so you don't slip down
+float  pm_friction;
+float  pm_waterfriction;
+float  pm_flightfriction;
+float  pm_spectatorfriction;
+float  pm_ladderfriction;  // Friction is high enough so you don't slip down
 
 int		c_pmove = 0;
 

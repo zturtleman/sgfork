@@ -668,7 +668,7 @@ static int CG_DrawPickupItem( int y ) {
 			color[3] = fadeColor[3];
 			CG_RegisterItemVisuals( value );
 			trap_R_SetColor( fadeColor );
-			CG_DrawPic( 320 - 143, y, size*bg_itemlist[value].xyrelation, size, pic );
+			CG_DrawPic( 320 - 143, y, size * bg_itemlist[value].xyrelation, size, pic );
 			trap_R_SetColor( NULL );
 
 			if(!Q_stricmp(bg_itemlist[value].classname, "pickup_money")){
@@ -2186,7 +2186,7 @@ static void CG_SetupItemMenu(void){
 	int count = 0;
 	qbool clone = qfalse; // second "cloned" pistol
 
-	item = bg_itemlist+1;
+	item = &bg_itemlist[1];
 
 	for(i = 1; item->classname; item++){
 		int belt = 1;
@@ -2321,7 +2321,7 @@ static gitem_t *CG_GetBuyItem(void){
 	gitem_t *item;
 	int	j;
 
-	item = bg_itemlist+1;
+	item = &bg_itemlist[1];
 
 	for(j = 0; item->classname; item++){
 		if ( item->weapon_sort != cg.menustat )

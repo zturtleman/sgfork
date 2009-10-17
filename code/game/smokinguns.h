@@ -24,29 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 =============================
-Pmove
-=============================
-*/
-
-#define PM_STOPSPEED 20.0f
-#define PM_DUCKSCALE 0.50f
-#define PM_SWIMSCALE 0.60f
-#define PM_WADESCALE 0.70f
-#define PM_RELOADSCALE 0.75f
-#define PM_ACCELERATE 8.4f
-#define PM_AIRACCELERATE 1.0f
-#define PM_WATERACCELERATE 5.6f
-#define PM_FLYACCELERATE 8.0f
-#define PM_FRICTON 6.0f
-#define PM_WATERFRICTION 1.2f
-#define PM_FLIGHTFRICTION 3.0f
-#define PM_SPECFRICTION 5.0f
-#define PM_LADDERSCALE 0.80f
-#define PM_LADDERACCELERATE 3000
-#define PM_LADDERFRICTION 3000
-
-/*
-=============================
 Weapon part
 =============================
 */

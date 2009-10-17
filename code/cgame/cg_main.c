@@ -847,7 +847,7 @@ static void CG_RegisterSounds( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-	for ( i = 1 ; i < bg_numItems ; i++ ) {
+	for ( i = 1 ; i <= IT_NUM_ITEMS ; i++ ) {
 //		if ( items[ i ] == '1' || cg_buildScript.integer ) {
 			CG_RegisterItemSounds( i );
 
@@ -1249,7 +1249,7 @@ static void CG_RegisterGraphics( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-	for ( i = 1 ; i < bg_numItems ; i++ ) {
+	for ( i = 1 ; i <= IT_NUM_ITEMS ; i++ ) {
 		if ( items[ i ] == '1' || cg_buildScript.integer ) {
 			CG_LoadingItem( i );
 			CG_RegisterItemVisuals( i );
@@ -2399,7 +2399,9 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 	memset( cg_items, 0, sizeof(cg_items) );
 
-  Weapons_GetInfos();
+	CG_Printf ("-----------------------------------\n");
+  config_GetInfos( PFT_WEAPONS | PFT_ITEMS );
+	CG_Printf ("-----------------------------------\n");
 
 	cg.clientNum = clientNum;
 

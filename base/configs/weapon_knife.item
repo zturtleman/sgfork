@@ -1,0 +1,12 @@
+classname = "weapon_knife"
+pickup_sound = "sound/misc/w_pickup.wav"
+world_model = < "models/weapons2/knife/e_knife.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/knife"
+xyrelation = "3.000000"
+quantity = "1"
+giType = "IT_WEAPON"
+giTag = "WP_KNIFE"
+prize = "8"
+weapon_sort = "WS_MISC"
+precaches = ""
+sounds = ""

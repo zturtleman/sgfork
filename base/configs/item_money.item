@@ -1,0 +1,12 @@
+classname = "item_money"
+pickup_sound = "sound/misc/m_pickup.wav"
+world_model = < "models/items/moneybag.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/moneybag"
+xyrelation = "1.000000"
+quantity = "0"
+giType = "IT_POWERUP"
+giTag = "WP_SCHOFIELD"
+prize = "0"
+weapon_sort = "WS_NONE"
+precaches = ""
+sounds = ""
