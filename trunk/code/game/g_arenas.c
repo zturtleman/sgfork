@@ -355,7 +355,7 @@ void SpawnModelsOnVictoryPads( void ) {
 Svcmd_AbortPodium_f
 ===============
 */
-void Svcmd_AbortPodium_f( void ) {
+void Svcmd_AbortPodium_f( char *cmd ) {
 	if( g_gametype.integer != GT_SINGLE_PLAYER ) {
 		return;
 	}

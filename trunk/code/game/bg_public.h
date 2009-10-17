@@ -75,8 +75,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #if defined QAGAME
 #define BG_Error G_Error
+#define BG_Printf G_Printf
 #elif defined CGAME
 #define BG_Error CG_Error
+#define BG_Printf CG_Printf
 #endif
 
 typedef enum {
@@ -914,6 +916,27 @@ typedef enum {
 } wp_buy_type;
 
 typedef struct gitem_s {
+	char		classname[MAX_QPATH];	// spawning name
+	char		pickup_sound[MAX_QPATH];
+	char		world_model[MAX_ITEM_MODELS][MAX_QPATH];
+
+	char		icon[MAX_QPATH];
+	float		xyrelation;		// for the icon
+	char		pickup_name[MAX_QPATH];	// for printing on pickup
+
+	int			quantity;		// for ammo how much, or duration of powerup
+	itemType_t  giType;			// IT_* flags
+
+	int			giTag;
+
+	int			prize;
+	int			weapon_sort;	// used for sorted weapons in changeweapon-menu
+
+	char		precaches[MAX_QPATH];		// string of all models and images this item will use
+	char		sounds[MAX_QPATH];		// string of all sounds this item will use
+} gitem_t;
+
+/*typedef struct gitem_s {
 	char		*classname;	// spawning name
 	char		*pickup_sound;
 	char		*world_model[MAX_ITEM_MODELS];
@@ -932,12 +955,10 @@ typedef struct gitem_s {
 
 	char		*precaches;		// string of all models and images this item will use
 	char		*sounds;		// string of all sounds this item will use
-} gitem_t;
+} gitem_t;*/
 
 // included in both the game dll and the client
-extern	gitem_t	bg_itemlist[];
 extern	wpinfo_t bg_weaponlist[WP_NUM_WEAPONS];
-extern	int		bg_numItems;
 
 gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForClassname( const char *classname );
@@ -1206,12 +1227,36 @@ extern vec3_t gatling_maxs;
 extern vec3_t gatling_mins2;
 extern vec3_t gatling_maxs2;
 
-extern const char *wp_fileNames[];
-extern const char *weapon_numNames[];
-extern const char *weapon_animName[];
-extern const char *weapon_sortNames[];
-extern void Weapons_GetInfos( void );
-extern int BG_WeaponNumByName( char *wp );
+//
+// bg_parse.c
+//
+#define PFT_WEAPONS 0x0001
+#define PFT_ITEMS 0x0002
+#define PFT_GRAVITY 0x0004
+
+#define IT_NUM_ITEMS 27
+
+extern	gitem_t	bg_itemlist[IT_NUM_ITEMS];
+
+typedef struct psf_weapons_s {
+  char *fileName;
+  char *numNames;
+} psf_weapons_t;
+
+extern const char *psf_itemTypes[];
+extern const char *psf_item_fileNames[];
+extern const char *psf_weapon_sortNames[];
+extern const char *psf_weapon_animName[];
+extern const char *psf_weapon_buyType[];
+extern const psf_weapons_t psf_weapons_config[];
+
+extern void parse_config( int fileType, char *fileName, int num );
+extern char *Parse_FindFile( int num, int fileType );
+extern void config_GetInfos( int fileType );
+extern int BG_ItemNumByName( char *name );
 extern int BG_AnimNumByName( char *anim );
-extern char *Weapons_FileForWeapon( int wp_num );
+extern int BG_WeaponNumByName( char *wp );
+int BG_FindWSNumByName( char *s );
+int BG_FindGiTagNumByName( char *s );
+int BG_FindGiTypeByName( char *s );
 

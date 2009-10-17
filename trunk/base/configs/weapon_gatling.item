@@ -1,0 +1,12 @@
+classname = "weapon_gatling"
+pickup_sound = "sound/misc/w_pickup.wav"
+world_model = < "models/weapons2/gatling/e_gatling.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/gatling"
+xyrelation = "1.000000"
+quantity = "25"
+giType = "IT_WEAPON"
+giTag = "WP_GATLING"
+prize = "53"
+weapon_sort = "WS_MGUN"
+precaches = ""
+sounds = ""

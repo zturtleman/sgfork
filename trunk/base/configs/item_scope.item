@@ -1,0 +1,12 @@
+classname = "item_scope"
+pickup_sound = "sound/misc/it_pickup.wav"
+world_model = < "models/weapons2/scope/scope.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/scope"
+xyrelation = "3.000000"
+quantity = "0"
+giType = "IT_POWERUP"
+giTag = "WP_KNIFE"
+prize = "15"
+weapon_sort = "WS_MISC"
+precaches = ""
+sounds = ""

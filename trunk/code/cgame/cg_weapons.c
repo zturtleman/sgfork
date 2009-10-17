@@ -128,7 +128,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 	weaponInfo->registered = qtrue;
 
-	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) {
+  for( item= &bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++ ) {
 		if ( item->giType == IT_WEAPON && item->giTag == weaponNum ) {
 			weaponInfo->item = item;
 			break;
@@ -137,7 +137,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	if ( !item->classname ) {
 		CG_Error( "Couldn't find weapon %i", weaponNum );
 	}
-	CG_RegisterItemVisuals( item - bg_itemlist );
+	CG_RegisterItemVisuals( ITEM_INDEX(item) );
 
 	// load cmodel before model so filecache works
 	weaponInfo->weaponModel = trap_R_RegisterModel( item->world_model[0] );
@@ -151,7 +151,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	weaponInfo->weaponIcon = trap_R_RegisterShader( item->icon );
 	weaponInfo->ammoIcon = trap_R_RegisterShader( item->icon );
 
-	for ( ammo = bg_itemlist + 1 ; ammo->classname ; ammo++ ) {
+  for( ammo = &bg_itemlist[1]; ITEM_INDEX(ammo) < IT_NUM_ITEMS; ammo++ ) {
 		if ( ammo->giType == IT_AMMO && ammo->giTag == weaponNum ) {
 			break;
 		}
@@ -278,8 +278,8 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	itemInfo_t		*itemInfo;
 	gitem_t			*item;
 
-	if ( itemNum < 0 || itemNum >= bg_numItems ) {
-		CG_Error( "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, bg_numItems-1 );
+	if ( itemNum < 0 || itemNum > IT_NUM_ITEMS ) {
+		CG_Error( "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, IT_NUM_ITEMS );
 	}
 
 	itemInfo = &cg_items[ itemNum ];

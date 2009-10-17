@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // this file holds commands that can be executed by the server console, but not remote clients
 
 #include "g_local.h"
+#include "bg_local.h"
 
 
 /*
@@ -263,7 +264,7 @@ void G_ProcessIPBans(void)
 Svcmd_AddIP_f
 =================
 */
-void Svcmd_AddIP_f (void)
+void Svcmd_AddIP_f(char *cmd)
 {
 	char		str[MAX_TOKEN_CHARS];
 
@@ -283,7 +284,7 @@ void Svcmd_AddIP_f (void)
 Svcmd_RemoveIP_f
 =================
 */
-void Svcmd_RemoveIP_f (void)
+void Svcmd_RemoveIP_f(char *cmd)
 {
 	ipFilter_t	f;
 	int			i;
@@ -318,7 +319,7 @@ void Svcmd_RemoveIP_f (void)
 Svcmd_EntityList_f
 ===================
 */
-void	Svcmd_EntityList_f (void) {
+void	Svcmd_EntityList_f(char *cmd) {
 	int			e;
 	gentity_t		*check;
 
@@ -424,7 +425,7 @@ Svcmd_ForceTeam_f
 forceteam <player> <team>
 ===================
 */
-void	Svcmd_ForceTeam_f( void ) {
+void	Svcmd_ForceTeam_f( char *cmd ) {
 	gclient_t	*cl;
 	char		str[MAX_TOKEN_CHARS];
 
@@ -440,7 +441,7 @@ void	Svcmd_ForceTeam_f( void ) {
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
-void Svcmd_KickBots_f(void){
+void Svcmd_KickBots_f(char *cmd){
 	int i;
 	gentity_t *ent;
 
@@ -453,10 +454,13 @@ void Svcmd_KickBots_f(void){
 	}
 }
 
-void Svcmd_Mute( qbool mute )
+void Svcmd_Mute( char *cmd )
 {
   gclient_t *cl;
   char buf[MAX_TOKEN_CHARS];
+  qbool mute;
+
+  mute = ( !Q_stricmp( cmd, "mute" ) ) ? qtrue : qfalse;
 
   trap_Argv( 1, buf, sizeof(buf) );
   cl = ClientForString( buf );
@@ -486,15 +490,13 @@ void Svcmd_Mute( qbool mute )
       (mute) ? "muted" : "unmuted" );
 }
 
-void Svcmd_GameWeapon_f( void ) {
+void Svcmd_GameWeapon_f( char *cmd ) {
   char args[10][25];
   char buf[20000];
   int i, n, bsize;
   int argc = trap_Argc( );
   char *fileName;
   fileHandle_t f;
-  wpinfo_t *wpinfo;
-  animation_t *anim;
 
 
   if( !g_cheats.integer )
@@ -508,132 +510,294 @@ void Svcmd_GameWeapon_f( void ) {
 
   bsize = sizeof(buf);
 
-  if( !Q_stricmp( args[1], "help" ) ) {
+  if( !Q_stricmp( args[1], "help" ) || argc < 2 ) {
     Com_Printf( "config:\n"
-      "  help\n"
-      "  weapons\n"
-      "    save\n"
-      "    load\n"
-      "    modify\n"
-      );
+        "  [help]\n"
+        "  [weapons|items|gravity]\n"
+        "    save\n"
+        "    load\n"
+        "    modify\n"
+        );
   }
-  else if( !Q_stricmp( args[1], "weapons" ) ) {
+  else if( !Q_stricmp( args[1], "gravity" ) ) {
     if( !Q_stricmp( args[2], "save" ) ) {
-      for(i=1; i < WP_NUM_WEAPONS; i++ )
-      {
-        fileName = Weapons_FileForWeapon(i);
+      fileName = Parse_FindFile( 0, PFT_GRAVITY );
+      trap_FS_FOpenFile( fileName, &f, FS_WRITE );
+
+      Com_sprintf( buf, bsize, "// %s created automatically at %i:%i:%i on %i/%i/%i\n\n",
+          fileName, level.qtime.tm_hour, level.qtime.tm_min, level.qtime.tm_sec,
+          level.qtime.tm_mday, level.qtime.tm_mon, level.qtime.tm_year );
+
+      Q_strcat( buf, bsize, va( "pm_stopspeed = \"%f\"\n", pm_stopspeed ) );
+      Q_strcat( buf, bsize, va( "pm_duckScale = \"%f\"\n", pm_duckScale ) );
+      Q_strcat( buf, bsize, va( "pm_swimScale = \"%f\"\n", pm_swimScale ) );
+      Q_strcat( buf, bsize, va( "pm_wadeScale = \"%f\"\n", pm_wadeScale ) );
+      Q_strcat( buf, bsize, va( "pm_ladderScale = \"%f\"\n", pm_ladderScale ) );
+      Q_strcat( buf, bsize, va( "pm_reloadScale = \"%f\"\n", pm_reloadScale ) );
+      Q_strcat( buf, bsize, va( "pm_accelerate = \"%f\"\n", pm_accelerate ) );
+      Q_strcat( buf, bsize, va( "pm_airaccelerate = \"%f\"\n", pm_airaccelerate ) );
+      Q_strcat( buf, bsize, va( "pm_wateraccelerate = \"%f\"\n", pm_wateraccelerate ) );
+      Q_strcat( buf, bsize, va( "pm_flyaccelerate = \"%f\"\n", pm_flyaccelerate ) );
+      Q_strcat( buf, bsize, va( "pm_ladderAccelerate = \"%f\"\n", pm_ladderAccelerate ) );
+      Q_strcat( buf, bsize, va( "pm_friction = \"%f\"\n", pm_friction ) );
+      Q_strcat( buf, bsize, va( "pm_waterfriction = \"%f\"\n", pm_waterfriction ) );
+      Q_strcat( buf, bsize, va( "pm_flightfriction = \"%f\"\n", pm_flightfriction ) );
+      Q_strcat( buf, bsize, va( "pm_spectatorfriction = \"%f\"\n", pm_spectatorfriction ) );
+      Q_strcat( buf, bsize, va( "pm_ladderfriction = \"%f\"\n", pm_ladderfriction ) );
+
+      trap_FS_Write( buf, strlen(buf), f );
+      trap_FS_FCloseFile( f );
+    } else if( !Q_stricmp( args[2], "modify" ) ) {
+      if( !Q_stricmp( args[3], "pm_stopspeed" ) ) 
+        pm_stopspeed = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_duckScale" ) )
+        pm_duckScale = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_swimScale" ) )
+        pm_swimScale = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_wadeScale" ) )
+        pm_wadeScale = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_ladderScale" ) )
+        pm_ladderScale = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_reloadScale" ) )
+        pm_reloadScale = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_accelerate" ) )
+        pm_accelerate = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_airaccelerate" ) )
+        pm_airaccelerate = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_wateraccelerate" ) )
+        pm_wateraccelerate = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_flyaccelerate" ) )
+        pm_flyaccelerate = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_ladderAccelerate" ) )
+        pm_ladderAccelerate = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_friction" ) )
+        pm_friction = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_waterfriction" ) )
+        pm_waterfriction = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_flightfriction" ) )
+        pm_flightfriction = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_spectatorfriction" ) )
+        pm_spectatorfriction = atof(args[4]);
+      else if( !Q_stricmp( args[3], "pm_ladderfriction" ) )
+        pm_ladderfriction = atof(args[4]);
+    }
+    else if( !Q_stricmp( args[2], "load" ) )
+      config_GetInfos( PFT_GRAVITY );
+  }
+  else if( !Q_stricmp( args[1], "items" ) ) {
+    gitem_t *item;
+
+    if( !Q_stricmp( args[2], "save" ) ) {
+      for( i = 0; i < IT_NUM_ITEMS; i++ ) {
+        fileName = Parse_FindFile( i, PFT_ITEMS );
         trap_FS_FOpenFile( fileName, &f, FS_WRITE );
 
-        Com_sprintf( buf, sizeof(buf), "// %s created automatically at %i:%i:%i on %i/%i/%i\n\n",
+        Com_sprintf( buf, bsize, "// %s created automatically at %i:%i:%i on %i/%i/%i\n\n",
             fileName, level.qtime.tm_hour, level.qtime.tm_min, level.qtime.tm_sec,
             level.qtime.tm_mday, level.qtime.tm_mon, level.qtime.tm_year );
 
-        wpinfo = &bg_weaponlist[i];
+        item = &bg_itemlist[i];
 
-        for( n=WP_ANIM_CHANGE; n <= WP_ANIM_SPECIAL2; n++ ) {
-          anim = &wpinfo->animations[n];
-          Q_strcat( buf, bsize, va( "%s\n", weapon_animName[n] ) );
-          Q_strcat( buf, bsize, va( "firstFrame = \"%i\"\n", anim->firstFrame ) );
-          Q_strcat( buf, bsize, va( "numFrames = \"%i\"\n", anim->numFrames ) );
-          Q_strcat( buf, bsize, va( "loopFrames = \"%i\"\n", anim->loopFrames ) );
-          Q_strcat( buf, bsize, va( "frameLerp = \"%i\"\n", anim->frameLerp ) );
-          Q_strcat( buf, bsize, va( "initialLerp = \"%i\"\n", anim->initialLerp ) );
-          Q_strcat( buf, bsize, va( "reversed = \"%i\"\n", anim->reversed ) );
-          Q_strcat( buf, bsize, va( "flipflop = \"%i\"\n", anim->flipflop ) );
-          Q_strcat( buf, bsize, "\n" );
-        }
-
-        Q_strcat( buf, bsize, va( "spread = \"%f\"\n", wpinfo->spread ) );
-        Q_strcat( buf, bsize, va( "damage = \"%f\"\n", wpinfo->damage ) );
-        Q_strcat( buf, bsize, va( "range = \"%i\"\n", wpinfo->range ) );
-        Q_strcat( buf, bsize, va( "addTime = \"%i\"\n", wpinfo->addTime ) );
-        Q_strcat( buf, bsize, va( "count = \"%i\"\n", wpinfo->count ) );
-        Q_strcat( buf, bsize, va( "clipAmmo = \"%i\"\n", wpinfo->clipAmmo ) );
-        Q_strcat( buf, bsize, va( "clip = \"%s\"\n", weapon_numNames[ wpinfo->clip ] ) );
-        Q_strcat( buf, bsize, va( "maxAmmo = \"%i\"\n", wpinfo->maxAmmo ) );
-        Q_strcat( buf, bsize, va( "v_model = \"%s\"\n", wpinfo->v_model ) );
-        Q_strcat( buf, bsize, va( "v_barrel = \"%s\"\n", wpinfo->v_barrel ) );
-        Q_strcat( buf, bsize, va( "snd_fire = \"%s\"\n", wpinfo->snd_fire ) );
-        Q_strcat( buf, bsize, va( "snd_reload = \"%s\"\n", wpinfo->snd_reload ) );
-        Q_strcat( buf, bsize, va( "name = \"%s\"\n", wpinfo->name ) );
-        Q_strcat( buf, bsize, va( "path = \"%s\"\n", wpinfo->path ) );
-        Q_strcat( buf, bsize, va( "wp_sort = \"%s\"\n", weapon_sortNames[ wpinfo->wp_sort ] ) );
+        Q_strcat( buf, bsize, va( "classname = \"%s\"\n", item->classname ) );
+        Q_strcat( buf, bsize, va( "pickup_sound = \"%s\"\n", item->pickup_sound ) );
+        Q_strcat( buf, bsize, va( "world_model = { \"%s\" \"%s\" \"%s\" \"%s\" }\n",
+              item->world_model[0], item->world_model[1], item->world_model[2], item->world_model[3] ) );
+        Q_strcat( buf, bsize, va( "icon = \"%s\"\n", item->icon ) );
+        Q_strcat( buf, bsize, va( "xyrelation = \"%f\"\n", item->xyrelation ) );
+        Q_strcat( buf, bsize, va( "quantity = \"%i\"\n", item->quantity ) );
+        Q_strcat( buf, bsize, va( "giType = \"%s\"\n", psf_itemTypes[ item->giType ] ) );
+        Q_strcat( buf, bsize, va( "giTag = \"%s\"\n", psf_weapons_config[ item->giTag ].numNames ) );
+        Q_strcat( buf, bsize, va( "prize = \"%i\"\n", item->prize ) );
+        Q_strcat( buf, bsize, va( "weapon_sort = \"%s\"\n", psf_weapon_buyType[item->weapon_sort] ) );
+        Q_strcat( buf, bsize, va( "precaches = \"%s\"\n", item->precaches ) );
+        Q_strcat( buf, bsize, va( "sounds = \"%s\"\n", item->sounds ) );
 
         trap_FS_Write( buf, strlen(buf), f );
         trap_FS_FCloseFile( f );
       }
     }
-    else if( !Q_stricmp( args[2], "load" ) ) {
-      G_LogPrintf( "Loading weapons' configuration files.\n" );
-      Weapons_GetInfos( );
-    }
+    // config items modify item_money prize 5
+    else if( !Q_stricmp( args[2], "load" ) )
+      config_GetInfos( PFT_ITEMS );
     else if( !Q_stricmp( args[2], "modify" ) ) {
-      if( !args[3] ) return;
-
-      wpinfo = &bg_weaponlist[ BG_WeaponNumByName(args[3]) ];
-      if( !Q_stricmp( args[4], "anim" ) ) {
-        anim = &wpinfo->animations[ BG_AnimNumByName(args[5]) ];
-
-        if( !Q_stricmp( args[6], "firstFrame" ) )
-          anim->firstFrame = atoi(args[7]);
-        else if( !Q_stricmp( args[6], "numFrames" ) )
-          anim->numFrames = atoi(args[7]);
-        else if( !Q_stricmp( args[6], "loopFrames" ) )
-          anim->loopFrames = atoi(args[7]);
-        else if( !Q_stricmp( args[6], "frameLerp" ) )
-          anim->frameLerp = atoi(args[7]);
-        else if( !Q_stricmp( args[6], "initialLerp" ) )
-          anim->initialLerp = atoi(args[7]);
-        else if( !Q_stricmp( args[6], "reversed" ) )
-          anim->reversed = atoi(args[7]);
-        else if( !Q_stricmp( args[6], "flipflop" ) )
-          anim->flipflop = atoi(args[7]);
-      }
-      else if( !Q_stricmp( args[4], "spread" ) )
-        wpinfo->spread = atof( args[5] );
-      else if( !Q_stricmp( args[4], "damage" ) )
-        wpinfo->damage = atof( args[5] );
-      else if( !Q_stricmp( args[4], "range" ) )
-        wpinfo->range = atoi( args[5] );
-      else if( !Q_stricmp( args[4], "addTime" ) )
-        wpinfo->addTime = atoi( args[5] );
-      else if( !Q_stricmp( args[4], "count" ) )
-        wpinfo->count = atoi( args[5] );
-      else if( !Q_stricmp( args[4], "clipAmmo" ) )
-        wpinfo->clipAmmo = atoi( args[5] );
-      else if( !Q_stricmp( args[4], "clip" ) )
+      if( !Q_stricmp( args[4], "classname" ) )
+        Com_sprintf( item->classname, sizeof(item->classname), args[5] );
+      else if( !Q_stricmp( args[4], "pickup_sound" ) )
+        Com_sprintf( item->pickup_sound, sizeof(item->pickup_sound), args[5] );
+      else if( !Q_stricmp( args[4], "world_model" ) )
       {
-        for(i=0; i <= WP_SEC_PISTOL; i++) {
-          if( !Q_stricmp( weapon_numNames[i], args[5] ) )
-            wpinfo->clip = i;
+        Com_sprintf( item->world_model[0], sizeof(item->world_model[0]), args[5] );
+        Com_sprintf( item->world_model[1], sizeof(item->world_model[0]), args[6] );
+        Com_sprintf( item->world_model[2], sizeof(item->world_model[0]), args[7] );
+        Com_sprintf( item->world_model[3], sizeof(item->world_model[0]), args[8] );
+      }
+      else if( !Q_stricmp( args[4], "icon" ) )
+        Com_sprintf( item->icon, sizeof(item->icon), args[5] );
+      else if( !Q_stricmp( args[4], "xyrelation" ) )
+        item->xyrelation = atof(args[5]);
+      else if( !Q_stricmp( args[4], "quantity" ) )
+        item->quantity = atoi(args[5]);
+      else if( !Q_stricmp( args[4], "giType" ) )
+        item->giType = BG_FindGiTypeByName( args[5] );
+      else if( !Q_stricmp( args[4], "giTag" ) )
+        item->giTag = BG_FindGiTagNumByName( args[5] );
+      else if( !Q_stricmp( args[4], "prize" ) )
+        item->prize = atoi( args[5] );
+      else if( !Q_stricmp( args[4], "weapon_sort" ) )
+        item->weapon_sort = BG_FindWSNumByName( args[5] );
+      else if( !Q_stricmp( args[4], "precaches" ) )
+        Com_sprintf( item->precaches, sizeof(item->precaches), args[5] );
+      else if( !Q_stricmp( args[4], "sounds" ) )
+        Com_sprintf( item->sounds, sizeof(item->sounds), args[5] );
+    }
+    else if( !Q_stricmp( args[1], "weapons" ) ) {
+      wpinfo_t *wpinfo;
+      animation_t *anim;
+
+      if( !Q_stricmp( args[2], "save" ) ) {
+        for(i=1; i < WP_NUM_WEAPONS; i++ )
+        {
+          fileName = Parse_FindFile( i, PFT_WEAPONS );
+          trap_FS_FOpenFile( fileName, &f, FS_WRITE );
+
+          Com_sprintf( buf, bsize, "// %s created automatically at %i:%i:%i on %i/%i/%i\n\n",
+              fileName, level.qtime.tm_hour, level.qtime.tm_min, level.qtime.tm_sec,
+              level.qtime.tm_mday, level.qtime.tm_mon, level.qtime.tm_year );
+
+          wpinfo = &bg_weaponlist[i];
+
+          for( n=WP_ANIM_CHANGE; n <= WP_ANIM_SPECIAL2; n++ ) {
+            anim = &wpinfo->animations[n];
+            Q_strcat( buf, bsize, va( "%s\n", psf_weapon_animName[n] ) );
+            Q_strcat( buf, bsize, va( "firstFrame = \"%i\"\n", anim->firstFrame ) );
+            Q_strcat( buf, bsize, va( "numFrames = \"%i\"\n", anim->numFrames ) );
+            Q_strcat( buf, bsize, va( "loopFrames = \"%i\"\n", anim->loopFrames ) );
+            Q_strcat( buf, bsize, va( "frameLerp = \"%i\"\n", anim->frameLerp ) );
+            Q_strcat( buf, bsize, va( "initialLerp = \"%i\"\n", anim->initialLerp ) );
+            Q_strcat( buf, bsize, va( "reversed = \"%i\"\n", anim->reversed ) );
+            Q_strcat( buf, bsize, va( "flipflop = \"%i\"\n", anim->flipflop ) );
+            Q_strcat( buf, bsize, "\n" );
+          }
+
+          Q_strcat( buf, bsize, va( "spread = \"%f\"\n", wpinfo->spread ) );
+          Q_strcat( buf, bsize, va( "damage = \"%f\"\n", wpinfo->damage ) );
+          Q_strcat( buf, bsize, va( "range = \"%i\"\n", wpinfo->range ) );
+          Q_strcat( buf, bsize, va( "addTime = \"%i\"\n", wpinfo->addTime ) );
+          Q_strcat( buf, bsize, va( "count = \"%i\"\n", wpinfo->count ) );
+          Q_strcat( buf, bsize, va( "clipAmmo = \"%i\"\n", wpinfo->clipAmmo ) );
+          Q_strcat( buf, bsize, va( "clip = \"%s\"\n", psf_weapons_config[wpinfo->clip].numNames ) );
+          Q_strcat( buf, bsize, va( "maxAmmo = \"%i\"\n", wpinfo->maxAmmo ) );
+          Q_strcat( buf, bsize, va( "v_model = \"%s\"\n", wpinfo->v_model ) );
+          Q_strcat( buf, bsize, va( "v_barrel = \"%s\"\n", wpinfo->v_barrel ) );
+          Q_strcat( buf, bsize, va( "snd_fire = \"%s\"\n", wpinfo->snd_fire ) );
+          Q_strcat( buf, bsize, va( "snd_reload = \"%s\"\n", wpinfo->snd_reload ) );
+          Q_strcat( buf, bsize, va( "name = \"%s\"\n", wpinfo->name ) );
+          Q_strcat( buf, bsize, va( "path = \"%s\"\n", wpinfo->path ) );
+          Q_strcat( buf, bsize, va( "wp_sort = \"%s\"\n", psf_weapon_sortNames[ wpinfo->wp_sort ] ) );
+
+          trap_FS_Write( buf, strlen(buf), f );
+          trap_FS_FCloseFile( f );
         }
       }
-      else if( !Q_stricmp( args[4], "maxAmmo" ) )
-        wpinfo->maxAmmo = atoi( args[5] );
-      else if( !Q_stricmp( args[4], "v_model" ) )
-        Com_sprintf( wpinfo->v_model, sizeof(wpinfo->v_model), args[5] );
-      else if( !Q_stricmp( args[4], "v_barrel" ) )
-        Com_sprintf( wpinfo->v_barrel, sizeof( wpinfo->v_barrel), args[5] );
-      else if( !Q_stricmp( args[4], "snd_fire" ) )
-        Com_sprintf( wpinfo->snd_fire, sizeof( wpinfo->snd_fire), args[5] );
-      else if( !Q_stricmp( args[4], "snd_reload" ) )
-        Com_sprintf( wpinfo->snd_reload, sizeof( wpinfo->snd_reload ), args[5] );
-      else if( !Q_stricmp( args[4], "name" ) )
-        Com_sprintf( wpinfo->name, sizeof( wpinfo->name ), args[5] );
-      else if( !Q_stricmp( args[4], "path" ) )
-        Com_sprintf( wpinfo->path, sizeof( wpinfo->path ), args[5] );
-      else if( !Q_stricmp( args[4], "wp_sort" ) )
-      {
-        for( i = WPS_NONE; i < WPS_NUM_ITEMS; i++ ) {
-          if( !Q_stricmp( weapon_sortNames[i], args[5] ) )
-            wpinfo->wp_sort = i;
+      else if( !Q_stricmp( args[2], "load" ) ) {
+        G_LogPrintf( "Loading weapons' configuration files.\n" );
+        config_GetInfos( PFT_WEAPONS );
+      }
+      else if( !Q_stricmp( args[2], "modify" ) ) {
+        if( !args[3] ) return;
+
+        wpinfo = &bg_weaponlist[ BG_WeaponNumByName(args[3]) ];
+        if( !Q_stricmp( args[4], "anim" ) ) {
+          anim = &wpinfo->animations[ BG_AnimNumByName(args[5]) ];
+
+          if( !Q_stricmp( args[6], "firstFrame" ) )
+            anim->firstFrame = atoi(args[7]);
+          else if( !Q_stricmp( args[6], "numFrames" ) )
+            anim->numFrames = atoi(args[7]);
+          else if( !Q_stricmp( args[6], "loopFrames" ) )
+            anim->loopFrames = atoi(args[7]);
+          else if( !Q_stricmp( args[6], "frameLerp" ) )
+            anim->frameLerp = atoi(args[7]);
+          else if( !Q_stricmp( args[6], "initialLerp" ) )
+            anim->initialLerp = atoi(args[7]);
+          else if( !Q_stricmp( args[6], "reversed" ) )
+            anim->reversed = atoi(args[7]);
+          else if( !Q_stricmp( args[6], "flipflop" ) )
+            anim->flipflop = atoi(args[7]);
+        }
+        else if( !Q_stricmp( args[4], "spread" ) )
+          wpinfo->spread = atof( args[5] );
+        else if( !Q_stricmp( args[4], "damage" ) )
+          wpinfo->damage = atof( args[5] );
+        else if( !Q_stricmp( args[4], "range" ) )
+          wpinfo->range = atoi( args[5] );
+        else if( !Q_stricmp( args[4], "addTime" ) )
+          wpinfo->addTime = atoi( args[5] );
+        else if( !Q_stricmp( args[4], "count" ) )
+          wpinfo->count = atoi( args[5] );
+        else if( !Q_stricmp( args[4], "clipAmmo" ) )
+          wpinfo->clipAmmo = atoi( args[5] );
+        else if( !Q_stricmp( args[4], "clip" ) )
+        {
+          for(i=0; i <= WP_SEC_PISTOL; i++) {
+            if( !Q_stricmp( psf_weapons_config[i].numNames, args[5] ) )
+              wpinfo->clip = i;
+          }
+        }
+        else if( !Q_stricmp( args[4], "maxAmmo" ) )
+          wpinfo->maxAmmo = atoi( args[5] );
+        else if( !Q_stricmp( args[4], "v_model" ) )
+          Com_sprintf( wpinfo->v_model, sizeof(wpinfo->v_model), args[5] );
+        else if( !Q_stricmp( args[4], "v_barrel" ) )
+          Com_sprintf( wpinfo->v_barrel, sizeof( wpinfo->v_barrel), args[5] );
+        else if( !Q_stricmp( args[4], "snd_fire" ) )
+          Com_sprintf( wpinfo->snd_fire, sizeof( wpinfo->snd_fire), args[5] );
+        else if( !Q_stricmp( args[4], "snd_reload" ) )
+          Com_sprintf( wpinfo->snd_reload, sizeof( wpinfo->snd_reload ), args[5] );
+        else if( !Q_stricmp( args[4], "name" ) )
+          Com_sprintf( wpinfo->name, sizeof( wpinfo->name ), args[5] );
+        else if( !Q_stricmp( args[4], "path" ) )
+          Com_sprintf( wpinfo->path, sizeof( wpinfo->path ), args[5] );
+        else if( !Q_stricmp( args[4], "wp_sort" ) )
+        {
+          for( i = WPS_NONE; i < WPS_NUM_ITEMS; i++ ) {
+            if( !Q_stricmp( psf_weapon_sortNames[i], args[5] ) )
+              wpinfo->wp_sort = i;
+          }
         }
       }
     }
   }
 }
 
+void Svcmd_ListIPs_f( char *cmd ) {
+  trap_SendConsoleCommand( EXEC_NOW, "g_banIPs\n" );
+}
+
 char	*ConcatArgs( int start );
+
+void Svcmd_Say_f( char *cmd ) {
+  if (g_dedicated.integer) {
+    if( !Q_stricmp (cmd, "say") )
+      trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(1) ) );
+      return;
+    }
+    else if( !Q_stricmp (cmd, "bigtext") || !Q_stricmp (cmd, "cp") ) {
+      const char *arg = ConcatArgs(1);
+      if ( Q_strncmp ("-1", arg, strlen(arg)) == 0 )
+        trap_SendServerCommand( -1, va("cp \"%s\"", ConcatArgs(2) ) );
+      else if ( arg[0]<'0' || arg[0]>'9' )
+        trap_SendServerCommand( -1, va("cp \"%s\"", arg ) );
+      else if (ClientForString(arg)) {
+        int clientNum = atoi(arg);
+        trap_SendServerCommand( clientNum, va("cp \"%s\"", ConcatArgs(2) ) );
+      }
+      return;
+    }
+    // everything else will also be printed as a say command
+    trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(0) ) );
+    return;
+}
 
 /*
 =================
@@ -641,95 +805,42 @@ ConsoleCommand
 
 =================
 */
+typedef struct g_svcmds_gameCmds_s {
+  char *name;
+  void (*cmdHandler)(char *cmd);
+} g_svcmds_gameCmds_t;
+
+static g_svcmds_gameCmds_t consoleCmdsTable[] = {
+  { "entitylist", Svcmd_EntityList_f },
+  { "forceteam", Svcmd_ForceTeam_f },
+  { "mute", Svcmd_Mute },
+  { "unmute", Svcmd_Mute },
+  { "config", Svcmd_GameWeapon_f },
+  { "addbot", Svcmd_AddBot_f },
+  { "kickbots", Svcmd_KickBots_f },
+  { "botlist", Svcmd_BotList_f },
+  { "abort_podium", Svcmd_AbortPodium_f },
+  { "addip", Svcmd_AddIP_f },
+  { "removeip", Svcmd_RemoveIP_f },
+  { "listip", Svcmd_ListIPs_f },
+  { "say", Svcmd_Say_f },
+};
+
+int numConsoleCmds = sizeof( consoleCmdsTable ) / sizeof( consoleCmdsTable[0] );
+
 qbool	ConsoleCommand( void ) {
 	char	cmd[MAX_TOKEN_CHARS];
+  int i;
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
-	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
-		Svcmd_EntityList_f();
-		return qtrue;
-	}
-
-	if ( Q_stricmp (cmd, "forceteam") == 0 ) {
-		Svcmd_ForceTeam_f();
-		return qtrue;
-	}
-
-  if( !Q_stricmp( cmd, "mute" ) ) {
-    Svcmd_Mute(qtrue);
-    return qtrue;
-  } else if( !Q_stricmp( cmd, "unmute" ) ) {
-    Svcmd_Mute(qfalse);
-    return qtrue;
+  for( i=0; i <= numConsoleCmds; i++ ) {
+    if( !Q_stricmp( consoleCmdsTable[i].name, cmd ) )
+    {
+      consoleCmdsTable[i].cmdHandler(cmd);
+      return qtrue;
+    }
   }
-
-	if (Q_stricmp (cmd, "game_memory") == 0) {
-		Svcmd_GameMem_f();
-		return qtrue;
-	}
-
-  if( !Q_stricmp( cmd, "config" ) ) {
-    Svcmd_GameWeapon_f();
-    return qtrue;
-  }
-
-	if (Q_stricmp (cmd, "addbot") == 0) {
-		Svcmd_AddBot_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "kickbots") == 0) {
-		Svcmd_KickBots_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "botlist") == 0) {
-		Svcmd_BotList_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "abort_podium") == 0) {
-		Svcmd_AbortPodium_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "addip") == 0) {
-		Svcmd_AddIP_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "removeip") == 0) {
-		Svcmd_RemoveIP_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "listip") == 0) {
-		trap_SendConsoleCommand( EXEC_NOW, "g_banIPs\n" );
-		return qtrue;
-	}
-
-	if (g_dedicated.integer) {
-		if (Q_stricmp (cmd, "say") == 0) {
-			trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(1) ) );
-			return qtrue;
-		}
-		else if (Q_stricmp (cmd, "bigtext") == 0 || Q_stricmp (cmd, "cp") == 0) {
-			const char *arg = ConcatArgs(1);
-			if ( Q_strncmp ("-1", arg, strlen(arg)) == 0 )
-				trap_SendServerCommand( -1, va("cp \"%s\"", ConcatArgs(2) ) );
-			else if ( arg[0]<'0' || arg[0]>'9' )
-				trap_SendServerCommand( -1, va("cp \"%s\"", arg ) );
-			else if (ClientForString(arg)) {
-				int clientNum = atoi(arg);
-				trap_SendServerCommand( clientNum, va("cp \"%s\"", ConcatArgs(2) ) );
-			}
-			return qtrue;
-		}
-		// everything else will also be printed as a say command
-		trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(0) ) );
-		return qtrue;
-	}
 
 	return qfalse;
 }

@@ -58,7 +58,7 @@ void CG_LoadingStage( int amount){
 		// set loading_all
 		// +items
 		strcpy( items, CG_ConfigString( CS_ITEMS) );
-		for ( i = 1 ; i < bg_numItems ; i++ ) {
+		for ( i = 1 ; i < IT_NUM_ITEMS ; i++ ) {
 			if ( items[ i ] == '1' || cg_buildScript.integer )
 				loading_all += 1.5;
 		}

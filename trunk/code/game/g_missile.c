@@ -443,7 +443,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace, int shaderNum ) {
 
 		item = BG_FindItemForWeapon(WP_KNIFE);
 
-		ent->s.modelindex = item-bg_itemlist;
+		ent->s.modelindex = ITEM_INDEX(item);
 		ent->s.modelindex2 = 1;
 
 		ent->item = item;
@@ -631,7 +631,7 @@ void G_Suck( gentity_t *self ) {
 
 		self->s.apos.trDelta[0] = 0;
 
-		self->s.modelindex = item- bg_itemlist;
+		self->s.modelindex = ITEM_INDEX(item);
 		self->s.modelindex2 = 1;
 
 		self->item = item;

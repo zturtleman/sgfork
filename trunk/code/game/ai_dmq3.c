@@ -1801,7 +1801,7 @@ void BotCheckBuy(bot_state_t *bs){
 		int j;
 		qbool qcontinue = qfalse;
 
-		item = bg_itemlist+i;
+		item = &bg_itemlist[i];
 
 		if(!item->classname)
 			break;
@@ -1847,8 +1847,8 @@ void BotCheckBuy(bot_state_t *bs){
 		}
 
 		if(item->prize <= money &&
-			(item->prize > (bg_itemlist+mark)->prize ||
-			item->prize > (bg_itemlist+mark2)->prize)){
+			(item->prize > (&bg_itemlist[mark])->prize ||
+			item->prize > (&bg_itemlist[mark2])->prize)){
 			mark2 = mark;
 			mark = i;
 		}
@@ -1856,9 +1856,9 @@ void BotCheckBuy(bot_state_t *bs){
 
 	// now buy the weapon
 	if(rand()%2 || mark2 == -1)
-		item = bg_itemlist+mark;
+		item = &bg_itemlist[mark];
 	else
-		item = bg_itemlist+mark2;
+		item = &bg_itemlist[mark2];
 
 	if(mark != -1 || mark2 != -1){
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
@@ -1875,7 +1875,7 @@ void BotCheckBuy(bot_state_t *bs){
 	// if still some money, buy a misc item
 	for(i=1, mark = -1, mark2 = -1; ; i++){
 
-		item = bg_itemlist+i;
+		item = &bg_itemlist[i];
 
 		if(!item->classname)
 			break;
@@ -1906,9 +1906,9 @@ void BotCheckBuy(bot_state_t *bs){
 
 	// now buy the item
 	if(rand()%2 || mark2 == -1)
-		item = bg_itemlist+mark;
+		item = &bg_itemlist[mark];
 	else
-		item = bg_itemlist+mark2;
+		item = &bg_itemlist[mark2];
 
 	if(mark != -1 || mark2 != -1){
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));

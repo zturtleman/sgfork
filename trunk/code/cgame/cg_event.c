@@ -681,7 +681,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			int		index = 1;
 			quantity = es->eventParm;		// player predicted
 
-			item = bg_itemlist + 1;
+			item = &bg_itemlist[1];
 			for( ;item->classname; item++){
 				if(!Q_stricmp(item->classname, "pickup_money"))
 					break;
@@ -708,7 +708,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-			if ( index < 1 || index >= bg_numItems ) {
+			if ( index < 1 || index > IT_NUM_ITEMS ) {
 				break;
 			}
 			item = &bg_itemlist[ index ];

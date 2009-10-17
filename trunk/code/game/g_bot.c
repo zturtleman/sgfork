@@ -744,7 +744,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 Svcmd_AddBot_f
 ===============
 */
-void Svcmd_AddBot_f( void ) {
+void Svcmd_AddBot_f( char *cmd ) {
 	float			skill;
 	int				delay;
 	char			name[MAX_TOKEN_CHARS];
@@ -803,7 +803,7 @@ void Svcmd_AddBot_f( void ) {
 Svcmd_BotList_f
 ===============
 */
-void Svcmd_BotList_f( void ) {
+void Svcmd_BotList_f( char *cmd ) {
 	int i;
 	char name[MAX_TOKEN_CHARS];
 	char funname[MAX_TOKEN_CHARS];

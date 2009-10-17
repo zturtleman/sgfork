@@ -1,0 +1,12 @@
+classname = "weapon_lightning"
+pickup_sound = "sound/misc/w_pickup.wav"
+world_model = < "models/weapons2/colt_light/e_lightning.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/lightning"
+xyrelation = "3.000000"
+quantity = "12"
+giType = "IT_WEAPON"
+giTag = "WP_LIGHTNING"
+prize = "30"
+weapon_sort = "WS_RIFLE"
+precaches = ""
+sounds = ""

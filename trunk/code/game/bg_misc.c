@@ -42,566 +42,8 @@ vec3_t gatling_mins2 = {GATLING_MINS2_PITCH, GATLING_MINS2_YAW, GATLING_MINS2_RO
 vec3_t gatling_maxs2 = {GATLING_MAXS2_PITCH, GATLING_MAXS2_YAW, GATLING_MAXS2_ROLL};
 
 //weapon informations
-wpinfo_t bg_weaponlist[WP_NUM_WEAPONS];
-
-/*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
-DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.
-The suspended flag will allow items to hang in the air, otherwise they are dropped to the next surface.
-
-If an item is the target of another entity, it will not spawn in until fired.
-
-An item fires all of its targets when it is picked up.  If the toucher can't carry it, the targets won't be fired.
-
-"notfree" if set to 1, don't spawn in free for all games
-"notteam" if set to 1, don't spawn in team games
-"notsingle" if set to 1, don't spawn in single player games
-"wait"	override the default wait before respawning.  -1 = never respawn automatically, which can be used with targeted spawning.
-"random" random number of plus or minus seconds varied from the respawn time
-"count" override quantity or duration on most items.
-*/
-gitem_t	bg_itemlist[] =
-{
-	{
-		NULL,
-		NULL,
-		{ NULL,
-		NULL, NULL, NULL } ,
-/* icon */		NULL,
-		0.0f,
-/* pickup */	NULL,
-		0,
-		0,
-		0,
-		0,// $
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},	// leave index 0 alone
-
-	//
-	// ARMOR
-	//
-
-/*QUAKED item_boiler_plate (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"item_boiler_plate",
-		"sound/misc/it_pickup.wav",
-		{ "models/powerups/holdable/boiler.md3",
-		NULL, NULL, NULL} ,
-/* icon */		"hud/weapons/boiler",
-		1,
-/* pickup */	"Boiler Plate",
-		BOILER_PLATE,
-		IT_ARMOR,
-		0,
-		15,
-		WS_MISC,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	//
-	// POWERUP ITEMS
-	//
-
-// has to be in front of item money because of many reasons ;)
-/*QUAKED pickup_money (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"pickup_money",
-		"sound/misc/m_pickup.wav",
-        { "models/items/moneybag.md3",
-        NULL, NULL, NULL },
-/* icon */		"hud/weapons/moneybag",
-		1,
-/* pickup */	"Money",
-		0,
-		IT_POWERUP,
-		PW_GOLD,
-		0,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED item_money (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"item_money",
-		"sound/misc/m_pickup.wav",
-        { "models/items/moneybag.md3",
-        NULL, NULL, NULL },
-/* icon */		"hud/weapons/moneybag",
-		1,
-/* pickup */	"Moneybag",
-		0,
-		IT_POWERUP,
-		PW_GOLD,
-		0,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED item_scope (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"item_scope",
-		"sound/misc/it_pickup.wav",
-        { "models/weapons2/scope/scope.md3",
-        NULL, NULL, NULL },
-/* icon */		"hud/weapons/scope",
-		3,
-/* pickup */	"Scope",
-		0,
-		IT_POWERUP,
-		PW_SCOPE,
-		15,
-		WS_MISC,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED item_belt (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"item_belt",
-		"sound/misc/it_pickup.wav",
-        { "models/powerups/holdable/belt.md3",
-        NULL, NULL, NULL },
-/* icon */		"hud/weapons/belt",
-		1,
-/* pickup */	"Ammunition Belt",
-		0,
-		IT_POWERUP,
-		PW_BELT,
-		10,
-		WS_MISC,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-
-	//
-	// WEAPONS
-	//
-
-/*QUAKED weapon_winch66 (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_winch66",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/winch66/e_winchester66.md3",
-		NULL, NULL, NULL },
-/* icon */		"hud/weapons/winch66",
-		3,
-/* pickup */	"Winchester 1866",
-		12,
-		IT_WEAPON,
-		WP_WINCHESTER66,
-		25,
-		WS_RIFLE,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	/*QUAKED weapon_lightning (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_lightning",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/colt_light/e_lightning.md3",
-		NULL, NULL, NULL },
-/* icon */		"hud/weapons/lightning",
-		3,
-/* pickup */	"Colt Lightning",
-		12,
-		IT_WEAPON,
-		WP_LIGHTNING,
-		30,
-		WS_RIFLE,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-
-	/*QUAKED weapon_sharps (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_sharps",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/sharps/e_sharps.md3",
-		NULL, NULL, NULL },
-/* icon */		"hud/weapons/sharps",
-		3,
-/* pickup */	"Sharps Rifle",
-		1,
-		IT_WEAPON,
-		WP_SHARPS,
-		40,
-		WS_RIFLE,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-		/*QUAKED weapon_gatling (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_gatling",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/gatling/e_gatling.md3",
-		NULL, NULL, NULL },
-/* icon */		"hud/weapons/gatling",
-		1,
-/* pickup */	"Gatling Gun",
-		25,
-		IT_WEAPON,
-		WP_GATLING,
-		53,
-		WS_MGUN,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-//
-// PISTOLS
-//
-
-/*QUAKED weapon_remington58 (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_remington58",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/remington58/e_remington58.md3",
-		NULL, NULL, NULL },
-/* icon */		"hud/weapons/rem58",
-		3,
-/* pickup */	"Remington58",
-		6,
-		IT_WEAPON,
-		WP_REM58,
-		15,
-		WS_PISTOL,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_schofield (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_schofield",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/schofield/e_schofield.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/schofield",
-		3,
-/* pickup */	"S&W Schofield",
-		6,
-		IT_WEAPON,
-		WP_SCHOFIELD,
-		18,
-		WS_PISTOL,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_peacemaker (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_peacemaker",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/peacemaker/e_peacemaker.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/peacemaker",
-		3,
-/* pickup */	"Colt Peacemaker",
-		6,
-		IT_WEAPON,
-		WP_PEACEMAKER,
-		22,
-		WS_PISTOL,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_dynamite (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_dynamite",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/dyn/e_dynamite.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/dynamite",
-		3,
-/* pickup */	"Dynamite",
-		1,
-		IT_WEAPON,
-		WP_DYNAMITE,
-		10,
-		WS_MISC,
-/* precache */ "",
-/* sounds */ ""//sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav"
-	},
-
-	/*QUAKED weapon_molotov (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_molotov",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/molotov/e_molotov.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/molotov",
-		3,
-/* pickup */	"Molotov Cocktail",
-		1,
-		IT_WEAPON,
-		WP_MOLOTOV,
-		10,
-		WS_MISC,
-/* precache */ "",
-/* sounds */ ""//sound/weapons/grenade/hgrenb1a.wav sound/weapons/grenade/hgrenb2a.wav"
-	},
-
-
-/*QUAKED weapon_knife (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_knife",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/knife/e_knife.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/knife",
-		3,
-/* pickup */	"Bowie Knife",
-		1,
-		IT_WEAPON,
-		WP_KNIFE,
-		8,
-		WS_MISC,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-
-/*QUAKED weapon_shotgun (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_shotgun",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/remgauge/e_remington.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/remington",
-		3,
-/* pickup */	"Remington 12 Gauge",
-		2,
-		IT_WEAPON,
-		WP_REMINGTON_GAUGE,
-		24,
-		WS_SHOTGUN,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_sawedoff (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_sawedoff",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/sawedoff/e_sawedoff.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/sawedoff",
-		3,
-/* pickup */	"Sawed Off Shotgun",
-		2,
-		IT_WEAPON,
-		WP_SAWEDOFF,
-		27,
-		WS_SHOTGUN,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-			/*QUAKED weapon_winch97 (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_winch97",
-		"sound/misc/w_pickup.wav",
-        { "models/weapons2/winch97/e_winch97.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/winch97",
-		3,
-/* pickup */	"Winchester 1897",
-		5,
-		IT_WEAPON,
-		WP_WINCH97,
-		33,
-		WS_SHOTGUN,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	//
-	// AMMO ITEMS
-	//
-
-/*QUAKED ammo_shells (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_shells",
-		"sound/misc/am_pickup.wav",
-        { "models/powerups/ammo/shotgammo.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/ammo_shell",
-		3.2f,
-/* pickup */	"Shells",
-		12,
-		IT_AMMO,
-		WP_SHELLS_CLIP,
-		5,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED ammo_bullets (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_bullets",
-		"sound/misc/am_pickup.wav",
-        { "models/powerups/ammo/pistolammo.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/ammo_bullet",
-		3.3f,
-/* pickup */	"Bullets",
-		12,
-		IT_AMMO,
-		WP_BULLETS_CLIP,
-		5,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED ammo_dynamite (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_dynamite",
-		"sound/misc/am_pickup.wav",
-        { "models/powerups/ammo/dynammo.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/dynamite",
-		3,
-/* pickup */	"Dynamite",
-		5,
-		IT_AMMO,
-		WP_DYNAMITE,
-		16,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	/*QUAKED ammo_molotov (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_molotov",
-		"sound/misc/am_pickup.wav",
-        { "models/weapons2/molotov/e_molotov.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/molotov",
-		3,
-/* pickup */	"Mol. Cocktails",
-		5,
-		IT_AMMO,
-		WP_MOLOTOV,
-		14,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	/*QUAKED ammo_knives (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_knives",
-		"sound/misc/am_pickup.wav",
-        { "models/weapons2/knife/e_knife.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/weapons/knife",
-		3,
-/* pickup */	"Knives",
-		5,
-		IT_AMMO,
-		WP_KNIFE,
-		17,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED ammo_cartridges (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_cartridges",
-		"sound/misc/am_pickup.wav",
-        { "models/powerups/ammo/rifleammo.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/ammo_cart",
-		4.1f,
-/* pickup */	"Cartridges",
-		12,
-		IT_AMMO,
-		WP_CART_CLIP,
-		5,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	/*QUAKED ammo_gatling (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_gatling",
-		"sound/misc/am_pickup.wav",
-        { "models/powerups/ammo/rifleammo.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/ammo_sharps",
-		5.3f,
-/* pickup */	"Gatling Gun Ammo",
-		1,
-		IT_AMMO,
-		WP_GATLING_CLIP,
-		5,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-		/*QUAKED ammo_sharps (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"ammo_sharps",
-		"sound/misc/am_pickup.wav",
-        { "models/powerups/ammo/rifleammo.md3",
-		NULL, NULL, NULL } ,
-/* icon */		"hud/ammo_sharps",
-		5.3f,
-/* pickup */	"Sharps Ammo",
-		12,
-		IT_AMMO,
-		WP_SHARPS_CLIP,
-		5,
-		0,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-	// end of list marker
-	{NULL}
-};
-
-int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
+wpinfo_t bg_weaponlist[ WP_NUM_WEAPONS ];
+gitem_t	bg_itemlist[ IT_NUM_ITEMS ];
 
 /*
 ==============
@@ -611,7 +53,7 @@ BG_FindItemForPowerup
 gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
 	int		i;
 
-	for ( i = 0 ; i < bg_numItems ; i++ ) {
+	for ( i = 0 ; i < IT_NUM_ITEMS ; i++ ) {
 		if ( (bg_itemlist[i].giType == IT_POWERUP || 
 					bg_itemlist[i].giType == IT_TEAM ||
 					bg_itemlist[i].giType == IT_PERSISTANT_POWERUP) && 
@@ -632,7 +74,7 @@ BG_FindItemForHoldable
 gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
 	int		i;
 
-	for ( i = 0 ; i < bg_numItems ; i++ ) {
+	for ( i = 0 ; i < IT_NUM_ITEMS ; i++ ) {
 		if ( bg_itemlist[i].giType == IT_HOLDABLE && bg_itemlist[i].giTag == pw ) {
 			return &bg_itemlist[i];
 		}
@@ -652,7 +94,7 @@ BG_FindItemForWeapon
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 	gitem_t	*it;
 
-	for ( it = bg_itemlist + 1 ; it->classname ; it++) {
+	for ( it = &bg_itemlist[1] ; it->classname ; it++) {
 		if ( it->giType == IT_WEAPON && it->giTag == weapon ) {
 			return it;
 		}
@@ -671,7 +113,7 @@ BG_FindItemForAmmo
 gitem_t	*BG_FindItemForAmmo( weapon_t ammo ) {
 	gitem_t	*it;
 
-	for ( it = bg_itemlist + 1 ; it->classname ; it++) {
+	for ( it = &bg_itemlist[1] ; it->classname ; it++) {
 		if ( it->giType == IT_AMMO && it->giTag == ammo ) {
 			return it;
 		}
@@ -706,7 +148,7 @@ by Spoon
 gitem_t	*BG_FindItemForClassname( const char *classname ) {
 	gitem_t	*it;
 
-	for ( it = bg_itemlist + 1 ; it->classname ; it++ ) {
+	for ( it = &bg_itemlist[1]; it->classname ; it++ ) {
 		if ( !Q_stricmp( it->classname, classname ) )
 			return it;
 	}
@@ -723,7 +165,7 @@ BG_FindItem
 gitem_t	*BG_FindItem( const char *pickupName ) {
 	gitem_t	*it;
 
-	for ( it = bg_itemlist + 1 ; it->classname ; it++ ) {
+	for ( it = &bg_itemlist[1]; it->classname ; it++ ) {
 		if ( !Q_stricmp( it->pickup_name, pickupName ) )
 			return it;
 	}
@@ -782,7 +224,7 @@ qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerS
 		return qfalse;
 	}
 
-	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
+	if ( ent->modelindex < 1 || ent->modelindex > IT_NUM_ITEMS ) {
 		return qfalse;
 	}
 

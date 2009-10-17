@@ -813,7 +813,7 @@ qbool CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 //
 void *G_Alloc( int size );
 void G_InitMemory( void );
-void Svcmd_GameMem_f( void );
+void Svcmd_GameMem_f( char *cmd );
 
 //
 // g_session.c
@@ -829,7 +829,7 @@ void G_WriteSessionData( void );
 //
 void UpdateTournamentInfo( void );
 void SpawnModelsOnVictoryPads( void );
-void Svcmd_AbortPodium_f( void );
+void Svcmd_AbortPodium_f( char *cmd );
 
 //
 // g_bot.c
@@ -840,8 +840,8 @@ char *G_GetBotInfoByName( const char *name );
 void G_CheckBotSpawn( void );
 void G_RemoveQueuedBotBegin( int clientNum );
 qbool G_BotConnect( int clientNum, qbool restart );
-void Svcmd_AddBot_f( void );
-void Svcmd_BotList_f( void );
+void Svcmd_AddBot_f( char *cmd );
+void Svcmd_BotList_f( char *cmd );
 void BotInterbreedEndMatch( void );
 
 // ai_main.c

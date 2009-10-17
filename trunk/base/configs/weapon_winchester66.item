@@ -1,0 +1,12 @@
+classname = "weapon_winch66"
+pickup_sound = "sound/misc/w_pickup.wav"
+world_model = < "models/weapons2/winch66/e_winchester66.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/winch66"
+xyrelation = "3.000000"
+quantity = "12"
+giType = "IT_WEAPON"
+giTag = "WP_WINECHESTER66"
+prize = "25"
+weapon_sort = "WS_RIFLE"
+precaches = ""
+sounds = ""
