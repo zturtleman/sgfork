@@ -635,26 +635,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
   config_GetInfos( PFT_WEAPONS | PFT_ITEMS | PFT_GRAVITY );
 	G_Printf ("-----------------------------------\n");
 
-  for(i=0; i < IT_NUM_ITEMS; i++ ) {
-    /*  
-        G_Printf( "(%i) classname = %s\n", i, bg_itemlist[i].classname );
-        G_Printf( "(%i) pickup_sound = %s\n", i, bg_itemlist[i].pickup_sound );
-        */    
-    G_Printf( "(%i) world_model[0] = %s\n", i, bg_itemlist[i].world_model[0] );
-    G_Printf( "(%i) world_model[1] = %s\n", i, bg_itemlist[i].world_model[1] );
-    G_Printf( "(%i) world_model[2] = %s\n", i, bg_itemlist[i].world_model[2] );
-    G_Printf( "(%i) world_model[3] = %s\n", i, bg_itemlist[i].world_model[3] );
-    /*  G_Printf( "(%i) xyrelation = %f\n", i, bg_itemlist[i].xyrelation );
-        G_Printf( "(%i) quantity = %i\n", i, bg_itemlist[i].quantity );
-        G_Printf( "(%i) giType = %i\n", i, bg_itemlist[i].giType );
-        G_Printf( "(%i) giTag = %i\n", i, bg_itemlist[i].giTag );
-        G_Printf( "(%i) prize = %i\n", i, bg_itemlist[i].prize );
-        G_Printf( "(%i) weapon_sort = %i\n", i, bg_itemlist[i].weapon_sort );
-        G_Printf( "(%i) precaches = %s\n", i, bg_itemlist[i].precaches );
-        G_Printf( "(%i) sounds = %s\n", i, bg_itemlist[i].sounds );
-        */
-  }
-
 	//read shader info
 	Com_sprintf(map2, sizeof(map), "maps/%s.tex", map);
 	G_ParseTexFile(map2);

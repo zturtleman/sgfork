@@ -545,7 +545,7 @@ void Svcmd_GameWeapon_f( char *cmd ) {
       Q_strcat( buf, bsize, va( "pm_spectatorfriction = \"%f\"\n", pm_spectatorfriction ) );
       Q_strcat( buf, bsize, va( "pm_ladderfriction = \"%f\"\n", pm_ladderfriction ) );
 
-      trap_FS_Write( buf, strlen(buf), f );
+      trap_FS_Write( buf, bsize, f );
       trap_FS_FCloseFile( f );
     } else if( !Q_stricmp( args[2], "modify" ) ) {
       if( !Q_stricmp( args[3], "pm_stopspeed" ) ) 
@@ -588,7 +588,7 @@ void Svcmd_GameWeapon_f( char *cmd ) {
     gitem_t *item;
 
     if( !Q_stricmp( args[2], "save" ) ) {
-      for( i = 0; i < IT_NUM_ITEMS; i++ ) {
+      for( i = 1; i < IT_NUM_ITEMS; i++ ) {
         fileName = Parse_FindFile( i, PFT_ITEMS );
         trap_FS_FOpenFile( fileName, &f, FS_WRITE );
 
@@ -612,11 +612,10 @@ void Svcmd_GameWeapon_f( char *cmd ) {
         Q_strcat( buf, bsize, va( "precaches = \"%s\"\n", item->precaches ) );
         Q_strcat( buf, bsize, va( "sounds = \"%s\"\n", item->sounds ) );
 
-        trap_FS_Write( buf, strlen(buf), f );
+        trap_FS_Write( buf, bsize, f );
         trap_FS_FCloseFile( f );
       }
     }
-    // config items modify item_money prize 5
     else if( !Q_stricmp( args[2], "load" ) )
       config_GetInfos( PFT_ITEMS );
     else if( !Q_stricmp( args[2], "modify" ) ) {
@@ -695,7 +694,7 @@ void Svcmd_GameWeapon_f( char *cmd ) {
           Q_strcat( buf, bsize, va( "path = \"%s\"\n", wpinfo->path ) );
           Q_strcat( buf, bsize, va( "wp_sort = \"%s\"\n", psf_weapon_sortNames[ wpinfo->wp_sort ] ) );
 
-          trap_FS_Write( buf, strlen(buf), f );
+          trap_FS_Write( buf, bsize, f );
           trap_FS_FCloseFile( f );
         }
       }

@@ -198,14 +198,17 @@ void parse_config( int fileType, char *fileName, int num )
           parse_TokToDest( item->classname, s );
         else if( !Q_stricmp( t, "pickup_sound" ) )
           parse_TokToDest( item->pickup_sound, s );
-        /*else if( !Q_stricmp( t, "world_model" ) ) {
-          t = parse_getChar(s);
-          t = parse_getChar(s);
+        else if( !Q_stricmp( t, "world_model" ) ) {
+          COM_ParseExt(&s, qfalse);
+          COM_ParseExt(&s, qfalse);
           parse_TokToDest( item->world_model[0], s );
+          COM_ParseExt(&s, qfalse);
           parse_TokToDest( item->world_model[1], s );
+          COM_ParseExt(&s, qfalse);
           parse_TokToDest( item->world_model[2], s );
+          COM_ParseExt(&s, qfalse);
           parse_TokToDest( item->world_model[3], s );
-        }*/
+        }
         else if( !Q_stricmp( t, "icon" ) )
           parse_TokToDest( item->icon, s );
         else if( !Q_stricmp( t, "xyrelation" ) )

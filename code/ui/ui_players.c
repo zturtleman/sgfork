@@ -68,7 +68,7 @@ tryagain:
 		return;
 	}
 
-	for ( item = bg_itemlist + 1; item->classname ; item++ ) {
+  for( item=&bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++ ) {
 		if ( item->giType != IT_WEAPON ) {
 			continue;
 		}
