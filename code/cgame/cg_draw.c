@@ -738,7 +738,7 @@ static float CG_DrawScores( float y ) {
 		//To be redone for BR game type
 /*		if ( cgs.gametype == GT_CTF ) {
 			// Display flag status
-			item = BG_FindItemForPowerup( PW_BLUEFLAG );
+			item = BG_ItemForPowerup( PW_BLUEFLAG );
 
 			if (item) {
 				y1 = y - BIGCHAR_HEIGHT - 8;
@@ -763,7 +763,7 @@ static float CG_DrawScores( float y ) {
 		//To be redone for BR game type
 		/*if ( cgs.gametype == GT_CTF ) {
 			// Display flag status
-			item = BG_FindItemForPowerup( PW_REDFLAG );
+			item = BG_ItemForPowerup( PW_REDFLAG );
 
 			if (item) {
 				y1 = y - BIGCHAR_HEIGHT - 8;
@@ -905,7 +905,7 @@ static float CG_DrawPowerups( float y ) {
 	// draw the icons and timers
 	x = 640 - ICON_SIZE - CHAR_WIDTH * 2;
 	for ( i = 0 ; i < active ; i++ ) {
-		item = BG_FindItemForPowerup( sorted[i] );
+		item = BG_ItemForPowerup( sorted[i] );
 
     if (item) {
 
@@ -2203,7 +2203,7 @@ static void CG_SetupItemMenu(void){
 		if((item->giTag == WP_DYNAMITE || item->giTag == WP_KNIFE || item->giTag == WP_MOLOTOV) &&
 			item->giType == IT_WEAPON){
 			gitem_t	*ammoitem;
-			ammoitem = BG_FindItemForAmmo(item->giTag);
+			ammoitem = BG_ItemForAmmo(item->giTag);
 			Q_strncpyz(menu_items[count].string, va("%s(%i)", ammoitem->pickup_name, ammoitem->quantity), 64);
 		}
 
@@ -2456,9 +2456,9 @@ static void CG_DrawBuyMenu( void ) {
 				cg.menustat <= 7 ){
 
 				if(cg.menustat == 6)
-					item = BG_FindItemForAmmo(WP_BULLETS_CLIP);
+					item = BG_ItemForAmmo(WP_BULLETS_CLIP);
 				else
-					item = BG_FindItemForAmmo(WP_CART_CLIP);
+					item = BG_ItemForAmmo(WP_CART_CLIP);
 
 				if(item->classname){
 					trap_SendConsoleCommand(va("cg_buy %s\n", item->classname));

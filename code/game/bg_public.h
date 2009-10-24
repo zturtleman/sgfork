@@ -79,6 +79,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #elif defined CGAME
 #define BG_Error CG_Error
 #define BG_Printf CG_Printf
+#elif defined UI
+#define BG_Error trap_Error
 #endif
 
 typedef enum {
@@ -960,13 +962,13 @@ typedef struct gitem_s {
 // included in both the game dll and the client
 extern	wpinfo_t bg_weaponlist[WP_NUM_WEAPONS];
 
-gitem_t	*BG_FindItem( const char *pickupName );
-gitem_t	*BG_FindItemForClassname( const char *classname );
-gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
-gitem_t	*BG_FindItemForAmmo( weapon_t ammo ) ;
-gitem_t	*BG_FindItemForPowerup( powerup_t pw );
-gitem_t	*BG_FindItemForHoldable( holdable_t pw );
-int	BG_FindPlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps);
+gitem_t	*BG_Item( const char *pickupName );
+gitem_t	*BG_ItemByClassname( const char *classname );
+gitem_t	*BG_ItemForWeapon( weapon_t weapon );
+gitem_t	*BG_ItemForAmmo( weapon_t ammo ) ;
+gitem_t	*BG_ItemForPowerup( powerup_t pw );
+gitem_t	*BG_ItemForHoldable( holdable_t pw );
+int	BG_PlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps);
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
 qbool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
@@ -1256,7 +1258,7 @@ extern void config_GetInfos( int fileType );
 extern int BG_ItemNumByName( char *name );
 extern int BG_AnimNumByName( char *anim );
 extern int BG_WeaponNumByName( char *wp );
-int BG_FindWSNumByName( char *s );
-int BG_FindGiTagNumByName( char *s );
-int BG_FindGiTypeByName( char *s );
+int BG_WSNumByName( char *s );
+int BG_GitagNumByName( char *s );
+int BG_GitypeByName( char *s );
 

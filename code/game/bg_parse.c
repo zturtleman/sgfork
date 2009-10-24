@@ -242,6 +242,7 @@ void parse_config( int fileType, char *fileName, int num )
         else if( !Q_stricmp( t, "sounds" ) )
           parse_TokToDest( item->sounds, s );
         break;
+#ifndef UI
       case PFT_GRAVITY:
         if( !Q_stricmp( t, "pm_stopspeed" ) ) 
           pm_stopspeed = parse_getFloat(s);
@@ -276,6 +277,7 @@ void parse_config( int fileType, char *fileName, int num )
         else if( !Q_stricmp( t, "pm_ladderfriction" ) )
           pm_ladderfriction = parse_getFloat(s);
         break;
+#endif
     }
   }
 }
@@ -311,7 +313,7 @@ int BG_ItemNumByName( char *name )
   return 0;
 }
 
-int BG_FindWSNumByName( char *s )
+int BG_WSNumByName( char *s )
 {
   int i;
 
@@ -322,7 +324,7 @@ int BG_FindWSNumByName( char *s )
   return 0;
 }
 
-int BG_FindGiTagNumByName( char *s )
+int BG_GitagNumByName( char *s )
 {
   int i;
   for(i=0; i <= WP_SEC_PISTOL; i++ ) {
@@ -332,7 +334,7 @@ int BG_FindGiTagNumByName( char *s )
   return 0;
 }
 
-int BG_FindGiTypeByName( char *s )
+int BG_GitypeByName( char *s )
 {
   int i;
 
@@ -361,11 +363,13 @@ void config_GetInfos( int fileType )
       parse_config( ft, Parse_FindFile(i, ft), i );
     }
   }
+#ifndef UI
   if( fileType & PFT_GRAVITY ) {
     Com_Printf( "Loading gravity.\n" );
     ft = PFT_GRAVITY;
     parse_config( ft, Parse_FindFile(0, ft), 0 );
   }
+#endif
 }
 
 #define CONFIG_DIR "configs"
@@ -385,9 +389,11 @@ char *Parse_FindFile( int num, int fileType )
       else
         BG_Error( "Parse_FindFile: Invalid item number %i\n", num );
       break;
+#ifndef UI
     case PFT_GRAVITY:
       Com_sprintf( f_buf, sizeof(f_buf), "%s/%s.cfg", CONFIG_DIR, GRAVITY_FILE );
       break;
+#endif
   }
 
   return f_buf;

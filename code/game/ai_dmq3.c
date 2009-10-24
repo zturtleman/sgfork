@@ -1825,10 +1825,10 @@ void BotCheckBuy(bot_state_t *bs){
 
 		// if the bot already has a better weapon
 		j = WP_REM58;
-		while(BG_FindPlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps)){
-			j = BG_FindPlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps);
+		while(BG_PlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps)){
+			j = BG_PlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps);
 
-			temp = BG_FindItemForWeapon(j);
+			temp = BG_ItemForWeapon(j);
 
 			// if it's a WPS_GUN
 			if(bg_itemlist[j].weapon_sort == WPS_GUN &&
@@ -1867,7 +1867,7 @@ void BotCheckBuy(bot_state_t *bs){
 
 	// now look if we have enough money to buy some money
 	if(money >= 5){
-		item = BG_FindItemForAmmo(WP_CART_CLIP);
+		item = BG_ItemForAmmo(WP_CART_CLIP);
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
 		money -= item->prize;
 	}
@@ -1917,7 +1917,7 @@ void BotCheckBuy(bot_state_t *bs){
 
 	// if we have got some more money now, buy pistol ammo
 	if(money >= 5){
-		item = BG_FindItemForAmmo(WP_BULLETS_CLIP);
+		item = BG_ItemForAmmo(WP_BULLETS_CLIP);
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
 		money -= item->prize;
 	}

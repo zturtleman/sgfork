@@ -101,10 +101,6 @@ qbool	CheatsOk( gentity_t *ent ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
 	}
-	if ( ent->health <= 0 ) {
-		trap_SendServerCommand( ent-g_entities, va("print \"You must be alive to use this command.\n\""));
-		return qfalse;
-	}
 	return qtrue;
 }
 
@@ -202,10 +198,6 @@ void Cmd_Give_f (gentity_t *ent)
 	gentity_t		*it_ent;
 	trace_t		trace;
 
-	if ( !CheatsOk( ent ) ) {
-		return;
-	}
-
 	name = ConcatArgs( 1 );
 
 	if (Q_stricmp(name, "all") == 0)
@@ -228,16 +220,12 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "ammo") == 0)
+	if (give_all || !Q_stricmp(name, "ammo") )
 	{
-		for ( i = 0 ; i < WP_NUM_WEAPONS ; i++ ) {
-			if(bg_weaponlist[i].clip)
-				ent->client->ps.ammo[i] = bg_weaponlist[i].clipAmmo;
-			else
-				ent->client->ps.ammo[i] = bg_weaponlist[i].maxAmmo;
-		}
-		ent->client->ps.ammo[WP_AKIMBO] = bg_weaponlist[WP_PEACEMAKER].clipAmmo;
+		for ( i = 0 ; i < WP_NUM_WEAPONS ; i++ )
+			ent->client->ps.ammo[i] = (bg_weaponlist[i].clip) ? bg_weaponlist[i].clipAmmo : bg_weaponlist[i].maxAmmo;
 
+		ent->client->ps.ammo[WP_AKIMBO] = bg_weaponlist[WP_PEACEMAKER].clipAmmo;
 		ent->client->ps.ammo[WP_BULLETS_CLIP] = bg_weaponlist[WP_PEACEMAKER].maxAmmo*2;
 		ent->client->ps.ammo[WP_SHELLS_CLIP] = bg_weaponlist[WP_REMINGTON_GAUGE].maxAmmo*2;
 		ent->client->ps.ammo[WP_CART_CLIP] = bg_weaponlist[WP_WINCHESTER66].maxAmmo*2;
@@ -271,7 +259,7 @@ void Cmd_Give_f (gentity_t *ent)
 
 	// spawn a specific item right on the player
 	if ( !give_all ) {
-		it = BG_FindItem (name);
+		it = BG_Item (name);
 		if (!it) {
 			return;
 		}
@@ -305,19 +293,10 @@ argv(0) god
 */
 void Cmd_God_f (gentity_t *ent)
 {
-	char	*msg;
-
-	if ( !CheatsOk( ent ) ) {
-		return;
-	}
-
 	ent->flags ^= FL_GODMODE;
-	if (!(ent->flags & FL_GODMODE) )
-		msg = "godmode OFF\n";
-	else
-		msg = "godmode ON\n";
 
-	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	trap_SendServerCommand( ent-g_entities,
+      va( "print \"godmode %s\n\"", (ent->flags & FL_GODMODE) ? "ON" : "OFF" ) );
 }
 
 
@@ -331,19 +310,10 @@ argv(0) notarget
 ==================
 */
 void Cmd_Notarget_f( gentity_t *ent ) {
-	char	*msg;
-
-	if ( !CheatsOk( ent ) ) {
-		return;
-	}
-
 	ent->flags ^= FL_NOTARGET;
-	if (!(ent->flags & FL_NOTARGET) )
-		msg = "notarget OFF\n";
-	else
-		msg = "notarget ON\n";
 
-	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	trap_SendServerCommand( ent-g_entities,
+      va("print \"notarget %s\n\"", (ent->flags & FL_NOTARGET) ? "ON" : "OFF" ));
 }
 
 
@@ -355,20 +325,10 @@ argv(0) noclip
 ==================
 */
 void Cmd_Noclip_f( gentity_t *ent ) {
-	char	*msg;
-
-	if ( !CheatsOk( ent ) ) {
-		return;
-	}
-
-	if ( ent->client->noclip ) {
-		msg = "noclip OFF\n";
-	} else {
-		msg = "noclip ON\n";
-	}
 	ent->client->noclip = !ent->client->noclip;
 
-	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	trap_SendServerCommand( ent-g_entities, 
+      va("print \"noclip %s\n\"", (ent->client->noclip) ? "ON" : "OFF" ));
 }
 
 
@@ -383,10 +343,6 @@ hide the scoreboard, and take a special screenshot
 ==================
 */
 void Cmd_LevelShot_f( gentity_t *ent ) {
-	if ( !CheatsOk( ent ) ) {
-		return;
-	}
-
 	BeginIntermission();
 	trap_SendServerCommand( ent-g_entities, "clientLevelShot" );
 }
@@ -428,12 +384,6 @@ Cmd_Kill_f
 =================
 */
 void Cmd_Kill_f( gentity_t *ent ) {
-	if ( ent->client->sess.sessionTeam >= TEAM_SPECTATOR ) {
-		return;
-	}
-	if (ent->health <= 0) {
-		return;
-	}
 	ent->flags &= ~FL_GODMODE;
 	ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
 	player_die (ent, ent, ent, 100000, MOD_SUICIDE);
@@ -1136,18 +1086,13 @@ Cmd_Say_f
 static void Cmd_Say_f( gentity_t *ent, int mode, qbool arg0 ) {
 	char		*p;
 
-	if ( trap_Argc () < 2 && !arg0 ) {
+	if ( trap_Argc () < 2 && !arg0 )
 		return;
-	}
 
 	if (arg0)
-	{
 		p = ConcatArgs( 0 );
-	}
 	else
-	{
 		p = ConcatArgs( 1 );
-	}
 
 	G_Say( ent, NULL, mode, p );
 }
@@ -1338,7 +1283,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		return;
 	}
 
-	// check for command separators in args[2]
+	// check for command separators in args
   for( i = 2; i <= argc; i++ ) {
     for( c = args[i]; *c; ++c) {
       switch(*c) {
@@ -1450,6 +1395,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
           (g_allowVote_timelimit.integer)?"  timelimit <time>\n":"",
           (g_allowVote_fraglimit.integer)?"  fraglimit <frags>\n":"",
           (g_allowVote_mapcycle.integer)?"  mapcycle <mapcyclename>\n":"" ) );
+    return;
   }
 
 	// if there is still a vote to be executed
@@ -1899,42 +1845,35 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 	qbool gatling = (ent->client->ps.weapon == WP_GATLING &&
 		ent->client->ps.stats[STAT_GATLING_MODE]);
 
-	if(ent->client->ps.stats[STAT_HEALTH] <= 0)
+	if( ent->client->ps.stats[STAT_HEALTH] <= 0 || item->prize <= 0 )
 		return;
 
-	if(!(ent->client->ps.stats[STAT_FLAGS] & SF_CANBUY) && g_gametype.integer >= GT_RTP){
-		if(!cgame)
-			trap_SendServerCommand( ent-g_entities, va("print \"You're not in a buy-zone!\n\""));
+	if(!(ent->client->ps.stats[STAT_FLAGS] & SF_CANBUY) && g_gametype.integer >= GT_RTP && !cgame ) {
+		trap_SendServerCommand( ent-g_entities, va("print \"You're not in a buy-zone!\n\""));
 		return;
-	}
+  }
 
-	if(level.time - g_roundstarttime > BUY_TIME && g_gametype.integer >= GT_RTP){
-		if(!cgame)
-			trap_SendServerCommand( ent-g_entities, va("print \"60 seconds have passed ... you can't buy anything\n\""));
+	if(level.time - g_roundstarttime > BUY_TIME && g_gametype.integer >= GT_RTP && !cgame ){
+		trap_SendServerCommand( ent-g_entities, va("print \"60 seconds have passed ... you can't buy anything\n\""));
 		return;
 	}
 
 	trap_Argv( 1, arg1, sizeof( arg1 ) );
 
-	item = BG_FindItemForClassname( arg1 );
+	item = BG_ItemByClassname( arg1 );
 
-	if(ent->client->sess.sessionTeam >= TEAM_SPECTATOR){
-		if(!cgame)
-			trap_SendServerCommand( ent-g_entities, va("print \"You can't buy while in spectator mode!\n\""));
+	if(ent->client->sess.sessionTeam >= TEAM_SPECTATOR && !cgame ){
+		trap_SendServerCommand( ent-g_entities, va("print \"You can't buy while in spectator mode!\n\""));
 		return;
 	}
 
-	if(!item){
+	if(!item) {
 		trap_SendServerCommand( ent-g_entities, "print \"Unknown Item\n\"");
 		return;
 	}
 
-	if(item->prize <= 0)
-		return;
-
-	if(ent->client->ps.stats[STAT_MONEY] < item->prize){
-		if(!cgame)
-			trap_SendServerCommand( ent-g_entities, va("print \"Not Enough Money!\n\""));
+	if(ent->client->ps.stats[STAT_MONEY] < item->prize && !cgame ){
+		trap_SendServerCommand( ent-g_entities, va("print \"Not Enough Money!\n\""));
 		return;
 	}
 
@@ -1948,17 +1887,14 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 		belt = 2;
 
 	if(g_gametype.integer == GT_DUEL){
-		if(item->giType == IT_WEAPON && bg_weaponlist[item->giTag].wp_sort != WPS_PISTOL)
-			return;
-
-		if(item->giType != IT_AMMO && item->giType != IT_WEAPON)
+		if((item->giType == IT_WEAPON && bg_weaponlist[item->giTag].wp_sort != WPS_PISTOL)
+        || (item->giType != IT_AMMO && item->giType != IT_WEAPON) )
 			return;
 	}
 
 	//check whether the item has to be changed or not
 	switch(item->giType){
 	case IT_WEAPON:
-
 		// can't have more than two pistols -> drop bad ones
 		if(bg_weaponlist[item->giTag].wp_sort == WPS_PISTOL && CheckPistols(ps, &weapon)){
 			if (!(ps->stats[STAT_FLAGS] & SF_SEC_PISTOL) &&
@@ -1980,24 +1916,18 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 			if(gatling)
 				return;
 
-			// throw away all the weapons you can find
-			drop = BG_FindPlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps);
-			while(drop){
-				//Cmd_DropWeapon_f(ent, drop);
+			while( (drop=BG_PlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps)) )
 				G_ThrowWeapon(drop, ent);
-				drop = BG_FindPlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps);
-			}
 		}
 
 		//check ammo
 		if(item->giTag == WP_DYNAMITE || item->giTag == WP_KNIFE || item->giTag == WP_MOLOTOV) {
-			if(ps->ammo[item->giTag] >= bg_weaponlist[item->giTag].maxAmmo){
-				if(!cgame)
-					trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
+			if(ps->ammo[item->giTag] >= bg_weaponlist[item->giTag].maxAmmo && !cgame ){
+				trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
 				return;
 			}
 
-			item = BG_FindItemForAmmo(item->giTag);
+			item = BG_ItemForAmmo(item->giTag);
 		}
 
 		//give ammo to player
@@ -2007,23 +1937,21 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 		break;
 	case IT_AMMO:
 		if (item->giTag == WP_BULLETS_CLIP) {
-			item = BG_FindItemForAmmo(WP_BULLETS_CLIP);
+			item = BG_ItemForAmmo(WP_BULLETS_CLIP);
 			i = WP_PEACEMAKER;
 		} else {
 			if ( ps->stats[STAT_GATLING_MODE] )
 				i = WP_GATLING;
 			else
-				i = BG_FindPlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps);
+				i = BG_PlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps);
 			if ( i )
-				item = BG_FindItemForAmmo(bg_weaponlist[i].clip);
+				item = BG_ItemForAmmo(bg_weaponlist[i].clip);
 			else
 				return;
 		}
-		if(ps->ammo[item->giTag] >= bg_weaponlist[i].maxAmmo*ent->client->maxAmmo){
-			if(!cgame)
-				trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
+		if(ps->ammo[item->giTag] >= bg_weaponlist[i].maxAmmo*ent->client->maxAmmo && !cgame ){
+			trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
 			return;
-
 		}
 		break;
 	case IT_ARMOR:
@@ -2076,102 +2004,136 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 	ent->client->ps.stats[STAT_MONEY] -= prize;
 }
 
+void GCmd_Say_f( gentity_t *ent ) {
+  char cmd[MAX_TOKEN_CHARS];
+  
+  trap_Argv( 0, cmd, sizeof(cmd) );
+  
+  if( !Q_stricmp( cmd, "say" ) )
+		Cmd_Say_f( ent, SAY_ALL, qfalse );
+  else if( !Q_stricmp( cmd, "say_team" ) )
+		Cmd_Say_f( ent, SAY_TEAM, qfalse );
+}
+
+void GCmd_FollowNext_f( gentity_t *ent ) {
+  ChaseCam_Start(ent, 1);
+}
+void GCmd_FollowPrev_f( gentity_t *ent ) {
+  ChaseCam_Start(ent, -1);
+}
+void GCmd_DropWeapon_f( gentity_t *ent ) {
+  Cmd_DropWeapon_f( ent, 0 );
+}
+
+void GCmd_Buy_f( gentity_t *ent ) {
+  Cmd_BuyItem_f( ent, qfalse );
+}
+
+void GCmd_CGBuy_f( gentity_t *ent ) {
+  Cmd_BuyItem_f( ent, qtrue );
+}
+
+void GCmd_DevJoinR( gentity_t *ent ) {
+  SetTeam(ent, "r");
+}
+void GCmd_DevJoinB( gentity_t *ent ) {
+  SetTeam(ent, "b" );
+}
+
+static gcmdsTable_t gcmdsTable[] = {
+  { "say", CMD_INTER, GCmd_Say_f },
+  { "say_team", CMD_INTER, GCmd_Say_f },
+  { "tell", CMD_INTER, Cmd_Tell_f },
+  { "score", CMD_INTER, Cmd_Score_f },
+
+  { "god", CMD_CHEAT | CMD_ALIVE, Cmd_God_f },
+  { "notarget", CMD_CHEAT | CMD_ALIVE, Cmd_Notarget_f },
+  { "noclip", CMD_CHEAT | CMD_ALIVE, Cmd_Noclip_f },
+  { "kill", CMD_ALIVE | CMD_TEAM, Cmd_Kill_f },
+  { "teamtask", 0, Cmd_TeamTask_f },
+  { "levelshot", CMD_CHEAT, Cmd_LevelShot_f },
+  { "follow", CMD_SPEC, Cmd_Follow_f },
+  { "follownext", CMD_DEAD, GCmd_FollowNext_f },
+  { "followprev", CMD_DEAD, GCmd_FollowPrev_f },
+  { "team", 0, Cmd_Team_f },
+  { "where", 0, Cmd_Where_f },
+  { "callvote", 0, Cmd_CallVote_f },
+  { "vote", 0, Cmd_Vote_f },
+  { "callteamvote", 0, Cmd_CallTeamVote_f },
+  { "teamvote", 0, Cmd_TeamVote_f },
+  { "gc", 0, Cmd_GameCommand_f },
+  { "setviewpos", CMD_CHEAT, Cmd_SetViewpos_f },
+  { "stats", 0, Cmd_Stats_f },
+  { "dropweapon", CMD_ALIVE, GCmd_DropWeapon_f },
+  { "mp", 0, Cmd_Tell_f },
+  { "buy", CMD_ALIVE, GCmd_Buy_f },
+  { "cg_buy", CMD_ALIVE, GCmd_CGBuy_f },
+
+  { "give", CMD_CHEAT, Cmd_Give_f },
+  { "dev_join_r", CMD_CHEAT, GCmd_DevJoinR },
+  { "dev_join_b", CMD_CHEAT, GCmd_DevJoinB },
+};
+int gcmdsNum = sizeof(gcmdsTable)/sizeof(gcmdsTable[0]);
+
 /*
 =================
 ClientCommand
 =================
 */
+
 void ClientCommand( int clientNum ) {
 	gentity_t *ent;
 	char	cmd[MAX_TOKEN_CHARS];
+  int i=0;
+  gcmdsTable_t *gct;
 
 	ent = g_entities + clientNum;
-	if ( !ent->client ) {
-		return;		// not fully in game yet
-	}
 
+	if( !ent->client )
+		return;
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
-	if (Q_stricmp (cmd, "say") == 0) {
-		Cmd_Say_f (ent, SAY_ALL, qfalse);
-		return;
-	}
-	if (Q_stricmp (cmd, "say_team") == 0) {
-		Cmd_Say_f (ent, SAY_TEAM, qfalse);
-		return;
-	}
-	if (Q_stricmp (cmd, "tell") == 0) {
-		Cmd_Tell_f ( ent );
-		return;
-	}
-	if (Q_stricmp (cmd, "score") == 0) {
-		Cmd_Score_f (ent);
-		return;
-	}
+  for( gct=&gcmdsTable[i]; gct != &gcmdsTable[gcmdsNum]; gct = &gcmdsTable[i++] ) {
+    if( !Q_stricmp( gct->name, cmd ) )
+    {
+      if( ( gct->cond & CMD_INTER ) && level.intermissiontime ) {
+        trap_SendServerCommand( clientNum, "print \"Can't execute this command"
+            "during intermission !\n\"" );
+        return;
+      }
+      if( (gct->cond & CMD_CHEAT ) && !CheatsOk( ent ) ) {
+        trap_SendServerCommand( clientNum, "print \"Cheats are not allowed here.\n\"" );
+        return;
+      }
+      if( (gct->cond & CMD_ALIVE ) && ( ent->health <= 0
+            || ent->client->sess.sessionTeam > TEAM_SPECTATOR ) ) {
+        trap_SendServerCommand( clientNum, "print \""
+            "You must be alive to use this command !\n\"" );
+        return;
+      }
+      if( (gct->cond & CMD_SPEC )
+          && ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+        trap_SendServerCommand( clientNum, "print \""
+            "You must be a spectator to use this command.\n\"" );
+        return;
+      }
+      if( (gct->cond & CMD_DEAD ) && ent->health >= 0 ) {
+        trap_SendServerCommand( clientNum, "print \""
+            "You must be dead to use this command.\n\"" );
+        return;
+      }
+      if( (gct->cond & CMD_TEAM ) &&
+          ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+        trap_SendServerCommand( clientNum, "print \""
+             "You must join a team to use this command.\n\"" );
+        return;
+      }
 
-	// ignore all other commands when at intermission
-	if (level.intermissiontime) {
-		Cmd_Say_f (ent, qfalse, qtrue);
-		return;
-	}
-
-	if (Q_stricmp (cmd, "give") == 0)
-		Cmd_Give_f (ent);
-	else if (Q_stricmp (cmd, "god") == 0)
-		Cmd_God_f (ent);
-	else if (Q_stricmp (cmd, "notarget") == 0)
-		Cmd_Notarget_f (ent);
-	else if (Q_stricmp (cmd, "noclip") == 0)
-		Cmd_Noclip_f (ent);
-	else if (Q_stricmp (cmd, "kill") == 0)
-		Cmd_Kill_f (ent);
-	else if (Q_stricmp (cmd, "teamtask") == 0)
-		Cmd_TeamTask_f (ent);
-	else if (Q_stricmp (cmd, "levelshot") == 0)
-		Cmd_LevelShot_f (ent);
-	else if (Q_stricmp (cmd, "follow") == 0)
-		Cmd_Follow_f (ent);
-	else if (Q_stricmp (cmd, "follownext") == 0)
-		ChaseCam_Start(ent, 1);
-	else if (Q_stricmp (cmd, "followprev") == 0)
-		ChaseCam_Start(ent, -1);
-	else if (Q_stricmp (cmd, "team") == 0)
-		Cmd_Team_f (ent);
-	else if (Q_stricmp (cmd, "where") == 0)
-		Cmd_Where_f (ent);
-	else if (Q_stricmp (cmd, "callvote") == 0)
-		Cmd_CallVote_f (ent);
-	else if (Q_stricmp (cmd, "vote") == 0)
-		Cmd_Vote_f (ent);
-	else if (Q_stricmp (cmd, "callteamvote") == 0)
-		Cmd_CallTeamVote_f (ent);
-	else if (Q_stricmp (cmd, "teamvote") == 0)
-		Cmd_TeamVote_f (ent);
-	else if (Q_stricmp (cmd, "gc") == 0)
-		Cmd_GameCommand_f( ent );
-	else if (Q_stricmp (cmd, "setviewpos") == 0)
-		Cmd_SetViewpos_f( ent );
-	else if (Q_stricmp (cmd, "stats") == 0)
-		Cmd_Stats_f( ent );
-	else if (Q_stricmp (cmd, "dropweapon") == 0)
-		Cmd_DropWeapon_f( ent, 0 );
-  else if( !Q_stricmp( cmd, "mp" ) )
-    Cmd_Tell_f( ent );
-	else if (Q_stricmp(cmd, "buy" ) == 0)
-		Cmd_BuyItem_f (ent, qfalse);
-	else if (Q_stricmp(cmd, "cg_buy" ) == 0)
-		Cmd_BuyItem_f (ent, qtrue);
-	//developer cheats by spoon, necessary to join in round based gametypes
-	else if(!Q_stricmp(cmd, "dev_join_r")){
-		if(CheatsOk( ent ))
-			SetTeam(ent, "r");
-	}
-	else if(!Q_stricmp(cmd, "dev_join_b")){
-		if(CheatsOk( ent ))
-			SetTeam(ent, "b");
-	}
-	else
-		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
+      gct->func(ent);
+      return;
+    }
+  }
+	trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }
 

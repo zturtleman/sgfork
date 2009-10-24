@@ -1089,7 +1089,7 @@ void FireWeapon( gentity_t *ent, qbool altfire, int weapon ) {
 		if(weapon == WP_PEACEMAKER)
 			damage *= 0.9f;
 	} else if(weapon != WP_NONE){
-		gitem_t *item = BG_FindItemForWeapon(weapon);
+		gitem_t *item = BG_ItemForWeapon(weapon);
 
 		spread *= 0.8f;
 

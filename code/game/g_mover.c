@@ -1194,7 +1194,7 @@ void SP_func_breakable (gentity_t *ent){
 	//set weapon by which it can be destroyed, 0 = every weapon
 	if(!ent->s.weapon){
 		G_SpawnString( "weapon", "", &s );
-		item = BG_FindItemForClassname(s);
+		item = BG_ItemByClassname(s);
 
 		if(item){
 			if(item->giType == IT_WEAPON)

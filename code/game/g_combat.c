@@ -115,7 +115,7 @@ void TossClientItems( gentity_t *self ) {
 			continue;
 
 		// find the item type for this weapon
-		item = BG_FindItemForWeapon( i );
+		item = BG_ItemForWeapon( i );
 		angle += 66.6f;
 
 		// spawn the item
@@ -173,7 +173,7 @@ void TossClientItems( gentity_t *self ) {
 
 			if ( self->client->ps.powerups[ i ] ) {
 				if(i == PW_GOLD)
-					item = BG_FindItemForClassname("item_money");
+					item = BG_ItemByClassname("item_money");
 				else
 					continue;
 				if ( !item )
@@ -190,7 +190,7 @@ void TossClientItems( gentity_t *self ) {
 		}
 	// drop armor
 	if( self->client->ps.stats[STAT_ARMOR]){
-		item = BG_FindItem("Boiler Plate");
+		item = BG_Item("Boiler Plate");
 
 		drop = Drop_Item(self, item, rand()%360);
 

@@ -1106,7 +1106,7 @@ void CG_DrawWeaponSelect( void ) {
 	y = TOP_HEIGHT;
 
 	for ( i = WP_KNIFE ; i < WP_NUM_WEAPONS ; i++ ) {
-		gitem_t	*item = BG_FindItemForWeapon(i);
+		gitem_t	*item = BG_ItemForWeapon(i);
 		qhandle_t	shader;
 
 		if ( !( bits & ( 1 << i ) ) ) {

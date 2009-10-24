@@ -159,6 +159,7 @@ SDK_Q3UIOBJ = \
   $(B)/$(SDK_GAMENAME)/ui/ui_players.o \
   $(B)/$(SDK_GAMENAME)/ui/ui_shared.o \
   \
+  $(B)/$(SDK_GAMENAME)/ui/bg_parse.o \
   $(B)/$(SDK_GAMENAME)/ui/bg_misc.o \
   $(B)/$(SDK_GAMENAME)/ui/bg_lib.o \
   \

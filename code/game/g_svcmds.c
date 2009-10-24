@@ -638,13 +638,13 @@ void Svcmd_GameWeapon_f( char *cmd ) {
       else if( !Q_stricmp( args[4], "quantity" ) )
         item->quantity = atoi(args[5]);
       else if( !Q_stricmp( args[4], "giType" ) )
-        item->giType = BG_FindGiTypeByName( args[5] );
+        item->giType = BG_GitypeByName( args[5] );
       else if( !Q_stricmp( args[4], "giTag" ) )
-        item->giTag = BG_FindGiTagNumByName( args[5] );
+        item->giTag = BG_GitagNumByName( args[5] );
       else if( !Q_stricmp( args[4], "prize" ) )
         item->prize = atoi( args[5] );
       else if( !Q_stricmp( args[4], "weapon_sort" ) )
-        item->weapon_sort = BG_FindWSNumByName( args[5] );
+        item->weapon_sort = BG_WSNumByName( args[5] );
       else if( !Q_stricmp( args[4], "precaches" ) )
         Com_sprintf( item->precaches, sizeof(item->precaches), args[5] );
       else if( !Q_stricmp( args[4], "sounds" ) )

@@ -611,21 +611,21 @@ void ClearRegisteredItems( void ) {
 			&& i != WP_KNIFE)
 			continue;
 
-		RegisterItem(BG_FindItemForWeapon( i ));
+		RegisterItem(BG_ItemForWeapon( i ));
 	}
 
 	// additional items
 	if(g_gametype.integer != GT_DUEL){
-		RegisterItem( BG_FindItemForClassname( "item_scope" ) );
-		RegisterItem( BG_FindItemForClassname( "item_boiler_plate" ) );
-		RegisterItem( BG_FindItemForClassname( "item_belt" ) );
+		RegisterItem( BG_ItemByClassname( "item_scope" ) );
+		RegisterItem( BG_ItemByClassname( "item_boiler_plate" ) );
+		RegisterItem( BG_ItemByClassname( "item_belt" ) );
 	}
 
 	// money-bag for bank robbery
 	if(g_gametype.integer == GT_BR)
-		RegisterItem( BG_FindItemForClassname( "item_money" ) );
+		RegisterItem( BG_ItemByClassname( "item_money" ) );
 	else if(g_gametype.integer != GT_RTP)
-		RegisterItem( BG_FindItemForClassname( "pickup_money" ) );
+		RegisterItem( BG_ItemByClassname( "pickup_money" ) );
 }
 
 /*
