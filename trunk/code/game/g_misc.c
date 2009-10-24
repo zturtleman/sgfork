@@ -292,7 +292,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	ent->s.weapon = weapon;
 
 	if(weapon != WP_NONE)
-		RegisterItem( BG_FindItemForWeapon( weapon ) );
+		RegisterItem( BG_ItemForWeapon( weapon ) );
 
 	G_SetMovedir( ent->s.angles, ent->movedir );
 

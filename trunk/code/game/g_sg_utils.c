@@ -204,7 +204,7 @@ void G_ThrowWeapon( int weapon, gentity_t *ent )
 	if(weapon == WP_NONE)
 		return;
 
-	item = BG_FindItemForWeapon( weapon );
+	item = BG_ItemForWeapon( weapon );
 
 	drop = G_dropWeapon( ent, item, 0, FL_DROPPED_ITEM | FL_THROWN_ITEM );
 
@@ -347,7 +347,7 @@ static void Gatling_Think( gentity_t *self) {
 				VectorCopy(self->s.pos.trBase, dir);
 			}
 
-			item = BG_FindItemForWeapon(WP_GATLING);
+			item = BG_ItemForWeapon(WP_GATLING);
 			LaunchItem(item, dir, velocity, FL_DROPPED_ITEM);
 			G_FreeEntity(self);
 			return;
@@ -358,7 +358,7 @@ static void Gatling_Think( gentity_t *self) {
 	if(client && self->s.time2 > 0){
 
 		if(client->ps.stats[STAT_HEALTH] <= 0){
-			gitem_t *item = BG_FindItemForWeapon(WP_GATLING);
+			gitem_t *item = BG_ItemForWeapon(WP_GATLING);
 
 			G_dropWeapon( self, item, 0, FL_DROPPED_ITEM | FL_THROWN_ITEM );
 			G_FreeEntity(self);
@@ -423,7 +423,7 @@ static void Gatling_Think( gentity_t *self) {
 		//pick gatling up
 		if(client->buttons & BUTTON_ALT_ATTACK && !(self->mapparttime & BUTTON_ALT_ATTACK)){
 			// don't dismantle if player already has a special weapon
-			if(BG_FindPlayerWeapon(WP_WINCHESTER66, WP_GATLING, &client->ps) ||
+			if(BG_PlayerWeapon(WP_WINCHESTER66, WP_GATLING, &client->ps) ||
 				(client->ps.stats[STAT_FLAGS] & SF_GAT_CARRY)){
 				trap_SendServerCommand( client->ps.clientNum, va("print \"You already have a secondary weapon.\n\""));
 			} else {

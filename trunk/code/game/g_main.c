@@ -1801,7 +1801,7 @@ static void Check_Gatling(playerState_t	*ps){
 		for( i=0; i<MAX_GENTITIES; i++){
 			if(g_entities[i].s.eType == ET_TURRET && g_entities[i].s.torsoAnim == ps->clientNum
 				&& g_entities[i].s.eventParm == -1) {
-				if(!BG_FindPlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps))
+				if(!BG_PlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, ps))
 					ps->stats[STAT_WEAPONS] |= (1 << WP_GATLING);
 				break;
 			}

@@ -765,6 +765,18 @@ void DeathmatchScoreboardMessage (gentity_t *client);
 //
 // g_cmds.c
 //
+typedef struct gcmdsTable_s {
+  char *name;
+  int cond;
+  void (*func)(gentity_t *ent);
+} gcmdsTable_t;
+
+#define CMD_INTER 0x0001
+#define CMD_CHEAT 0x0002
+#define CMD_ALIVE 0x0004
+#define CMD_SPEC 0x0008
+#define CMD_DEAD 0x0010
+#define CMD_TEAM 0x0020
 
 //
 // g_pweapon.c

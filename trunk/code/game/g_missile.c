@@ -441,7 +441,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace, int shaderNum ) {
 		vec3_t dir;
 		gitem_t			*item;
 
-		item = BG_FindItemForWeapon(WP_KNIFE);
+		item = BG_ItemForWeapon(WP_KNIFE);
 
 		ent->s.modelindex = ITEM_INDEX(item);
 		ent->s.modelindex2 = 1;
@@ -627,7 +627,7 @@ void G_Suck( gentity_t *self ) {
 	if (!Q_stricmp(self->classname, "grenadeend")){
 		gitem_t *item;
 
-		item = BG_FindItemForWeapon( WP_DYNAMITE );
+		item = BG_ItemForWeapon( WP_DYNAMITE );
 
 		self->s.apos.trDelta[0] = 0;
 

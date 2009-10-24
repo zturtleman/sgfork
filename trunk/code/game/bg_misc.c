@@ -47,10 +47,10 @@ gitem_t	bg_itemlist[ IT_NUM_ITEMS ];
 
 /*
 ==============
-BG_FindItemForPowerup
+BG_ItemForPowerup
 ==============
 */
-gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
+gitem_t	*BG_ItemForPowerup( powerup_t pw ) {
 	int		i;
 
 	for ( i = 0 ; i < IT_NUM_ITEMS ; i++ ) {
@@ -68,10 +68,10 @@ gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
 
 /*
 ==============
-BG_FindItemForHoldable
+BG_ItemForHoldable
 ==============
 */
-gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
+gitem_t	*BG_ItemForHoldable( holdable_t pw ) {
 	int		i;
 
 	for ( i = 0 ; i < IT_NUM_ITEMS ; i++ ) {
@@ -87,11 +87,11 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
 
 /*
 ===============
-BG_FindItemForWeapon
+BG_ItemForWeapon
 
 ===============
 */
-gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
+gitem_t	*BG_ItemForWeapon( weapon_t weapon ) {
 	gitem_t	*it;
 
 	for ( it = &bg_itemlist[1] ; it->classname ; it++) {
@@ -106,11 +106,11 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 
 /*
 ===============
-BG_FindItemForAmmo
+BG_ItemForAmmo
 
 ===============
 */
-gitem_t	*BG_FindItemForAmmo( weapon_t ammo ) {
+gitem_t	*BG_ItemForAmmo( weapon_t ammo ) {
 	gitem_t	*it;
 
 	for ( it = &bg_itemlist[1] ; it->classname ; it++) {
@@ -125,10 +125,10 @@ gitem_t	*BG_FindItemForAmmo( weapon_t ammo ) {
 
 /*
 ===========================
-BG_FindPlayerWeapon
+BG_PlayerWeapon
 ===========================
 */
-int	BG_FindPlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps){
+int	BG_PlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps){
 	int i;
 
 	for(i=firstweapon;i<lastweapon;i++){
@@ -141,11 +141,11 @@ int	BG_FindPlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps){
 
 /*
 ===============
-BG_FindItemForClassname
+BG_ItemByClassname
 by Spoon
 ===============
 */
-gitem_t	*BG_FindItemForClassname( const char *classname ) {
+gitem_t	*BG_ItemByClassname( const char *classname ) {
 	gitem_t	*it;
 
 	for ( it = &bg_itemlist[1]; it->classname ; it++ ) {
@@ -158,11 +158,11 @@ gitem_t	*BG_FindItemForClassname( const char *classname ) {
 
 /*
 ===============
-BG_FindItem
+BG_Item
 
 ===============
 */
-gitem_t	*BG_FindItem( const char *pickupName ) {
+gitem_t	*BG_Item( const char *pickupName ) {
 	gitem_t	*it;
 
 	for ( it = &bg_itemlist[1]; it->classname ; it++ ) {

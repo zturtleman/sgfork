@@ -636,7 +636,7 @@ static void CG_DrawBlueScore(rectDef_t *rect, float scale, vec4_t color, qhandle
 static void CG_DrawRedName(rectDef_t *rect, float scale, vec4_t color, int textStyle ) {
 	// draw moneybag to indicate that this is the robber team
 	if(cgs.gametype == GT_BR){
-		gitem_t *item = BG_FindItem("Moneybag");
+		gitem_t *item = BG_Item("Moneybag");
 		int x = 14;
 		int	y = 50;
 		vec4_t colorw = { 1.0f, 1.0f, 1.0f, 1.0f};
@@ -1389,7 +1389,7 @@ static void CG_DrawTeamOverlay(rectDef_t *rect, qbool right, qbool upper) {
 			for (j = 0; j <= PW_NUM_POWERUPS; j++) {
 				if (ci->powerups & (1 << j)) {
 
-					item = BG_FindItemForPowerup( j );
+					item = BG_ItemForPowerup( j );
 
 					if (item) {
 						CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
@@ -1426,7 +1426,7 @@ static void CG_DrawDeathMessages(rectDef_t *rect, vec4_t textColor) {
 	for(n = 0; n < MAX_DEATH_MESSAGES; n++){
 
 		if(cg.messagetime[n] + MESSAGETIME > cg.time && cg.messagetime[n]){
-			gitem_t	*item = BG_FindItemForWeapon(cg.mod[n]);
+			gitem_t	*item = BG_ItemForWeapon(cg.mod[n]);
 
 			if(item)
 				width = MESSICON*item->xyrelation;
@@ -1823,7 +1823,7 @@ static void CG_DrawHoldables(int rectx, int recty){
 	if(cgs.gametype != GT_DUEL){
 
 		if(cg.snap->ps.stats[STAT_ARMOR]){
-			gitem_t	*item = BG_FindItem("Boiler Plate");
+			gitem_t	*item = BG_Item("Boiler Plate");
 
 			CG_FillRect(x, recty, 32, 32, colors[3]);
 			CG_DrawPic(x, recty, 32, 32, cg_items[ITEM_INDEX(item)].icon);
@@ -1831,7 +1831,7 @@ static void CG_DrawHoldables(int rectx, int recty){
 		}
 
 		if(cg.snap->ps.powerups[PW_BELT]){
-			gitem_t *item = BG_FindItem("Ammunition Belt");
+			gitem_t *item = BG_Item("Ammunition Belt");
 
 			CG_FillRect(x, recty, 32, 32, colors[3]);
 			CG_DrawPic(x, recty, 32, 32, cg_items[ITEM_INDEX(item)].icon);
@@ -1839,7 +1839,7 @@ static void CG_DrawHoldables(int rectx, int recty){
 		}
 
 		if(cg.snap->ps.powerups[PW_GOLD] && cgs.gametype == GT_BR){
-			gitem_t *item = BG_FindItem("Moneybag");
+			gitem_t *item = BG_Item("Moneybag");
 
 			CG_FillRect(x, recty, 32, 32, colors[3]);
 			CG_DrawPic(x, recty, 32, 32, cg_items[ITEM_INDEX(item)].icon);
@@ -2197,7 +2197,7 @@ void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float tex
 
 		if(ownerDraw == CG_BUTTON_PRIM_AMMO || ownerDraw == CG_BUTTON_SEC_AMMO){
 			int belt = 1;
-			int weapon = BG_FindPlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, &cg.snap->ps);
+			int weapon = BG_PlayerWeapon(WP_WINCHESTER66, WP_DYNAMITE, &cg.snap->ps);
 			if(cg.snap->ps.powerups[PW_BELT]) belt = 2;
 			if(ownerDraw == CG_BUTTON_PRIM_AMMO) weapon = WP_REM58;
 

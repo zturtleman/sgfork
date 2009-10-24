@@ -4808,6 +4808,8 @@ void _UI_Init( qbool inGameLoad ) {
 	UI_RegisterCvars();
 	UI_InitMemory();
 
+  config_GetInfos( PFT_WEAPONS | PFT_ITEMS );
+
 	// cache redundant calulations
 	trap_GetGlconfig( &uiInfo.uiDC.glconfig );
 

@@ -26,9 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // g_mem.c
 //
 
-
 #include "g_local.h"
-
 
 #define POOLSIZE	(256 * 1024 * 4)
 
