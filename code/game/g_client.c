@@ -165,7 +165,7 @@ go to a random point that doesn't telefrag
 ================
 */
 #define	MAX_SPAWN_POINTS	128
-gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
+gentity_t *SelectRandomDeathmatchSpawnPoint(qbool isbot) {
 	gentity_t	*spot;
 	int			count;
 	int			selection;
@@ -174,11 +174,19 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	count = 0;
 	spot = NULL;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( SpotWouldTelefrag( spot ) ) {
+	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL && count < MAX_SPAWN_POINTS)
+	{
+		if(SpotWouldTelefrag(spot))
+			continue;
+
+		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			// spot is not for this human/bot player
 			continue;
 		}
-		spots[ count ] = spot;
+
+		spots[count] = spot;
 		count++;
 	}
 
@@ -189,6 +197,7 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	selection = rand() % count;
 	return spots[ selection ];
 }
+
 
 /*
 ===========
@@ -202,17 +211,17 @@ Chooses a player start, deathmatch start, etc
 		&& !( !(client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_HUMANS) ) )
 
 gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles,
-										   int mappart, gclient_t *client) {
+										   int mappart, gclient_t *client, qbool isbot ) {
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
-	float		list_dist[64];
-	gentity_t	*list_spot[64];
+	float		list_dist[MAX_SPAWN_POINTS];
+	gentity_t	*list_spot[MAX_SPAWN_POINTS];
 	int			numSpots, rnd, i, j, ignoreTeam;
 	gentity_t *ent_client;
-	gentity_t	*allSpot[64];
-	qbool	telefragSpot[64];
-	int			availSpot[64];
+	gentity_t	*allSpot[MAX_SPAWN_POINTS];
+	qbool	telefragSpot[MAX_SPAWN_POINTS];
+	int			availSpot[MAX_SPAWN_POINTS];
 	int			numAllSpots = 0;
 	int			numAvailSpots;
 	qbool perfectSpot = qfalse, telefrag;
@@ -224,7 +233,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
 		telefrag = SpotWouldTelefrag( spot );
 		if (g_gametype.integer != GT_DUEL) {
-			if (numAllSpots < 64) {
+			if (numAllSpots < MAX_SPAWN_POINTS) {
 				allSpot[ numAllSpots ] = spot;
 				telefragSpot[ numAllSpots ] = telefrag;
 				numAllSpots++;
@@ -264,8 +273,8 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 		dist = VectorLength( delta );
 		for (i = 0; i < numSpots; i++) {
 			if ( dist > list_dist[i] ) {
-				if ( numSpots >= 64 )
-					numSpots = 64-1;
+				if ( numSpots >= MAX_SPAWN_POINTS )
+					numSpots = MAX_SPAWN_POINTS-1;
 				for (j = numSpots; j > i; j--) {
 					list_dist[j] = list_dist[j-1];
 					list_spot[j] = list_spot[j-1];
@@ -273,12 +282,12 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 				list_dist[i] = dist;
 				list_spot[i] = spot;
 				numSpots++;
-				if (numSpots > 64)
-					numSpots = 64;
+				if (numSpots > MAX_SPAWN_POINTS)
+					numSpots = MAX_SPAWN_POINTS;
 				break;
 			}
 		}
-		if (i >= numSpots && numSpots < 64) {
+		if (i >= numSpots && numSpots < MAX_SPAWN_POINTS) {
 			list_dist[numSpots] = dist;
 			list_spot[numSpots] = spot;
 			numSpots++;
@@ -446,8 +455,8 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client ) {
-	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, mappart, client );
+gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client, qbool isbot ) {
+	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, mappart, client, isbot );
 }
 
 /*
@@ -458,21 +467,28 @@ Try to find a spawn point marked 'initial', otherwise
 use normal spawn selection.
 ============
 */
-gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, int mappart, gclient_t *client) {
+gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, int mappart, gclient_t *client, qbool isbot ) {
 	gentity_t	*spot;
 
 	spot = NULL;
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( spot->spawnflags & 1 ) {
-			break;
+	
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+	{
+		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			continue;
 		}
+		
+		if((spot->spawnflags & 0x01))
+			break;
 	}
 
-	if ( !spot || SpotWouldTelefrag( spot ) ) {
-		return SelectSpawnPoint( vec3_origin, origin, angles, mappart, client );
-	}
+	if (!spot || SpotWouldTelefrag(spot))
+		return SelectSpawnPoint(vec3_origin, origin, angles, mappart, client , isbot);
 
 	VectorCopy (spot->s.origin, origin);
+	origin[2] += 9;
 	VectorCopy (spot->s.angles, angles);
 
 	return spot;
@@ -823,79 +839,59 @@ static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) 
 ClientCheckName
 ============
 */
-static void ClientCleanName( const char *in, char *out, int outSize ) {
-	int		len, colorlessLen;
-	char	ch;
-	char	*p;
-	int		spaces;
+static void ClientCleanName(const char *in, char *out, int outSize)
+{
+	int outpos = 0, colorlessLen = 0, spaces = 0;
 
-	//save room for trailing null byte
-	outSize--;
+	// discard leading spaces
+	for(; *in == ' '; in++);
+	
+	for(; *in && outpos < outSize - 1; in++)
+	{
+		out[outpos] = *in;
 
-	len = 0;
-	colorlessLen = 0;
-	p = out;
-	*p = 0;
-	spaces = 0;
-
-	while( 1 ) {
-		ch = *in++;
-		if( !ch )
-			break;
-
-		// don't allow leading spaces
-		if( colorlessLen == 0 && ch == ' ' ) {
-			continue;
-		}
-
-		// check colors
-		if( ch == Q_COLOR_ESCAPE ) {
-			// solo trailing carat is not a color prefix
-			if( !*in )
-				break;
-
-			// don't allow black in a name, period
-			if( ColorIndex(*in) == 0 ) {
-				in++;
+		if(*in == ' ')
+		{
+			// don't allow too many consecutive spaces
+			if(spaces > 2)
 				continue;
-			}
-
-			// make sure room in dest for both chars
-			if( len > outSize - 2 )
-				break;
-
-			*out++ = ch;
-			*out++ = *in++;
-			len += 2;
-			continue;
-		}
-
-		// don't allow too many consecutive spaces
-		// don't count spaces in colorlessLen
-		if( ch == ' ' ) {
+			
 			spaces++;
-			if( spaces > 3 )
-				continue;
- 
-			*out++ = ch;
-			len++;
-			continue;
+		}
+		else if(outpos > 0 && out[outpos - 1] == Q_COLOR_ESCAPE)
+		{
+			if(Q_IsColorString(&out[outpos - 1]))
+			{
+				colorlessLen--;
+				
+				if(ColorIndex(*in) == 0)
+				{
+					// Disallow color black in names to prevent players
+					// from getting advantage playing in front of black backgrounds
+					outpos--;
+					continue;
+				}
+			}
+			else
+			{
+				spaces = 0;
+				colorlessLen++;
+			}
 		}
 		else
+		{
 			spaces = 0;
-
-		if( len > outSize - 1 )
-			break;
-
-		*out++ = ch;
-		colorlessLen++;
-		len++;
+			colorlessLen++;
+		}
+		
+		outpos++;
 	}
-	*out = 0;
+
+	out[outpos] = '\0';
 
 	// don't allow empty names
-	if( *p == 0 || colorlessLen == 0 )
-		Q_strncpyz( p, "UnnamedPlayer", outSize );
+	if( *out == '\0' || colorlessLen == 0)
+		Q_strncpyz(out, "UnnamedPlayer", outSize );
 }
 
 
@@ -923,8 +919,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
-	char	guid[MAX_INFO_STRING];
 	char	version[MAX_INFO_STRING];
+	char    guid[MAX_INFO_STRING];
 
 	ent = g_entities + clientNum;
 	client = ent->client;
@@ -1057,7 +1053,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
-	if ( ent->r.svFlags & SVF_BOT ) {
+	if (ent->r.svFlags & SVF_BOT) {
 		s = va("n\\%s\\t\\%i\\model\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d",
 			client->pers.netname, client->sess.sessionTeam, model,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
@@ -1125,7 +1121,7 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
   // we don't check password for bots and local client
   // NOTE: local client <-> "ip" "localhost"
   //   this means this client is not running in our current process
-	if ( !isBot && (strcmp(value, "localhost") != 0)) {
+	if ( !isBot && (strcmp(ip, "localhost") != 0)) {
     ent->client->pers.ip = ip;
 		// check for a password
 		value = Info_ValueForKey (userinfo, "password");
@@ -1247,7 +1243,7 @@ void ClientBegin( int clientNum ) {
 	CalculateRanks();
 
 	//start into game: receive money (by Spoon)
-	ent->client->ps.stats[STAT_MONEY] = START_MONEY;
+	ent->client->ps.stats[STAT_MONEY] = g_moneyMin.integer;
 }
 
 /*
@@ -1381,6 +1377,8 @@ void ClientSpawn(gentity_t *ent) {
 	if(!ent->mappart && g_gametype.integer == GT_DUEL)
 		ent->mappart = rand()%g_maxmapparts+1;
 
+	VectorClear(spawn_origin);
+
 	// find a spawn point
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
@@ -1398,7 +1396,8 @@ void ClientSpawn(gentity_t *ent) {
 			spawnPoint = SelectCTFSpawnPoint (
 				client->sess.sessionTeam,
 				client->pers.teamState.state,
-				spawn_origin, spawn_angles, ent->mappart);
+				spawn_origin, spawn_angles, ent->mappart,
+				!!(ent->r.svFlags & SVF_BOT));
 		}
 	} else if (g_gametype.integer == GT_DUEL){
 		if (client->sess.sessionTeam == TEAM_SPECTATOR) {
@@ -1408,31 +1407,23 @@ void ClientSpawn(gentity_t *ent) {
 		} else {
 			spawnPoint = SelectSpawnPoint (
 						client->ps.origin,
-						spawn_origin, spawn_angles, ent->mappart, ent->client);
+						spawn_origin, spawn_angles, ent->mappart, ent->client,
+						!!(ent->r.svFlags & SVF_BOT));
 		}
 	} else {
 		do {
 			// the first spawn should be at a good looking spot
 			if ( !client->pers.initialSpawn && client->pers.localClient ) {
 				client->pers.initialSpawn = qtrue;
-				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles, ent->mappart, ent->client );
+				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles, ent->mappart, ent->client,
+					!!(ent->r.svFlags & SVF_BOT));
 			} else {
 				// don't spawn near existing origin if possible
 				spawnPoint = SelectSpawnPoint (
 					client->ps.origin,
-					spawn_origin, spawn_angles, ent->mappart, client);
+					spawn_origin, spawn_angles, ent->mappart, client,
+					!!(ent->r.svFlags & SVF_BOT));
 			}
-
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
-			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) )
-				continue;	// try again
-      
-			// just to be symetric, we have a nohumans option...
-			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) )
-				continue;	// try again
-
-			break;
 		} while ( 1 );
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
@@ -1553,20 +1544,20 @@ void ClientSpawn(gentity_t *ent) {
 	if ( ent->client->sess.sessionTeam >= TEAM_SPECTATOR ) {
 	} else {
 		if ( g_gametype.integer == GT_DUEL )  {
-			min_money = DU_MIN_MONEY ;
+			min_money = g_moneyDUMin.integer;
 		}
 		else  {
-			if ( g_moneyRespawn.integer == 1 ) {
+			if (g_moneyRespawnMode.integer == 1) {
 				// Joe Kari: new minimum money at respawn formula //
-				if ( ( g_gametype.integer == GT_BR ) || ( g_gametype.integer == GT_RTP ) ) {
-					min_money = MIN_MONEY + ( client->ps.stats[ STAT_MONEY ] - m_teamlose.integer ) / 4 ;
+				if ((g_moneyRespawnMode.integer == GT_BR) || (g_gametype.integer == GT_RTP)) {
+					min_money = g_moneyMin.integer + (client->ps.stats[STAT_MONEY] - g_moneyTeamLose.integer) / 4;
 				} else {
-					min_money = MIN_MONEY + client->ps.stats[ STAT_MONEY ] / 4 ;
+					min_money = g_moneyMin.integer + client->ps.stats[STAT_MONEY] / 4;
 				}
 			}
-			if ( min_money < MIN_MONEY ) {
+			if ( min_money < g_moneyMin.integer ) {
 				// former minimum money at respawn formula : //
-				min_money = MIN_MONEY ;
+				min_money = g_moneyMin.integer;
 			}
 		}
 		

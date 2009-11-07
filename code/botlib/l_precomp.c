@@ -949,7 +949,7 @@ void PC_ConvertPath(char *path)
 		if ((*ptr == '\\' || *ptr == '/') &&
 				(*(ptr+1) == '\\' || *(ptr+1) == '/'))
 		{
-			strcpy(ptr, ptr+1);
+			memmove(ptr, ptr+1, strlen(ptr));
 		} //end if
 		else
 		{
@@ -2563,11 +2563,12 @@ int PC_DollarDirective_evalint(source_t *source)
 	token.type = TT_NUMBER;
 	token.subtype = TT_INTEGER|TT_LONG|TT_DECIMAL;
 #ifdef NUMBERVALUE
-	token.intvalue = value;
-	token.floatvalue = value;
+	token.intvalue = abs(value);
+	token.floatvalue = token.intvalue;
 #endif //NUMBERVALUE
 	PC_UnreadSourceToken(source, &token);
-	if (value < 0) UnreadSignToken(source);
+	if (value < 0)
+		UnreadSignToken(source);
 	return qtrue;
 } //end of the function PC_DollarDirective_evalint
 //============================================================================
@@ -2590,11 +2591,12 @@ int PC_DollarDirective_evalfloat(source_t *source)
 	token.type = TT_NUMBER;
 	token.subtype = TT_FLOAT|TT_LONG|TT_DECIMAL;
 #ifdef NUMBERVALUE
-	token.intvalue = (unsigned long) value;
-	token.floatvalue = value;
+	token.floatvalue = fabs(value);
+	token.intvalue = (unsigned long) token.floatvalue;
 #endif //NUMBERVALUE
 	PC_UnreadSourceToken(source, &token);
-	if (value < 0) UnreadSignToken(source);
+	if (value < 0)
+		UnreadSignToken(source);
 	return qtrue;
 } //end of the function PC_DollarDirective_evalfloat
 //============================================================================

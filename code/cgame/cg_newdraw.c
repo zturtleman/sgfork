@@ -236,8 +236,8 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	  trap_R_SetColor( NULL );
 	} else {
 		Com_sprintf (num, sizeof(num), "%i", value);
-		value = CG_Text_Width(num, scale, 0);
-	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+		value = UI_Text_Width(num, scale, 0);
+	  UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
 
@@ -286,8 +286,8 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 			  trap_R_SetColor( NULL );
 			} else {
 				Com_sprintf (num, sizeof(num), "%i", value);
-				value = CG_Text_Width(num, scale, 0);
-				CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+				value = UI_Text_Width(num, scale, 0);
+				UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 			}
 		}
 	}
@@ -360,8 +360,8 @@ static void CG_DrawSelectedPlayerHealth( rectDef_t *rect, float scale, vec4_t co
 			trap_R_SetColor( NULL );
 		} else {
 			Com_sprintf (num, sizeof(num), "%i", ci->health);
-		  value = CG_Text_Width(num, scale, 0);
-		  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+		  value = UI_Text_Width(num, scale, 0);
+		  UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 		}
 	}
 }
@@ -379,8 +379,8 @@ static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t col
 				trap_R_SetColor( NULL );
 			} else {
 				Com_sprintf (num, sizeof(num), "%i", ci->armor);
-				value = CG_Text_Width(num, scale, 0);
-				CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+				value = UI_Text_Width(num, scale, 0);
+				UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 			}
 		}
  	}
@@ -422,7 +422,7 @@ static void CG_DrawSelectedPlayerName( rectDef_t *rect, float scale, vec4_t colo
 	clientInfo_t *ci;
   ci = cgs.clientinfo + ((voice) ? cgs.currentVoiceClient : sortedTeamPlayers[CG_GetSelectedPlayer()]);
   if (ci) {
-    CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, ci->name, 0, 0, textStyle);
+    UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, ci->name, 0, 0, textStyle);
   }
 }
 
@@ -434,7 +434,7 @@ static void CG_DrawSelectedPlayerLocation( rectDef_t *rect, float scale, vec4_t 
 		if (!p || !*p) {
 			p = "unknown";
 		}
-    CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, p, 0, 0, textStyle);
+    UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, p, 0, 0, textStyle);
   }
 }
 
@@ -445,7 +445,7 @@ static void CG_DrawPlayerLocation( rectDef_t *rect, float scale, vec4_t color, i
 		if (!p || !*p) {
 			p = "unknown";
 		}
-    CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, p, 0, 0, textStyle);
+    UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, p, 0, 0, textStyle);
   }
 }
 
@@ -478,8 +478,8 @@ static void CG_DrawPlayerScore( rectDef_t *rect, float scale, vec4_t color, qhan
 		trap_R_SetColor( NULL );
 	} else {
 		Com_sprintf (num, sizeof(num), "%i", value);
-		value = CG_Text_Width(num, scale, 0);
-	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+		value = UI_Text_Width(num, scale, 0);
+	  UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
 
@@ -506,8 +506,8 @@ static void CG_DrawRoundtime( rectDef_t *rect, float scale, vec4_t color, qhandl
 
 	s = va( "%i:%i%i", mins, tens, seconds );
 
-	value = CG_Text_Width(s, scale, 0);
-	CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, s, 0, 0, textStyle);
+	value = UI_Text_Width(s, scale, 0);
+	UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, s, 0, 0, textStyle);
 }
 
 static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qbool draw2D) {
@@ -599,8 +599,8 @@ static void CG_DrawPlayerHealth(rectDef_t *rect, float scale, vec4_t color, qhan
 		trap_R_SetColor( NULL );
 	} else {
 		Com_sprintf (num, sizeof(num), "%i", value);
-	  value = CG_Text_Width(num, scale, 0);
-	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+	  value = UI_Text_Width(num, scale, 0);
+	  UI_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
 
@@ -614,8 +614,8 @@ static void CG_DrawRedScore(rectDef_t *rect, float scale, vec4_t color, qhandle_
 	else {
 		Com_sprintf (num, sizeof(num), "%i", cgs.scores1);
 	}
-	value = CG_Text_Width(num, scale, 0);
-	CG_Text_Paint(rect->x + rect->w - value, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+	value = UI_Text_Width(num, scale, 0);
+	UI_Text_Paint(rect->x + rect->w - value, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 }
 
 static void CG_DrawBlueScore(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
@@ -628,8 +628,8 @@ static void CG_DrawBlueScore(rectDef_t *rect, float scale, vec4_t color, qhandle
 	else {
 		Com_sprintf (num, sizeof(num), "%i", cgs.scores2);
 	}
-	value = CG_Text_Width(num, scale, 0);
-	CG_Text_Paint(rect->x + rect->w - value, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+	value = UI_Text_Width(num, scale, 0);
+	UI_Text_Paint(rect->x + rect->w - value, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 }
 
 // FIXME: team name support
@@ -645,16 +645,16 @@ static void CG_DrawRedName(rectDef_t *rect, float scale, vec4_t color, int textS
 		x += 32 + 5;
 
 		if(cg.snap->ps.persistant[PERS_ROBBER])
-			CG_Text_Paint(x, y, scale, colorw, "Get the Moneybag!", 0, -1, 3);
+			UI_Text_Paint(x, y, scale, colorw, "Get the Moneybag!", 0, -1, 3);
 		else
-			CG_Text_Paint(x, y, scale, colorw, "Defend the Moneybag!", 0, -1, 3);
+			UI_Text_Paint(x, y, scale, colorw, "Defend the Moneybag!", 0, -1, 3);
 	}
 
-	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, cg_redTeamName.string , 0, 0, textStyle);
+	UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, cg_redTeamName.string , 0, 0, textStyle);
 }
 
 static void CG_DrawBlueName(rectDef_t *rect, float scale, vec4_t color, int textStyle ) {
-  CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, cg_blueTeamName.string, 0, 0, textStyle);
+  UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, cg_blueTeamName.string, 0, 0, textStyle);
 }
 
 static void CG_DrawTeamColor(rectDef_t *rect, vec4_t color) {
@@ -806,15 +806,15 @@ qbool CG_OwnerDrawVisible(int flags) {
 }
 
 static void CG_DrawAreaSystemChat(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader) {
-  CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, systemChat, 0, 0, 0);
+ UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, systemChat, 0, 0, 0);
 }
 
 static void CG_DrawAreaTeamChat(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader) {
-  CG_Text_Paint(rect->x, rect->y + rect->h, scale, color,teamChat1, 0, 0, 0);
+  UI_Text_Paint(rect->x, rect->y + rect->h, scale, color,teamChat1, 0, 0, 0);
 }
 
 static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader) {
-  CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, teamChat2, 0, 0, 0);
+  UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, teamChat2, 0, 0, 0);
 }
 
 const char *CG_GetKillerText(void) {
@@ -830,7 +830,7 @@ static void CG_DrawKiller(rectDef_t *rect, float scale, vec4_t color, qhandle_t 
 	// fragged by ... line
 	if ( cg.killerName[0] ) {
 		int x = rect->x + rect->w / 2;
-	  CG_Text_Paint(x - CG_Text_Width(CG_GetKillerText(), scale, 0) / 2, rect->y + rect->h, scale, color, CG_GetKillerText(), 0, 0, textStyle);
+	  UI_Text_Paint(x - UI_Text_Width(CG_GetKillerText(), scale, 0) / 2, rect->y + rect->h, scale, color, CG_GetKillerText(), 0, 0, textStyle);
 	}
 
 }
@@ -841,18 +841,18 @@ static void CG_DrawCapFragLimit(rectDef_t *rect, float scale, vec4_t color, qhan
 	if(cgs.gametype == GT_DUEL)
 		limit = cgs.duellimit;
 
-	CG_Text_Paint(rect->x, rect->y, scale, color, va("%2i", limit),0, 0, textStyle);
+	UI_Text_Paint(rect->x, rect->y, scale, color, va("%2i", limit),0, 0, textStyle);
 }
 
 static void CG_Draw1stPlace(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	if (cgs.scores1 != SCORE_NOT_PRESENT) {
-		CG_Text_Paint(rect->x, rect->y, scale, color, va("%2i", cgs.scores1),0, 0, textStyle);
+		UI_Text_Paint(rect->x, rect->y, scale, color, va("%2i", cgs.scores1),0, 0, textStyle);
 	}
 }
 
 static void CG_Draw2ndPlace(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	if (cgs.scores2 != SCORE_NOT_PRESENT) {
-		CG_Text_Paint(rect->x, rect->y, scale, color, va("%2i", cgs.scores2),0, 0, textStyle);
+		UI_Text_Paint(rect->x, rect->y, scale, color, va("%2i", cgs.scores2),0, 0, textStyle);
 	}
 }
 
@@ -869,7 +869,7 @@ const char *CG_GetGameStatusText(void) {
 }
 
 static void CG_DrawGameStatus(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
-	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GetGameStatusText(), 0, 0, textStyle);
+	UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GetGameStatusText(), 0, 0, textStyle);
 }
 
 const char *CG_GameTypeString(void) {
@@ -887,62 +887,7 @@ const char *CG_GameTypeString(void) {
 	return "";
 }
 static void CG_DrawGameType(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
-	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GameTypeString(), 0, 0, textStyle);
-}
-
-static void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t color, const char* text, float adjust, int limit) {
-  int len, count;
-	vec4_t newColor;
-	glyphInfo_t *glyph;
-  if (text) {
-		const char *s = text;
-		float max = *maxX;
-		float useScale;
-		fontInfo_t *font = &cgDC.Assets.textFont;
-		if (scale <= cg_smallFont.value) {
-			font = &cgDC.Assets.smallFont;
-		} else if (scale > cg_bigFont.value) {
-			font = &cgDC.Assets.bigFont;
-		}
-		useScale = scale * font->glyphScale;
-		trap_R_SetColor( color );
-    len = strlen(text);
-		if (limit > 0 && len > limit) {
-			len = limit;
-		}
-		count = 0;
-		while (s && *s && count < len) {
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
-			if ( Q_IsColorString( s ) ) {
-				memcpy( newColor, g_color_table[ColorIndex(*(s+1))], sizeof( newColor ) );
-				newColor[3] = color[3];
-				trap_R_SetColor( newColor );
-				s += 2;
-				continue;
-			} else {
-	      float yadj = useScale * glyph->top;
-				if (CG_Text_Width(s, useScale, 1) + x > max) {
-					*maxX = 0;
-					break;
-				}
-		    CG_Text_PaintChar(x, y - yadj,
-			                    glyph->imageWidth,
-				                  glyph->imageHeight,
-					                useScale,
-						              glyph->s,
-							            glyph->t,
-								          glyph->s2,
-									        glyph->t2,
-										      glyph->glyph);
-	      x += (glyph->xSkip * useScale) + adjust;
-				*maxX = x;
-				count++;
-				s++;
-	    }
-		}
-	  trap_R_SetColor( NULL );
-  }
-
+	UI_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GameTypeString(), 0, 0, textStyle);
 }
 
 static void CG_DrawTimer(rectDef_t *rect, vec4_t textColor) {
@@ -965,7 +910,7 @@ static void CG_DrawTimer(rectDef_t *rect, vec4_t textColor) {
 	s = va( "%i:%i%i", mins, tens, seconds );
 //	w = CG_DrawStrlen( s ) * 11;
 
-	CG_Text_Paint(rect->x, rect->y + 5 + BIGCHAR_HEIGHT, 0.4f, textColor, s, 0, 0, 3);
+	UI_Text_Paint(rect->x, rect->y + 5 + BIGCHAR_HEIGHT, 0.4f, textColor, s, 0, 0, 3);
 }
 
 //by: hika / 2006-12-30
@@ -1027,7 +972,7 @@ static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
 
 	if (eType[ max_eType ][0] > 0) {
 		s = va("=== Entities ===");
-		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 		y += TINYCHAR_HEIGHT + 4;
 
 		// Then, display for each entity type, the total number in the snapshot
@@ -1106,7 +1051,7 @@ static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
 				if (s_eType != NULL) {
 					s = va("[%s]: %i/%i entities, %i/%i solids",
 						s_eType, eType[i][1], eType[i][0], eType[i][3], eType[i][2]);
-					CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+					UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 					y += TINYCHAR_HEIGHT + 4;
 				}
 			}
@@ -1115,7 +1060,7 @@ static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
 		// Show total entities
 		s = va("TOTAL: %i/%i entities, %i/%i solids",
 			eType[i][1], eType[i][0], eType[i][3], eType[i][2]);
-		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 		y += TINYCHAR_HEIGHT + 4;
 	}
 
@@ -1145,7 +1090,7 @@ static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
 
 	if (leType[ max_leType ][0] > 0) {
 		s = va("=== Local Entities ===");
-		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 		y += TINYCHAR_HEIGHT + 4;
 
 		// Then, display for each locale entity type
@@ -1187,7 +1132,7 @@ static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
 
 				if (s_leType != NULL) {
 					s = va("[%s]: %i/%i local entities", s_leType, leType[i][1], leType[i][0]);
-					CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+					UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 					y += TINYCHAR_HEIGHT + 4;
 				}
 			}
@@ -1195,7 +1140,7 @@ static void CG_DrawStatusEntities(rectDef_t *rect,vec4_t textColor) {
 
 		// Show total local entities
 		s = va("TOTAL: %i/%i local entities", leType[i][1], leType[i][0]);
-		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 		y += TINYCHAR_HEIGHT + 4;
 	}
 }
@@ -1213,31 +1158,31 @@ static void CG_DrawCameraInfo(rectDef_t *rect,vec4_t textColor) {
 	y = rect->y;
 
 	s = va("=== Camera Origin ===");
-	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 	y += TINYCHAR_HEIGHT + 5;
 
 	s = va("[ %f, %f, %f ]", cg.refdef.vieworg[0], cg.refdef.vieworg[1], cg.refdef.vieworg[2]);
-	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 	y += TINYCHAR_HEIGHT + 5;
 
 	s = va("=== Camera Axis ===");
-	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 	y += TINYCHAR_HEIGHT + 5;
 
 	for ( i = 0; i < 3; i++ ) {
 		s = va("[ %f, %f, %f ]",
 			cg.refdef.viewaxis[i][0], cg.refdef.viewaxis[i][1], cg.refdef.viewaxis[i][2]);
-		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 		y += TINYCHAR_HEIGHT + 5;
 	}
 
 	s = va("=== Frustum Plane%s ===", (sa_engine_inuse ? " (SG engine)" : ""));
-	CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+	UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 	y += TINYCHAR_HEIGHT + 5;
 	for ( i = 0; i < 4; i++ ) {
 		s = va("[%i].normal : [ %f, %f, %f ]", i,
 			cg_frustum[i].normal[0], cg_frustum[i].normal[1], cg_frustum[i].normal[2]);
-		CG_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(x, y + 5 + TINYCHAR_HEIGHT, 0.2f, textColor, s, 0, 0, 3);
 		y += TINYCHAR_HEIGHT + 5;
 	}
 }
@@ -1582,7 +1527,7 @@ static void CG_DrawFPS(rectDef_t *rect, vec4_t textColor) {
 		fps = 1000 * FPS_FRAMES / total;
 
 		s = va( "%ifps", fps );
-		CG_Text_Paint(rect->x, rect->y + 5 + BIGCHAR_HEIGHT, 0.4f, textColor, s, 0, 0, 3);
+		UI_Text_Paint(rect->x, rect->y + 5 + BIGCHAR_HEIGHT, 0.4f, textColor, s, 0, 0, 3);
 	}
 }
 
@@ -1655,7 +1600,7 @@ static void CG_DrawLagometer( rectDef_t *rect, vec4_t textColor ) {
 
 	trap_R_SetColor( NULL );
 
-	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
+	UI_AdjustFrom640( &ax, &ay, &aw, &ah );
 
 	color = -1;
 	range = ah / 3;
@@ -1766,7 +1711,7 @@ void CG_DrawTeamSpectators(rectDef_t *rect, float scale, vec4_t color, qhandle_t
 						cg.spectatorOffset+=2;
 					}
 					if (cg.spectatorOffset < cg.spectatorLen) {
-						cg.spectatorPaintX += CG_Text_Width(&cg.spectatorList[cg.spectatorOffset], scale, 1) - 1;
+						cg.spectatorPaintX += UI_Text_Width(&cg.spectatorList[cg.spectatorOffset], scale, 1) - 1;
 						cg.spectatorOffset++;
 					}
 				} else {
@@ -1789,10 +1734,10 @@ void CG_DrawTeamSpectators(rectDef_t *rect, float scale, vec4_t color, qhandle_t
 		}
 
 		maxX = rect->x + rect->w - 2;
-		CG_Text_Paint_Limit(&maxX, cg.spectatorPaintX, rect->y + rect->h - 3, scale, cg.spectatorCurrentColor, &cg.spectatorList[cg.spectatorOffset], 0, 0);
+		UI_Text_Paint_Limit(&maxX, cg.spectatorPaintX, rect->y + rect->h - 3, scale, cg.spectatorCurrentColor, &cg.spectatorList[cg.spectatorOffset], 0, 0);
 		if (cg.spectatorPaintX2 >= 0) {
 			float maxX2 = rect->x + rect->w - 2;
-			CG_Text_Paint_Limit(&maxX2, cg.spectatorPaintX2, rect->y + rect->h - 3, scale, color, cg.spectatorList, 0, cg.spectatorOffset);
+			UI_Text_Paint_Limit(&maxX2, cg.spectatorPaintX2, rect->y + rect->h - 3, scale, color, cg.spectatorList, 0, cg.spectatorOffset);
 		}
 		if (cg.spectatorOffset && maxX > 0) {
 			// if we have an offset ( we are skipping the first part of the string ) and we fit the string
@@ -2283,14 +2228,14 @@ void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float tex
 
 			//different colors depending on money, the player has
 			if(menu_items[cg.menuitem-1].inventory){
-				CG_Text_Paint(x+35, newy+10, 0.28f, colors[2], va("cost: $%i", buyitem->prize), 0, -1, 0);
-				CG_Text_Paint(x+35, newy+25, 0.28f, colors[2], "You own this item", 0, -1, 0);
+				UI_Text_Paint(x+35, newy+10, 0.28f, colors[2], va("cost: $%i", buyitem->prize), 0, -1, 0);
+				UI_Text_Paint(x+35, newy+25, 0.28f, colors[2], "You own this item", 0, -1, 0);
 			} else if(!menu_items[cg.menuitem-1].money) {
-				CG_Text_Paint(x+35, newy+10, 0.28f, colors[1], va("cost: $%i", buyitem->prize), 0, -1, 0);
-				CG_Text_Paint(x+35, newy+25, 0.28f, colors[1], "Not enough money", 0, -1, 0);
+				UI_Text_Paint(x+35, newy+10, 0.28f, colors[1], va("cost: $%i", buyitem->prize), 0, -1, 0);
+				UI_Text_Paint(x+35, newy+25, 0.28f, colors[1], "Not enough money", 0, -1, 0);
 			} else {
-				CG_Text_Paint(x+35, newy+10, 0.28f, colors[0], va("cost: $%i", buyitem->prize), 0, -1, 0);
-				CG_Text_Paint(x+35, newy+25, 0.28f, colors[0], "Press MOUSE1 to buy", 0, -1, 0);
+				UI_Text_Paint(x+35, newy+10, 0.28f, colors[0], va("cost: $%i", buyitem->prize), 0, -1, 0);
+				UI_Text_Paint(x+35, newy+25, 0.28f, colors[0], "Press MOUSE1 to buy", 0, -1, 0);
 			}
 
 			newy += 25 + 24;

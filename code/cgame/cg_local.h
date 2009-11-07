@@ -1225,8 +1225,6 @@ typedef struct {
 typedef struct {
 	gameState_t		gameState;			// gamestate from server
 	glconfig_t		glconfig;			// rendering configuration
-	float			screenXScale;		// derived from glconfig
-	float			screenYScale;
 	float			screenXBias;
 
 	int				serverCommandSequence;	// reliable command stream counter
@@ -1254,7 +1252,9 @@ typedef struct {
 
 	qbool		specsareflies;
 	qbool		deathcam;
-int				voteTime;
+	int			moneyMax;
+
+	int				voteTime;
 	int				voteYes;
 	int				voteNo;
 	qbool		voteModified;			// beep whenever changed
@@ -1269,8 +1269,6 @@ int				voteTime;
 	int				levelStartTime;
 
 	int				scores1, scores2;		// from configstrings
-	int				redflag, blueflag;		// flag status from configstrings
-	int				flagStatus;
 
 	qbool  newHud;
 
@@ -1564,7 +1562,6 @@ const char *CG_ConfigString( int index );
 const char *CG_Argv( int arg );
 
 void QDECL CG_Printf( const char *msg, ... );
-void QDECL CG_Error( const char *msg, ... );
 
 void CG_SelectMusic( void );
 void CG_PlayMusic( void );
@@ -1601,7 +1598,6 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qbool demoPla
 //
 // cg_drawtools.c
 //
-void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
 void CG_DrawString( float x, float y, const char *string,
@@ -1652,9 +1648,6 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
 #include "../ui/ui_shared.h"
 void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
 
-void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
-int CG_Text_Width(const char *text, float scale, int limit);
-int CG_Text_Height(const char *text, float scale, int limit);
 void CG_SelectPrevPlayer( void );
 void CG_SelectNextPlayer( void );
 float CG_GetValue(int ownerDraw);
@@ -1667,8 +1660,6 @@ void CG_GetTeamColor(vec4_t *color);
 const char *CG_GetGameStatusText( void );
 const char *CG_GetKillerText( void );
 void CG_Draw3DModel(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles);
-void CG_Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader);
-void CG_Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
 void CG_CheckOrderPending( void );
 const char *CG_GameTypeString( void );
 qbool CG_YourTeamHasFlag( void );
@@ -1737,7 +1728,6 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 //
 // cg_parse.c
 //
-void Weapons_GetInfos( void );
 int BG_AnimNumByName( char *anim );
 int BG_WeaponNumByName( char *wp );
 char *Weapons_FileForWeapon( int wp_num );
@@ -1888,14 +1878,6 @@ void		trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bu
 int			trap_Argc( void );
 void		trap_Argv( int n, char *buffer, int bufferLength );
 void		trap_Args( char *buffer, int bufferLength );
-
-// filesystem access
-// returns length of file
-int			trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void		trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void		trap_FS_Write( const void *buffer, int len, fileHandle_t f );
-void		trap_FS_FCloseFile( fileHandle_t f );
-int			trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t
 
 // add commands to the local console as if they were typed in
 // for map changing, etc.  The command is not executed immediately,

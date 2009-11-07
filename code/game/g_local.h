@@ -728,7 +728,7 @@ team_t TeamCount( int ignoreClientNum, int team );
 int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client );
+gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client, qbool isbot);
 void CopyToBodyQue( gentity_t *ent );
 void respawn (gentity_t *ent);
 void BeginIntermission (void);
@@ -793,7 +793,6 @@ void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... );
-void QDECL G_Error( const char *fmt, ... );
 
 //
 // g_client.c
@@ -890,7 +889,22 @@ extern	vmCvar_t	g_maxclients;			// allow this many total, including spectators
 extern	vmCvar_t	g_maxGameClients;		// allow this many active
 extern	vmCvar_t	g_restarted;
 
-extern	vmCvar_t	g_moneyRespawn;
+extern	vmCvar_t	g_moneyRespawnMode;
+extern	vmCvar_t	g_countSocialHelp;
+
+//Money system
+extern	vmCvar_t	g_moneyMax;
+extern	vmCvar_t	g_moneyMin;
+extern	vmCvar_t	g_moneyDUMin;
+extern	vmCvar_t	g_moneySocialHelp;
+extern	vmCvar_t	g_moneyLose;
+extern	vmCvar_t	g_moneyForRobber;
+
+extern	vmCvar_t	g_moneyMaxReward;
+extern	vmCvar_t	g_moneyTeamWin;
+extern	vmCvar_t	g_moneyTeamLose;
+//Money system END
+
 extern	vmCvar_t	g_newShotgunPattern;
 extern	vmCvar_t	g_roundNoMoveTime;
 extern	vmCvar_t	g_duellimit;
@@ -1045,10 +1059,6 @@ extern	vmCvar_t	g_splitChat;
 
 
 //Spoon End
-
-extern	vmCvar_t	m_maxreward;
-extern	vmCvar_t	m_teamwin;
-extern	vmCvar_t	m_teamlose;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

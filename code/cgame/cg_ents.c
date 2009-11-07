@@ -771,30 +771,9 @@ CG_Mover
 static void CG_Mover( centity_t *cent ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
-	
-	// Joe Kari: farclip_type and farclip_dist :
-	
-	int farclip_type = cent->currentState.powerups & 255 ;	// only 8 lower bits of powerups is used for farclipping
-	// fast multiply by 64:
-	float farclip_dist = (float)( cent->currentState.legsAnim << 6 ) ;
-	float farclip_alt_dist = (float)( cent->currentState.torsoAnim << 6 ) ;
-	float farclip_factor ;
-	
-	if ( !cg_farclip.integer || farclip_dist < 1 )
-	{
-		farclip_type = FARCLIP_NONE ;
-	}
-	else
-	{
-		if ( cg.zoomed )  farclip_factor = cg_farclipZoomValue.value ;
-		else  farclip_factor = cg_farclipValue.value ;
-		if ( farclip_factor < 1 )  farclip_factor = 1 ;
-		farclip_dist *= farclip_factor ;
-		farclip_alt_dist *= farclip_factor ;
-	}
-	
+
 	s1 = &cent->currentState;
-	
+
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
 	VectorCopy( cent->lerpOrigin, ent.origin);
@@ -802,24 +781,10 @@ static void CG_Mover( centity_t *cent ) {
 	AnglesToAxis( cent->lerpAngles, ent.axis );
 
 	ent.renderfx = RF_NOSHADOW;
-	
-	// Joe Kari: for func_static (yes there are classified as mover)
-	// if a LOD is specified for this entity, then try to clip it !!!
-	if ( cent->currentState.powerups & MAPLOD_BINARY_MASK ) {
-		int objectLOD = ( cent->currentState.powerups >> 8 ) & 3 ;
-		if ( cent->currentState.powerups & MAPLOD_GTE_BINARY_MASK ) {
-			if ( cg_mapLOD.integer < objectLOD )  return;
-		}
-		else if ( cg_mapLOD.integer > objectLOD )  return;
-	}
-	
-	// Joe Kari: for func_static
-	// if a farclip is specified for this entity, then try to clip it !!!
-	if ( ( farclip_type > FARCLIP_NONE ) && ( farclip_type < CG_Farclip_Tester_Table_Size ) && ( CG_Farclip_Tester[farclip_type]( s1->origin , cg.refdef.vieworg , farclip_dist , farclip_alt_dist ) ) )  return;
-	
+
 	// flicker between two skins (FIXME?)
 	ent.skinNum = ( cg.time >> 6 ) & 1;
-	
+
 	// get the model, either as a bmodel or a modelindex
 	if ( s1->solid == SOLID_BMODEL ) {
 		ent.hModel = cgs.inlineDrawModel[s1->modelindex];

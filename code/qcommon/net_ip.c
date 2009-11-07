@@ -267,7 +267,9 @@ Sys_StringToSockaddr
 */
 static qbool Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_len, sa_family_t family)
 {
-	struct addrinfo hints, *res = NULL, *search = NULL;
+	struct addrinfo hints;
+	struct addrinfo *res = NULL;
+	struct addrinfo *search = NULL;
 	struct addrinfo *hintsp;
 	int retval;
 	
@@ -997,7 +999,7 @@ void NET_SetMulticast6(void)
 	if(*net_mcast6iface->string)
 	{
 #ifdef _WIN32
-		curgroup.ipv6mr_interface = atoi(net_mcast6iface->string);
+		curgroup.ipv6mr_interface = net_mcast6iface->integer;
 #else
 		curgroup.ipv6mr_interface = if_nametoindex(net_mcast6iface->string);
 #endif
@@ -1431,7 +1433,6 @@ void NET_OpenIP( void ) {
 
 //===================================================================
 
-
 /*
 ====================
 NET_GetCvars
@@ -1472,7 +1473,11 @@ static qbool NET_GetCvars( void ) {
 	modified += net_mcast6addr->modified;
 	net_mcast6addr->modified = qfalse;
 
+#ifdef _WIN32
 	net_mcast6iface = Cvar_Get( "net_mcast6iface", "0", CVAR_LATCH | CVAR_ARCHIVE );
+#else
+	net_mcast6iface = Cvar_Get( "net_mcast6iface", "", CVAR_LATCH | CVAR_ARCHIVE );
+#endif
 	modified += net_mcast6iface->modified; 
 	net_mcast6iface->modified = qfalse;
 
@@ -1498,7 +1503,6 @@ static qbool NET_GetCvars( void ) {
 
 	return modified ? qtrue : qfalse;
 }
-
 
 /*
 ====================

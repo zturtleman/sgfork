@@ -53,7 +53,21 @@ int			g_roundstarttime;
 
 int			g_session;
 
-vmCvar_t	g_moneyRespawn;
+vmCvar_t	g_moneyRespawnMode;
+vmCvar_t	g_countSocialHelp;
+ 
+//Money system:
+vmCvar_t	g_moneyMax;
+vmCvar_t	g_moneyMin;
+vmCvar_t	g_moneyDUMin;
+vmCvar_t	g_moneySocialHelp;
+vmCvar_t	g_moneyLose;
+vmCvar_t	g_moneyForRobber;
+
+vmCvar_t	g_moneyMaxReward;
+vmCvar_t	g_moneyTeamWin;
+vmCvar_t	g_moneyTeamLose;
+//Money system END
 
 // bank robbery
 qbool	g_goldescaped;
@@ -83,10 +97,6 @@ vmCvar_t	g_specsareflies;
 vmCvar_t	g_splitChat;
 
 //debugging
-vmCvar_t	m_maxreward;
-vmCvar_t	m_teamwin;
-vmCvar_t	m_teamlose;
-
 
 vmCvar_t	g_duellimit;
 vmCvar_t	g_dmflags;
@@ -212,11 +222,25 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &du_enabletrio, "du_enabletrio", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &du_forcetrio, "du_forcetrio", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
-	{ &br_teamrole, "br_teamrole", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-	{ &g_moneyRespawn, "g_moneyRespawn", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &br_teamrole, "br_teamrole", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyRespawnMode, "g_moneyRespawnMode", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_countSocialHelp, "g_countSocialHelp", "3", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+
+	//Money system
+	{ &g_moneyMax, "g_moneyMax", "200", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyDUMin, "g_moneyDUMin", "20", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyMin, "g_moneyMin", "20", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneySocialHelp, "g_moneySocialHelp", "28", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyLose, "g_moneyLose", "7", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyForRobber, "g_moneyForRobber", "10", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+
+	{ &g_moneyMaxReward, "g_moneyMaxReward", "20", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyTeamWin, "g_moneyTeamWin", "16", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyTeamLose, "g_moneyTeamLose", "10", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	//Money system END
   	
-	{ &g_newShotgunPattern, "g_newShotgunPattern", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
- 	{ &g_roundNoMoveTime, "g_roundNoMoveTime", "3", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_newShotgunPattern, "g_newShotgunPattern", "0", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+ 	{ &g_roundNoMoveTime, "g_roundNoMoveTime", "3", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
 	{ &g_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO, 0, qfalse  },
 
@@ -307,10 +331,6 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_redteamscore, "g_redteamscore", "0", CVAR_SERVERINFO, 0, qfalse  },
 	{ &g_blueteamscore, "g_blueteamscore", "0", CVAR_SERVERINFO, 0, qfalse  },
 
-	{ &m_maxreward, "m_maxreward", MAX_REWARD, CVAR_CHEAT, 0, qtrue },
-	{ &m_teamwin, "m_teamwin", ROUND_WIN_MONEY, CVAR_CHEAT, 0, qtrue },
-	{ &m_teamlose, "m_teamlose", ROUND_LOSE_MONEY, CVAR_CHEAT, 0, qtrue },
-
 	{ &g_version, "sg_version", XSTRING(PRODUCT_VERSION) " " XSTRING(SG_RELEASE), CVAR_ROM | CVAR_SERVERINFO , 0, qtrue },
 	{ &g_url, "MOD_URL", "www.smokin-guns.net", CVAR_ROM | CVAR_SERVERINFO, 0, qtrue },
 
@@ -337,7 +357,7 @@ This is the only way control passes into the module.
 This must be the very first function compiled into the .q3vm file
 ================
 */
-intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
 	switch ( command ) {
 	case GAME_INIT:
 		G_InitGame( arg0, arg1, arg2 );
@@ -599,9 +619,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	char				map2[64];
 	char				serverinfo[MAX_INFO_STRING];
 	int					prefix_gametype;
-#ifdef Q3_VERSION
-	G_Printf( "QAgame version: %s, %d, %s\n", Q3_VERSION, SG_RELEASE, __TIME__ );
-#endif
 
 	G_Printf ("------- Game Initialization -------\n");
 	G_Printf ("gamename: %s\n", GAMEVERSION);
@@ -1221,7 +1238,7 @@ void FindIntermissionPoint( int mappart ) {
 	}
 
 	if ( !ent )	// the map creator forgot to put in an intermission point...
-		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle, mappart, NULL );
+		SelectSpawnPoint(vec3_origin, level.intermission_origin, level.intermission_angle, mappart, NULL, qfalse);
 	else {
 		VectorCopy (ent->s.origin, level.intermission_origin);
 		VectorCopy (ent->s.angles, level.intermission_angle);
@@ -1926,26 +1943,26 @@ static void BankRobbed( void ){
 	for (i = 0; i < level.maxclients; i++){
 		gclient_t *client= &level.clients[i];
 
-		if(client->ps.stats[STAT_MONEY] < MIN_MONEY)
-			client->ps.stats[STAT_MONEY] = MIN_MONEY;
+		if(client->ps.stats[STAT_MONEY] < g_moneyMin.integer)
+			client->ps.stats[STAT_MONEY] = g_moneyMin.integer;
 
 		if(client->sess.sessionTeam == g_robteam ||
 			client->sess.sessionTeam == g_robteam+3){
 
-			client->ps.stats[STAT_MONEY] += m_teamwin.integer+25;
-			client->pers.savedMoney += m_teamwin.integer+25;
+			client->ps.stats[STAT_MONEY] += g_moneyTeamWin.integer+25;
+			client->pers.savedMoney += g_moneyTeamWin.integer+25;
 
 		} else if(client->sess.sessionTeam == g_defendteam ||
 			client->sess.sessionTeam == g_defendteam+3){
 
-			client->ps.stats[STAT_MONEY] += m_teamlose.integer;
-			client->pers.savedMoney += m_teamlose.integer;
+			client->ps.stats[STAT_MONEY] += g_moneyTeamLose.integer;
+			client->pers.savedMoney += g_moneyTeamLose.integer;
 		}
 
-		if(client->ps.stats[STAT_MONEY] > MAX_MONEY)
-				client->ps.stats[STAT_MONEY] = MAX_MONEY;
-		if(client->pers.savedMoney > MAX_MONEY)
-							client->pers.savedMoney = MAX_MONEY;
+		if(client->ps.stats[STAT_MONEY] > g_moneyMax.integer)
+			client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
+		if(client->pers.savedMoney > g_moneyMax.integer)
+			client->pers.savedMoney = g_moneyMax.integer;
 	}
 
 	//the bank was robbed 
@@ -2142,25 +2159,25 @@ void CheckRound(void){
 				for (i = 0; i < level.maxclients; i++){
 					gclient_t *client= &level.clients[i];
 
-					if(client->ps.stats[STAT_MONEY] < MIN_MONEY)
-						client->ps.stats[STAT_MONEY] = MIN_MONEY;
+					if(client->ps.stats[STAT_MONEY] < g_moneyMin.integer)
+						client->ps.stats[STAT_MONEY] = g_moneyMin.integer;
 
 					if(client->sess.sessionTeam == winner ||
 						client->sess.sessionTeam == winner+3){
 
-						client->ps.stats[STAT_MONEY] += m_teamwin.integer;
-						client->pers.savedMoney += m_teamwin.integer;
+						client->ps.stats[STAT_MONEY] += g_moneyTeamWin.integer;
+						client->pers.savedMoney += g_moneyTeamWin.integer;
 					} else if(client->sess.sessionTeam == loser ||
 						client->sess.sessionTeam == loser+3){
 
-						client->ps.stats[STAT_MONEY] += m_teamlose.integer;
-						client->pers.savedMoney += m_teamlose.integer;
+						client->ps.stats[STAT_MONEY] += g_moneyTeamLose.integer;
+						client->pers.savedMoney += g_moneyTeamLose.integer;
 					}
 
-					if(client->ps.stats[STAT_MONEY] > MAX_MONEY)
-							client->ps.stats[STAT_MONEY] = MAX_MONEY;
-					if(client->pers.savedMoney > MAX_MONEY)
-						client->pers.savedMoney = MAX_MONEY;
+					if(client->ps.stats[STAT_MONEY] > g_moneyMax.integer)
+							client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
+					if(client->pers.savedMoney > g_moneyMax.integer)
+						client->pers.savedMoney = g_moneyMax.integer;
 				}
 				
 			} else {
@@ -2174,18 +2191,18 @@ void CheckRound(void){
 				for (i = 0; i < level.maxclients; i++){
 					gclient_t *client= &level.clients[i];
 
-					if(client->ps.stats[STAT_MONEY] < MIN_MONEY)
-						client->ps.stats[STAT_MONEY] = MIN_MONEY;
+					if(client->ps.stats[STAT_MONEY] < g_moneyMin.integer)
+						client->ps.stats[STAT_MONEY] = g_moneyMin.integer;
 
 					if(client->sess.sessionTeam != TEAM_SPECTATOR){
-						client->ps.stats[STAT_MONEY] += m_teamlose.integer;
-						client->pers.savedMoney += m_teamlose.integer;
+						client->ps.stats[STAT_MONEY] += g_moneyTeamLose.integer;
+						client->pers.savedMoney += g_moneyTeamLose.integer;
 					}
 
-					if(client->ps.stats[STAT_MONEY] > MAX_MONEY)
-							client->ps.stats[STAT_MONEY] = MAX_MONEY;
-					if(client->pers.savedMoney > MAX_MONEY)
-							client->pers.savedMoney = MAX_MONEY;
+					if(client->ps.stats[STAT_MONEY] > g_moneyMax.integer)
+						client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
+					if(client->pers.savedMoney > g_moneyMax.integer)
+						client->pers.savedMoney = g_moneyMax.integer;
 				}
 
 				G_LogPrintf( "ROUND: Tied.\n" );
@@ -2291,7 +2308,7 @@ void ClearMedals(void){
 	for(i = 0; i < MAX_CLIENTS; i++){
 
 		if(level.clients[i].pers.connected == CON_CONNECTED){
-			g_entities[i].client->ps.stats[STAT_MONEY] = DU_MIN_MONEY;
+			g_entities[i].client->ps.stats[STAT_MONEY] = g_moneyDUMin.integer;
 			g_entities[i].client->ps.stats[STAT_WEAPONS] = 0;
 			g_entities[i].client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_REM58);
 			g_entities[i].client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_KNIFE);

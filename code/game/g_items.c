@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	if(ent->item->giTag == PW_GOLD && g_gametype.integer == GT_BR) {
-		other->client->ps.stats[STAT_MONEY] += 10;
+		other->client->ps.stats[STAT_MONEY] += g_moneyForRobber.integer;
 		other->client->ps.powerups[ent->item->giTag] = 1;
 	} else if(ent->item->giTag == PW_GOLD) {
 		other->client->ps.stats[STAT_MONEY] += ent->count;
@@ -63,8 +63,8 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 		other->client->ps.powerups[ent->item->giTag] = 1;
 	}
 	
-	if(other->client->ps.stats[STAT_MONEY] > MAX_MONEY)
-			other->client->ps.stats[STAT_MONEY] = MAX_MONEY;
+	if(other->client->ps.stats[STAT_MONEY] > g_moneyMax.integer)
+		other->client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
 
 	if(ent->item->giTag == PW_GOLD && g_gametype.integer == GT_BR)
 		return 0;
@@ -254,7 +254,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		return;		// dead people can't pickup
 
 	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( g_gametype.integer, &ent->s, &other->client->ps ) ) {
+	if (!BG_CanItemBeGrabbed(g_gametype.integer, &ent->s, &other->client->ps,g_moneyMax.integer)) {
 		return;
 	}
 

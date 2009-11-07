@@ -136,6 +136,7 @@ cvar_t	*r_subdivisions;
 cvar_t	*r_lodCurveError;
 
 cvar_t	*r_fullscreen;
+cvar_t  *r_noborder;
 
 cvar_t	*r_customwidth;
 cvar_t	*r_customheight;
@@ -155,6 +156,8 @@ cvar_t	*r_debugLight;
 cvar_t	*r_debugSort;
 cvar_t	*r_printShaders;
 cvar_t	*r_saveFontData;
+
+cvar_t	*r_marksOnTriangleMeshes;
 
 cvar_t	*r_maxpolys;
 int		max_polys;
@@ -915,6 +918,7 @@ void R_Register( void )
 	r_ignorehwgamma = ri.Cvar_Get( "r_ignorehwgamma", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	r_mode = ri.Cvar_Get( "r_mode", "3", CVAR_ARCHIVE | CVAR_LATCH );
 	r_fullscreen = ri.Cvar_Get( "r_fullscreen", "1", CVAR_ARCHIVE );
+	r_noborder = Cvar_Get("r_noborder", "0", CVAR_ARCHIVE);
 	r_customwidth = ri.Cvar_Get( "r_customwidth", "1600", CVAR_ARCHIVE | CVAR_LATCH );
 	r_customheight = ri.Cvar_Get( "r_customheight", "1024", CVAR_ARCHIVE | CVAR_LATCH );
 	r_customPixelAspect = ri.Cvar_Get( "r_customPixelAspect", "1", CVAR_ARCHIVE | CVAR_LATCH );
@@ -1016,6 +1020,8 @@ void R_Register( void )
 	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
+
+	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "0", CVAR_ARCHIVE);
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);

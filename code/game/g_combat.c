@@ -490,19 +490,19 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		//if he didn't kill a mate ;)
 		if(victim->client->sess.sessionTeam == assaulter->client->sess.sessionTeam && g_gametype.integer >= GT_TEAM) {
 
-			assaulter->client->ps.stats[STAT_MONEY] -= 2*LOSE_MONEY;
+			assaulter->client->ps.stats[STAT_MONEY] -= 2*g_moneyLose.integer;
 
 			if(assaulter->client->ps.stats[STAT_MONEY] < 0){
-				if ( g_moneyRespawn.integer == 1 ) {
+				if (g_moneyRespawnMode.integer == 1) {
 					// Joe Kari: in the new money system, the teamkiller don't waste its money, 
 					// what he loses is a gift to his mate
-					victim->client->ps.stats[STAT_MONEY] += 2*LOSE_MONEY + assaulter->client->ps.stats[STAT_MONEY] ;
+					victim->client->ps.stats[STAT_MONEY] += 2*g_moneyLose.integer + assaulter->client->ps.stats[STAT_MONEY];
 				}
 				assaulter->client->ps.stats[STAT_MONEY] = 0;
-			} else if ( g_moneyRespawn.integer == 1 ) {
+			} else if (g_moneyRespawnMode.integer == 1) {
 				// Joe Kari: in the new money system, the teamkiller don't waste its money, 
 				// what he loses is a gift to his mate
-				victim->client->ps.stats[STAT_MONEY] += 2*LOSE_MONEY ;
+				victim->client->ps.stats[STAT_MONEY] += 2*g_moneyLose.integer;
 			}
 			return;
 		}
@@ -536,7 +536,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 
 			f_amount = sqrt(sqrt(1.0/rank)); // take (1/rank)exp 1/4
-			f_amount = (float)(f_amount*f_amount*f_amount) * (float)(m_maxreward.integer * factor2); // here exponent is 3
+			f_amount = (float)(f_amount*f_amount*f_amount) * (float)(g_moneyMaxReward.integer * factor2); // here exponent is 3
 
 			if(g_gametype.integer == GT_DUEL)
 				f_amount *= 1.75f;
@@ -546,19 +546,19 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 			assaulter->client->ps.stats[STAT_MONEY] += amount;
 
-			if(assaulter->client->ps.stats[STAT_MONEY] > MAX_MONEY)
-				assaulter->client->ps.stats[STAT_MONEY] = MAX_MONEY;
+			if(assaulter->client->ps.stats[STAT_MONEY] > g_moneyMax.integer)
+				assaulter->client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
 		}
 
 		victim->client->deaths++;
 
-		if(victim->client->deaths >= SOCIAL_HELP_COUNT){
+		if(victim->client->deaths >= g_countSocialHelp.integer){
 			victim ->client->deaths = 0;
-			victim->client->ps.stats[STAT_MONEY] += SOCIAL_MONEY;
+			victim->client->ps.stats[STAT_MONEY] += g_moneySocialHelp.integer;
 		}
 
-		if(victim->client->ps.stats[STAT_MONEY] > MAX_MONEY)
-			victim->client->ps.stats[STAT_MONEY] = MAX_MONEY;
+		if(victim->client->ps.stats[STAT_MONEY] > g_moneyMax.integer)
+			victim->client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
 
 		if(0)
 			G_Printf("Rank: %i, Amount: %i\n", rank, amount);
@@ -566,6 +566,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	//G_Printf("attacker: %i inflictor: %i\n", attacker->client->ps.persistant[PERS_SCORE],
 	//	inflictor->client->ps.persistant[PERS_SCORE]);
+	//G_Printf("attacker: %i inflictor: %i\n", attacker->client->ps.stats[STAT_MONEY],
+	//  inflictor->client->ps.stats[STAT_MONEY]);
 }
 
 #define	L_PRINT	0

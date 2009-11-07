@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -489,10 +489,10 @@ static void CodeError( char *fmt, ... ) {
 
 	errorCount++;
 
-	report( "%s:%i ", currentFileName, currentFileLine );
+	fprintf( stderr, "%s:%i ", currentFileName, currentFileLine );
 
 	va_start( argptr,fmt );
-	vprintf( fmt,argptr );
+	vfprintf( stderr, fmt, argptr );
 	va_end( argptr );
 }
 
@@ -681,11 +681,11 @@ Parse a token out of linebuffer
 static qbool Parse( void ) {
 	/* Hand-optimized by PhaethonH */
 	const char 	*p, *q;
-	
+
 	/* Because lineParseOffset is only updated just before exit, this makes this code version somewhat harder to debug under a symbolic debugger. */
 
 	*token = 0;  /* Clear token. */
-	
+
 	// skip whitespace
 	for (p = lineBuffer + lineParseOffset; *p && (*p <= ' '); p++) /* nop */ ;
 
@@ -702,7 +702,7 @@ static qbool Parse( void ) {
 	/* *p now sits on separator.  Mangle other values accordingly. */
 	strncpy(token, q, p - q);
 	token[p - q] = 0;
-	
+
 	lineParseOffset = p - lineBuffer;
 
 	return qtrue;

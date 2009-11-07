@@ -77,6 +77,7 @@ void MSG_WriteFloat (msg_t *sb, float f);
 void MSG_WriteString (msg_t *sb, const char *s);
 void MSG_WriteBigString (msg_t *sb, const char *s);
 void MSG_WriteAngle16 (msg_t *sb, float f);
+int MSG_HashKey(const char *string, int maxlen);
 
 void	MSG_BeginReading (msg_t *sb);
 void	MSG_BeginReadingOOB(msg_t *sb);
@@ -601,7 +602,9 @@ void	FS_FreeFileList( char **list );
 
 qbool FS_FileExists( const char *file );
 
+qbool FS_CreatePath (char *OSPath);
 char   *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
+qbool FS_CompareZipChecksum(const char *zipfile);
 
 int		FS_LoadStack( void );
 
@@ -796,7 +799,6 @@ void 		Com_Quit_f( void );
 int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 char		*Com_MD5File(const char *filename, int length, const char *prefix, int prefix_len);
-int			Com_HashKey(char *string, int maxlen);
 int			Com_Filter(char *filter, char *name, int casesensitive);
 int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
@@ -1067,7 +1069,7 @@ qbool	Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family );
 qbool	Sys_IsLANAddress (netadr_t adr);
 void		Sys_ShowIP(void);
 
-void	Sys_Mkdir( const char *path );
+qbool	Sys_Mkdir( const char *path );
 char	*Sys_Cwd( void );
 void	Sys_SetDefaultInstallPath(const char *path);
 char	*Sys_DefaultInstallPath(void);
@@ -1087,6 +1089,8 @@ void	Sys_FreeFileList( char **list );
 void	Sys_Sleep(int msec);
 
 qbool Sys_LowPhysicalMemory( void );
+
+void Sys_SetEnv(const char *name, const char *value);
 
 /* This is based on the Adaptive Huffman algorithm described in Sayood's Data
  * Compression book.  The ranks are not actually stored, but implicitly defined

@@ -182,7 +182,7 @@ void UI_LoadArenas( void ) {
 	int			numdirs;
 	vmCvar_t	arenasFile;
 	char		filename[128];
-	char		dirlist[1024];
+	char		dirlist[2048];
 	char*		dirptr;
 	int			i, n;
 	int			dirlen;
@@ -192,7 +192,7 @@ void UI_LoadArenas( void ) {
 	uiInfo.mapCount = 0;
 
 	trap_Cvar_Register( &arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM );
-	numdirs = trap_FS_GetFileList("maps", ".cfg", dirlist, 1024 );
+	numdirs = trap_FS_GetFileList("maps", ".cfg", dirlist, 2048 );
 	dirptr  = dirlist;
 	for (i = 0; i < numdirs; i++, dirptr += dirlen+1) {
 		dirlen = strlen(dirptr);

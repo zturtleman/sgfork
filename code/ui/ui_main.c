@@ -150,7 +150,7 @@ void _UI_MouseEvent( int dx, int dy );
 void _UI_Refresh( int realtime );
 qbool _UI_IsFullscreen( void );
 void Send_KeyBindings(void);
-intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
 #ifndef _WIN32
 	Send_KeyBindings();
 
@@ -4801,10 +4801,6 @@ void _UI_Init( qbool inGameLoad ) {
 	char head[256];
 	int i;
 
-#if defined Q3_VERSION
-	Com_Printf( "UI version: %s, %d, %s\n", Q3_VERSION, SG_RELEASE, __TIME__ );
-#endif
-
 	UI_RegisterCvars();
 	UI_InitMemory();
 
@@ -4814,16 +4810,12 @@ void _UI_Init( qbool inGameLoad ) {
 	trap_GetGlconfig( &uiInfo.uiDC.glconfig );
 
 	// for 640x480 virtualized screen
-	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0/480.0);
-	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0/640.0);
-	if ( uiInfo.uiDC.glconfig.vidWidth * 480 > uiInfo.uiDC.glconfig.vidHeight * 640 ) {
-		// wide screen
-		uiInfo.uiDC.bias = 0.5 * ( uiInfo.uiDC.glconfig.vidWidth - ( uiInfo.uiDC.glconfig.vidHeight * (640.0/480.0) ) );
-	}
-	else {
-		// no wide screen
-		uiInfo.uiDC.bias = 0;
-	}
+	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth / 640.0f;
+	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight / 480.0f;
+
+	// wide screen
+	uiInfo.uiDC.aspectWidthScale = ( ( 640.0f * uiInfo.uiDC.glconfig.vidHeight ) /
+									( 480.0f * uiInfo.uiDC.glconfig.vidWidth ) );
 
 
   //UI_Load();
@@ -4831,9 +4823,6 @@ void _UI_Init( qbool inGameLoad ) {
 	uiInfo.uiDC.setColor = &UI_SetColor;
 	uiInfo.uiDC.drawHandlePic = &UI_DrawHandlePic;
 	uiInfo.uiDC.drawStretchPic = &trap_R_DrawStretchPic;
-	uiInfo.uiDC.drawText = &Text_Paint;
-	uiInfo.uiDC.textWidth = &Text_Width;
-	uiInfo.uiDC.textHeight = &Text_Height;
 	uiInfo.uiDC.registerModel = &trap_R_RegisterModel;
 	uiInfo.uiDC.modelBounds = &trap_R_ModelBounds;
 	uiInfo.uiDC.fillRect = &UI_FillRect;

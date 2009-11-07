@@ -43,7 +43,7 @@ This is the only way control passes into the module.
 This must be the very first function compiled into the .q3vm file
 ================
 */
-intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
 
 	switch ( command ) {
 	case CG_INIT:
@@ -2228,24 +2228,24 @@ static float CG_Cvar_Get(const char *cvar) {
 }
 
 void CG_Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const char *text, int cursorPos, char cursor, int limit, int style) {
-	CG_Text_Paint(x, y, scale, color, text, 0, limit, style);
+	UI_Text_Paint(x, y, scale, color, text, 0, limit, style);
 }
 
 static int CG_OwnerDrawWidth(int ownerDraw, float scale) {
 	switch (ownerDraw) {
 	  case CG_GAME_TYPE:
-			return CG_Text_Width(CG_GameTypeString(), scale, 0);
+			return UI_Text_Width(CG_GameTypeString(), scale, 0);
 	  case CG_GAME_STATUS:
-			return CG_Text_Width(CG_GetGameStatusText(), scale, 0);
+			return UI_Text_Width(CG_GetGameStatusText(), scale, 0);
 			break;
 	  case CG_KILLER:
-			return CG_Text_Width(CG_GetKillerText(), scale, 0);
+			return UI_Text_Width(CG_GetKillerText(), scale, 0);
 			break;
 	  case CG_RED_NAME:
-			return CG_Text_Width(cg_redTeamName.string, scale, 0);
+			return UI_Text_Width(cg_redTeamName.string, scale, 0);
 			break;
 	  case CG_BLUE_NAME:
-			return CG_Text_Width(cg_blueTeamName.string, scale, 0);
+			return UI_Text_Width(cg_blueTeamName.string, scale, 0);
 			break;
 
 
@@ -2277,16 +2277,18 @@ CG_LoadHudMenu();
 =================
 */
 void CG_LoadHudMenu( void ) {
-	const char *hudSet;
-  char buff[1024];
+	const char	*hudSet;
+	char		buff[1024];
+
+	cgDC.aspectWidthScale = ( ( 640.0f * cgs.glconfig.vidHeight ) /
+							( 480.0f * cgs.glconfig.vidWidth ) );
+	cgDC.xscale = cgs.glconfig.vidWidth / 640.0f;
+	cgDC.yscale = cgs.glconfig.vidHeight / 480.0f;
 
 	cgDC.registerShaderNoMip = &trap_R_RegisterShaderNoMip;
 	cgDC.setColor = &trap_R_SetColor;
 	cgDC.drawHandlePic = &CG_DrawPic;
 	cgDC.drawStretchPic = &trap_R_DrawStretchPic;
-	cgDC.drawText = &CG_Text_Paint;
-	cgDC.textWidth = &CG_Text_Width;
-	cgDC.textHeight = &CG_Text_Height;
 	cgDC.registerModel = &trap_R_RegisterModel;
 	cgDC.modelBounds = &trap_R_ModelBounds;
 	cgDC.fillRect = &CG_FillRect;
@@ -2329,7 +2331,7 @@ void CG_LoadHudMenu( void ) {
 	cgDC.stopCinematic = &CG_StopCinematic;
 	cgDC.drawCinematic = &CG_DrawCinematic;
 	cgDC.runCinematicFrame = &CG_RunCinematicFrame;
-  cgDC.hudloading = qtrue;
+	cgDC.hudloading = qtrue;
 
 	Init_Display(&cgDC);
 
@@ -2388,10 +2390,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	const char	*s;
 	char		name[64], name2[64];
 
-#ifdef Q3_VERSION
-	CG_Printf( "Cgame version: %s, %d, %s\n", Q3_VERSION, SG_RELEASE, __TIME__ );
-#endif
-
 	// clear everything
 	memset( &cgs, 0, sizeof( cgs ) );
 	memset( &cg, 0, sizeof( cg ) );
@@ -2399,14 +2397,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 	memset( cg_items, 0, sizeof(cg_items) );
 
-	CG_Printf ("-----------------------------------\n");
-  config_GetInfos( PFT_WEAPONS | PFT_ITEMS );
-	CG_Printf ("-----------------------------------\n");
-
 	cg.clientNum = clientNum;
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
+
+	// get the rendering configuration from the client system
+	trap_GetGlconfig( &cgs.glconfig );
 
 	// load a few needed things before we do any screen updates
 	cgs.media.charsetShader		= trap_R_RegisterShader( "gfx/2d/bigchars" );
@@ -2414,9 +2411,19 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cgs.media.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
 	cgs.media.charsetPropB		= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );
 
+	//Load shared information:
+	CG_Printf ("-----------------------------------\n");
+	config_GetInfos( PFT_WEAPONS | PFT_ITEMS );
+	CG_Printf ("-----------------------------------\n");
+
 	CG_RegisterCvars();
 
 	CG_InitConsoleCommands();
+
+	String_Init();
+
+	CG_AssetCache();
+	CG_LoadHudMenu();      // load new hud stuff
 
 	cg.weaponSelect = WP_REM58;
 	cg.lastusedweapon = WP_NONE;
@@ -2430,14 +2437,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// reset aipointer
 	ai_nodepointer = 0;
 
-	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
-	cgs.flagStatus = -1;
 	// old servers
-
-	// get the rendering configuration from the client system
-	trap_GetGlconfig( &cgs.glconfig );
-	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
-	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );
@@ -2470,8 +2470,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		cg.musicfile = qfalse;
 	}
 
-	String_Init();
-
 	cg.loading = qtrue;		// force players to load instead of defer
 
 	//set to zero
@@ -2487,9 +2485,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_LoadingString( "clients" );
 
 	CG_RegisterClients();		// if low on memory, some clients will be deferred
-
-	CG_AssetCache();
-	CG_LoadHudMenu();      // load new hud stuff
 
 	cg.loading = qfalse;	// future players will be deferred
 

@@ -208,7 +208,7 @@ Returns false if the item should not be picked up.
 This needs to be the same for client side prediction and server use.
 ================
 */
-qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
+qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int MaxMoney ) {
 	gitem_t	*item;
 	int		belt = 1, i;
 
@@ -342,7 +342,7 @@ qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerS
 				if(!ps->persistant[PERS_ROBBER])
 					return qfalse;
 			} else {
-				if(ps->stats[STAT_MONEY] >= MAX_MONEY)
+				if(ps->stats[STAT_MONEY] >= MaxMoney)
 					return qfalse;
 			}
 		}

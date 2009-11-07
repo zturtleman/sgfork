@@ -1,7 +1,6 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2005-2008 Smokin' Guns
 
 This file is part of Smokin' Guns.
 
@@ -34,14 +33,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #else
 #define C(label) _##label
 #endif
-
-// plane_t structure
-// !!! if this is changed, it must be changed in q_shared.h too !!!
-#define pl_normal	0
-#define pl_dist		12
-#define pl_type		16
-#define pl_signbits	17
-#define pl_pad		18
-#define pl_size		20
 
 #endif
