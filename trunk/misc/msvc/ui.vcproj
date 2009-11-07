@@ -311,53 +311,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\code\game\bg_lib.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\code\game\bg_misc.c"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;UI_EXPORTS;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release SSE|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;UI_EXPORTS;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release SSE2|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;UI_EXPORTS;"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\code\qcommon\q_math.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\code\qcommon\q_shared.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ui.def"
-				>
-			</File>
-			<File
 				RelativePath="..\..\code\ui\ui_atoms.c"
 				>
 				<FileConfiguration
@@ -459,6 +412,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\ui\ui_syscalls.asm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\ui\ui_syscalls.c"
 				>
 				<FileConfiguration
@@ -495,14 +452,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\code\client\keycodes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\code\qcommon\q_shared.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\code\ui\ui_local.h"
 				>
 				<FileConfiguration
@@ -533,6 +482,85 @@
 			</File>
 			<File
 				RelativePath="..\..\code\ui\ui_shared.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Shared Files"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath="..\..\code\game\bg_parse.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\code\client\keycodes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\code\qcommon\q_shared.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath="..\..\code\game\bg_lib.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\code\game\bg_misc.c"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="2"
+							PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;UI_EXPORTS;"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release SSE|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="2"
+							PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;UI_EXPORTS;"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release SSE2|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							Optimization="2"
+							PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;UI_EXPORTS;"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\code\game\bg_parse.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\code\qcommon\q_math.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\code\qcommon\q_shared.c"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Definitions"
+			>
+			<File
+				RelativePath=".\ui.def"
 				>
 			</File>
 		</Filter>

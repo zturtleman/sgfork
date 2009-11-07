@@ -25,14 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-// spawnflags for doors, dont forget to change for ClearItems
-#define DOOR_RETURN 8
-#define TRIGGER_DOOR 16
 
-// only for rotating doors
-#define DOOR_ROTATING_X_AXIS 32
-#define DOOR_ROTATING_Y_AXIS 64
-#define DOOR_ROTATING_ONE_WAY 128
 
 /*
 ===============================================================================
@@ -73,11 +66,49 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 	} else {
 		trap_Trace_New( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask );
 	}
-
+	
 	if (tr.startsolid)
 		return &g_entities[ tr.entityNum ];
-
+		
 	return NULL;
+}
+
+/*
+================
+G_CreateRotationMatrix
+================
+*/
+void G_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
+	AngleVectors(angles, matrix[0], matrix[1], matrix[2]);
+	VectorInverse(matrix[1]);
+}
+
+/*
+================
+G_TransposeMatrix
+================
+*/
+void G_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
+	int i, j;
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			transpose[i][j] = matrix[j][i];
+		}
+	}
+}
+
+/*
+================
+G_RotatePoint
+================
+*/
+void G_RotatePoint(vec3_t point, vec3_t matrix[3]) {
+	vec3_t tvec;
+
+	VectorCopy(point, tvec);
+	point[0] = DotProduct(matrix[0], tvec);
+	point[1] = DotProduct(matrix[1], tvec);
+	point[2] = DotProduct(matrix[2], tvec);
 }
 
 /*
@@ -88,13 +119,13 @@ Returns qfalse if the move is blocked
 ==================
 */
 qbool	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3_t amove ) {
-	vec3_t		forward, right, up;
+	vec3_t		matrix[3], transpose[3];
 	vec3_t		org, org2, move2;
 	gentity_t	*block;
 
 	// EF_MOVER_STOP will just stop when contacting another entity
 	// instead of pushing it, but entities can still ride on top of it
-	if ( ( pusher->s.eFlags & EF_MOVER_STOP ) &&
+	if ( ( pusher->s.eFlags & EF_MOVER_STOP ) && 
 		check->s.groundEntityNum != pusher->s.number ) {
 		return qfalse;
 	}
@@ -112,26 +143,27 @@ qbool	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3
 	}
 	pushed_p++;
 
-	// we need this for pushing things later
-	VectorSubtract (vec3_origin, amove, org);
-	AngleVectors (org, forward, right, up);
-
-	VectorAdd (check->s.pos.trBase, move, check->s.pos.trBase);
-	if (check->client) {
-		// make sure the client's view rotates when on a rotating mover
-		check->client->ps.delta_angles[YAW] += ANGLE2SHORT(amove[YAW]);
-	}
-
+	// try moving the contacted entity 
 	// figure movement due to the pusher's amove
-	VectorSubtract (check->s.pos.trBase, pusher->r.currentOrigin, org);
-	org2[0] = DotProduct (org, forward);
-	org2[1] = -DotProduct (org, right);
-	org2[2] = DotProduct (org, up);
+	G_CreateRotationMatrix( amove, transpose );
+	G_TransposeMatrix( transpose, matrix );
+	if ( check->client ) {
+		VectorSubtract (check->client->ps.origin, pusher->r.currentOrigin, org);
+	}
+	else {
+		VectorSubtract (check->s.pos.trBase, pusher->r.currentOrigin, org);
+	}
+	VectorCopy( org, org2 );
+	G_RotatePoint( org2, matrix );
 	VectorSubtract (org2, org, move2);
+	// add movement
+	VectorAdd (check->s.pos.trBase, move, check->s.pos.trBase);
 	VectorAdd (check->s.pos.trBase, move2, check->s.pos.trBase);
 	if ( check->client ) {
 		VectorAdd (check->client->ps.origin, move, check->client->ps.origin);
 		VectorAdd (check->client->ps.origin, move2, check->client->ps.origin);
+		// make sure the client's view rotates when on a rotating mover
+		check->client->ps.delta_angles[YAW] += ANGLE2SHORT(amove[YAW]);
 	}
 
 	// may have pushed them off an edge
@@ -231,11 +263,6 @@ qbool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obs
 	// move the pusher to it's final position
 	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
 	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
-
-	// Tequila comment: Fix "CM_AdjustAreaPortalState: negative reference count" case in SteamBoat
-	// Binary mod don't round float in the same way than QVM mod
-	SnapVector( pusher->r.currentAngles );
-
 	trap_LinkEntity( pusher );
 
 	// see if any solid entities are inside the final position
@@ -243,8 +270,7 @@ qbool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obs
 		check = &g_entities[ entityList[ e ] ];
 
 		// only push items and players
-		if ( (check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER && check->s.eType != ET_TURRET
-			&& !check->physicsObject ) ) {
+		if (check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER && check->s.eType != ET_TURRET && !check->physicsObject) {
 			continue;
 		}
 
@@ -275,13 +301,11 @@ qbool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obs
 
 		// bobbing entities are instant-kill and never get blocked
 		if ( pusher->s.pos.trType == TR_SINE || pusher->s.apos.trType == TR_SINE ) {
-			if(pusher->damage > 0){
-				G_Damage( check, pusher, pusher, NULL, NULL, 99999, 0, MOD_CRUSH );
-				continue;
-			}
+			G_Damage( check, pusher, pusher, NULL, NULL, 99999, 0, MOD_CRUSH );
+			continue;
 		}
 
-
+		
 		// save off the obstacle so we can call the block function (crush, etc)
 		*obstacle = check;
 
@@ -411,73 +435,44 @@ SetMoverState
 void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	vec3_t			delta;
 	float			f;
+	trajectory_t*	tr;
+
 
 	if ( ent->moverState == MOVER_STATIC )  return ;
 
 	ent->moverState = moverState;
 
-	if(!Q_stricmp(ent->classname, "func_door_rotating")){
+	if(!Q_stricmp(ent->classname, "func_door_rotating"))
+		tr = &ent->s.apos; //Rotate doors instead of moving them
+	else
+		tr = &ent->s.pos;
 
-		ent->s.apos.trTime = time;
-
-		switch( moverState ) {
-		case MOVER_POS1:
-			VectorCopy( ent->pos1, ent->s.apos.trBase );
-			ent->s.apos.trType = TR_STATIONARY;
-			break;
-		case MOVER_POS2:
-			VectorCopy( ent->pos2, ent->s.apos.trBase );
-			ent->s.apos.trType = TR_STATIONARY;
-			break;
-		case MOVER_1TO2:
-			VectorCopy( ent->pos1, ent->s.apos.trBase );
-			VectorSubtract( ent->pos2, ent->pos1, delta );
-			f = 1000.0 / ent->s.apos.trDuration;
-			VectorScale( delta, f, ent->s.apos.trDelta );
-			ent->s.apos.trType = TR_LINEAR_STOP;
-			break;
-		case MOVER_2TO1:
-			VectorCopy( ent->pos2, ent->s.apos.trBase );
-			VectorSubtract( ent->pos1, ent->pos2, delta );
-			f = 1000.0 / ent->s.apos.trDuration;
-			VectorScale( delta, f, ent->s.apos.trDelta );
-			ent->s.apos.trType = TR_LINEAR_STOP;
-			break;
-		default: // Tequila comment: Avoid a compilation warning about MOVER_STATIC
-			break;
-		}
-
-	} else {
-
-		ent->s.pos.trTime = time;
-		switch( moverState ) {
-		case MOVER_POS1:
-			VectorCopy( ent->pos1, ent->s.pos.trBase );
-			ent->s.pos.trType = TR_STATIONARY;
-			break;
-		case MOVER_POS2:
-			VectorCopy( ent->pos2, ent->s.pos.trBase );
-			ent->s.pos.trType = TR_STATIONARY;
-			break;
-		case MOVER_1TO2:
-			VectorCopy( ent->pos1, ent->s.pos.trBase );
-			VectorSubtract( ent->pos2, ent->pos1, delta );
-			f = 1000.0 / ent->s.pos.trDuration;
-			VectorScale( delta, f, ent->s.pos.trDelta );
-			ent->s.pos.trType = TR_LINEAR_STOP;
-			break;
-		case MOVER_2TO1:
-			VectorCopy( ent->pos2, ent->s.pos.trBase );
-			VectorSubtract( ent->pos1, ent->pos2, delta );
-			f = 1000.0 / ent->s.pos.trDuration;
-			VectorScale( delta, f, ent->s.pos.trDelta );
-			ent->s.pos.trType = TR_LINEAR_STOP;
-			break;
-		default: // Tequila comment: Avoid a compilation warning about MOVER_STATIC
-			break;
-		}
+	tr->trTime = time;
+	switch( moverState ) {
+	case MOVER_POS1:
+		VectorCopy( ent->pos1, tr->trBase );
+		tr->trType = TR_STATIONARY;
+		break;
+	case MOVER_POS2:
+		VectorCopy( ent->pos2, tr->trBase );
+		tr->trType = TR_STATIONARY;
+		break;
+	case MOVER_1TO2:
+		VectorCopy( ent->pos1, tr->trBase );
+		VectorSubtract( ent->pos2, ent->pos1, delta );
+		f = 1000.0 / ent->s.pos.trDuration;
+		VectorScale( delta, f, tr->trDelta );
+		tr->trType = TR_LINEAR_STOP;
+		break;
+	case MOVER_2TO1:
+		VectorCopy( ent->pos2, tr->trBase );
+		VectorSubtract( ent->pos1, ent->pos2, delta );
+		f = 1000.0 / ent->s.pos.trDuration;
+		VectorScale( delta, f, tr->trDelta );
+		tr->trType = TR_LINEAR_STOP;
+		break;
 	}
-	BG_EvaluateTrajectory( &ent->s.pos, level.time, ent->r.currentOrigin );
+	BG_EvaluateTrajectory( tr, level.time, ent->r.currentOrigin );	
 	trap_LinkEntity( ent );
 }
 
@@ -748,7 +743,7 @@ void InitMover( gentity_t *ent ) {
 	float		distance;
 	float		light;
 	vec3_t		color;
-	qbool	lightSet, colorSet;
+	qbool		lightSet, colorSet;
 	char		*sound;
 
 	// if the "model2" key is set, use a seperate model
@@ -761,9 +756,6 @@ void InitMover( gentity_t *ent ) {
 	if ( G_SpawnString( "noise", "100", &sound ) ) {
 		ent->s.loopSound = G_SoundIndex( sound );
 	}
-	
-	// Joe Kari: this prevent from collision with func_static far clipping
-	ent->s.powerups = FARCLIP_NONE ;
 
 	// if the "color" or "light" keys are set, setup constantLight
 	lightSet = G_SpawnFloat( "light", "100", &light );
@@ -854,7 +846,6 @@ Blocked_Door
 void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	// remove anything other than a client
 	if ( !other->client ) {
-		// except CTF flags!!!!
 		G_TempEntity( other->s.origin, EV_ITEM_POP );
 		G_FreeEntity( other );
 		return;
@@ -873,11 +864,48 @@ void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 
 /*
 ================
+Touch_DoorTriggerSpectator
+================
+*/
+static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_t *trace ) {
+	int i, axis;
+	vec3_t origin, dir, angles;
+
+	axis = ent->count;
+	VectorClear(dir);
+	if (fabs(other->s.origin[axis] - ent->r.absmax[axis]) <
+		fabs(other->s.origin[axis] - ent->r.absmin[axis])) {
+		origin[axis] = ent->r.absmin[axis] - 10;
+		dir[axis] = -1;
+	}
+	else {
+		origin[axis] = ent->r.absmax[axis] + 10;
+		dir[axis] = 1;
+	}
+	for (i = 0; i < 3; i++) {
+		if (i == axis) continue;
+		origin[i] = (ent->r.absmin[i] + ent->r.absmax[i]) * 0.5;
+	}
+	vectoangles(dir, angles);
+	TeleportPlayer(other, origin, angles );
+}
+
+/*
+================
 Touch_DoorTrigger
 ================
 */
 void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace ) {
-	if ( ent->parent->moverState != MOVER_1TO2 ) {
+	/*if ( other->client && other->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		// if the door is not open and not opening
+		if ( ent->parent->moverState != MOVER_1TO2 &&
+			ent->parent->moverState != MOVER_POS2) {
+			Touch_DoorTriggerSpectator( ent, other, trace );
+		}
+	}
+	else */
+	//Spectators triggering is disabled for the moment
+if ( ent->parent->moverState != MOVER_1TO2 ) {
 		Use_BinaryMover( ent->parent, ent, other );
 	}
 }
@@ -1487,7 +1515,7 @@ void SpawnPlatTrigger( gentity_t *ent ) {
 	trigger->touch = Touch_PlatCenterTrigger;
 	trigger->r.contents = CONTENTS_TRIGGER;
 	trigger->parent = ent;
-
+	
 	tmin[0] = ent->pos1[0] + ent->r.mins[0] + 33;
 	tmin[1] = ent->pos1[1] + ent->r.mins[1] + 33;
 	tmin[2] = ent->pos1[2] + ent->r.mins[2];
@@ -1504,7 +1532,7 @@ void SpawnPlatTrigger( gentity_t *ent ) {
 		tmin[1] = ent->pos1[1] + (ent->r.mins[1] + ent->r.maxs[1]) *0.5;
 		tmax[1] = tmin[1] + 1;
 	}
-
+	
 	VectorCopy (tmin, trigger->r.mins);
 	VectorCopy (tmax, trigger->r.maxs);
 
@@ -1612,7 +1640,7 @@ void SP_func_button( gentity_t *ent ) {
 	float		lip;
 
 	ent->sound1to2 = G_SoundIndex("sound/movers/switches/butn2.wav");
-
+	
 	if ( !ent->speed ) {
 		ent->speed = 40;
 	}
@@ -1717,17 +1745,24 @@ void Reached_Train( gentity_t *ent ) {
 	length = VectorLength( move );
 
 	ent->s.pos.trDuration = length * 1000 / speed;
+
+	// Tequila comment: Be sure to send to clients after any fast move case
+	ent->r.svFlags &= ~SVF_NOCLIENT;
+
+	// Tequila comment: Fast move case
 	if(ent->s.pos.trDuration<1) {
 		// Tequila comment: As trDuration is used later in a division, we need to avoid that case now
-		// I think the major side effect is the lag problem in dm_train as very high speed are
-		// used to cycle the landscape rocks with a func_train mover. With null trDuration,
+		// With null trDuration,
 		// the calculated rocks bounding box becomes infinite and the engine think for a short time
 		// any entity is riding that mover but not the world entity... In rare case, I found it
-		// can also stuck every map entities after funct_door are used.
+		// can also stuck every map entities after func_door are used.
 		// The desired effect with very very big speed is to have instant move, so any not null duration
 		// lower than a frame duration should be sufficient.
 		// Afaik, the negative case don't have to be supported.
 		ent->s.pos.trDuration=1;
+
+		// Tequila comment: Don't send entity to clients so it becomes really invisible 
+		ent->r.svFlags |= SVF_NOCLIENT;
 	}
 
 	// looping sound
@@ -1872,114 +1907,13 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 "color"		constantLight color
 "light"		constantLight radius
 */
-void SP_func_static( gentity_t *ent )
-{
-	
-	// Joe Kari: new func_static (totally rewritten) with far-clipping and level of detail support
-	// with reminder-style comment
-	
-	float		light ;
-	vec3_t		color ;
-	qbool	lightSet , colorSet ;
-	char		*value ;
-	char		tmp_char[32] ;
-	int		tmp_int ;
-	
-	// register brush model to physical engine
-	trap_SetBrushModel( ent , ent->model ) ;
-	
-	// because a func_static could have is own origin, this is needed to replace its coord in world coord
-	// (automatically made for game, but not for cgame)
-	VectorCopy( ent->r.currentOrigin , ent->s.origin ) ;
-	
-	// this is needed for CG_Mover() to display the element (yes func_static was used like a mover)
-	ent->s.eType = ET_MOVER ;
-	
-	// just a new value to ensure that the game will never perform "think" for this entity
-	ent->moverState = MOVER_STATIC;
-	
-	// if the "color" or "light" keys are set, setup constantLight
-	lightSet = G_SpawnFloat( "light" , "100" , &light ) ;
-	colorSet = G_SpawnVector( "color" , "1 1 1" , color ) ;
-	if ( lightSet || colorSet )
-	{
-		int r , g , b , i ;
-		r = color[0] * 255 ;
-		if ( r > 255 )  r = 255 ;
-		g = color[1] * 255 ;
-		if ( g > 255 )  g = 255 ;
-		b = color[2] * 255 ;
-		if ( b > 255 )  b = 255 ;
-		i = light / 4 ;
-		if ( i > 255 )  i = 255 ;
-		ent->s.constantLight = r | ( g << 8 ) | ( b << 16 ) | ( i << 24 ) ;
-	}
-	
-	// if the "model2" key is set, use a seperate model
-	// for drawing, but clip against the brushes
-	if ( ent->model2 )  ent->s.modelindex2 = G_ModelIndex( ent->model2 ) ;
-
-	// get the value for the key "farclip" and copy it to powerups (8 lower bits), legsAnim and torsoAnim field
-	
-	G_SpawnString( "farclip" , "none" , &value ) ;
-	sscanf( value , "%31s %i %i" , tmp_char , &ent->s.legsAnim , &ent->s.torsoAnim ) ;
-	
-	if ( !Q_stricmp( "none" , tmp_char ) )  ent->s.powerups = FARCLIP_NONE ;
-	else if ( !Q_stricmp( "sphere" , tmp_char ) )  ent->s.powerups = FARCLIP_SPHERE ;
-	else if ( !Q_stricmp( "cube" , tmp_char ) )  ent->s.powerups = FARCLIP_CUBE ;
-	else if ( !Q_stricmp( "ellipse_z" , tmp_char ) )  ent->s.powerups = FARCLIP_ELLIPSE_Z ;
-	else if ( !Q_stricmp( "cylinder_z" , tmp_char ) )  ent->s.powerups = FARCLIP_CYLINDER_Z ;
-	else if ( !Q_stricmp( "box_z" , tmp_char ) )  ent->s.powerups = FARCLIP_BOX_Z ;
-	else if ( !Q_stricmp( "cone_z" , tmp_char ) )  ent->s.powerups = FARCLIP_CONE_Z ;
-	else if ( !Q_stricmp( "pyramid_z" , tmp_char ) )  ent->s.powerups = FARCLIP_PYRAMID_Z ;
-	else if ( !Q_stricmp( "circle_infinite_z" , tmp_char ) )  ent->s.powerups = FARCLIP_CIRCLE_INFINITE_Z ;
-	else if ( !Q_stricmp( "square_infinite_z" , tmp_char ) )  ent->s.powerups = FARCLIP_SQUARE_INFINITE_Z ;
-	else if ( !Q_stricmp( "ellipse_x" , tmp_char ) )  ent->s.powerups = FARCLIP_ELLIPSE_X ;
-	else if ( !Q_stricmp( "cylinder_x" , tmp_char ) )  ent->s.powerups = FARCLIP_CYLINDER_X ;
-	else if ( !Q_stricmp( "box_x" , tmp_char ) )  ent->s.powerups = FARCLIP_BOX_X ;
-	else if ( !Q_stricmp( "cone_x" , tmp_char ) )  ent->s.powerups = FARCLIP_CONE_X ;
-	else if ( !Q_stricmp( "pyramid_x" , tmp_char ) )  ent->s.powerups = FARCLIP_PYRAMID_X ;
-	else if ( !Q_stricmp( "circle_infinite_x" , tmp_char ) )  ent->s.powerups = FARCLIP_CIRCLE_INFINITE_X ;
-	else if ( !Q_stricmp( "square_infinite_x" , tmp_char ) )  ent->s.powerups = FARCLIP_SQUARE_INFINITE_X ;
-	else if ( !Q_stricmp( "ellipse_y" , tmp_char ) )  ent->s.powerups = FARCLIP_ELLIPSE_Y ;
-	else if ( !Q_stricmp( "cylinder_y" , tmp_char ) )  ent->s.powerups = FARCLIP_CYLINDER_Y ;
-	else if ( !Q_stricmp( "box_y" , tmp_char ) )  ent->s.powerups = FARCLIP_BOX_Y ;
-	else if ( !Q_stricmp( "cone_y" , tmp_char ) )  ent->s.powerups = FARCLIP_CONE_Y ;
-	else if ( !Q_stricmp( "pyramid_y" , tmp_char ) )  ent->s.powerups = FARCLIP_PYRAMID_Y ;
-	else if ( !Q_stricmp( "circle_infinite_y" , tmp_char ) )  ent->s.powerups = FARCLIP_CIRCLE_INFINITE_Y ;
-	else if ( !Q_stricmp( "square_infinite_y" , tmp_char ) )  ent->s.powerups = FARCLIP_SQUARE_INFINITE_Y ;
-	else  ent->s.powerups = FARCLIP_NONE ;
-	
-	if ( ent->s.powerups )
-	{
-		// "legsAnim" has only 8 bits over network, so the far clip value is rounded to multiple of 64
-		ent->s.legsAnim = ( ent->s.legsAnim + 32 ) / 64 ;
-		if ( ent->s.legsAnim < 1 )  ent->s.legsAnim = 1 ;
-		
-		// "torsoAnim" has only 8 bits over network, so the far clip value is rounded to multiple of 64
-		ent->s.torsoAnim = ( ent->s.torsoAnim + 32 ) / 64 ;
-		if ( ent->s.torsoAnim < 1 )  ent->s.torsoAnim = 1 ;
-	}
-	
-	//G_Printf( "^4%s (%i) : %i - %i\n" , tmp_char , ent->s.powerups , ent->s.legsAnim , ent->s.torsoAnim ) ;
-	
-	
-	// get the value for the key "lod" (Level Of Detail) and copy it to upper bits of powerups (bits 9 to 12)
-	
-	G_SpawnString( "lod" , "none" , &value ) ;
-	sscanf( value , "%5s %i" , tmp_char , &tmp_int ) ;
-	
-	if ( !Q_stricmp( "min" , tmp_char ) )  ent->s.powerups |= MAPLOD_BINARY_MASK | MAPLOD_GTE_BINARY_MASK | ( ( tmp_int & 3 ) << 8 ) ;
-	else if ( !Q_stricmp( "max" , tmp_char ) )  ent->s.powerups |= MAPLOD_BINARY_MASK | ( ( tmp_int & 3 ) << 8 ) ;
-	
-	
-	//G_Printf( "^5%s (%i) : %i - %i\n" , tmp_char , ent->s.powerups , ent->s.legsAnim , ent->s.torsoAnim ) ;
-	
-	
-	// should determinate in which cluster the entity is ??
-	trap_LinkEntity( ent ) ;
-	
+void SP_func_static( gentity_t *ent ) {
+	trap_SetBrushModel( ent, ent->model );
+	InitMover( ent );
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 }
+
 
 /*
 ===============================================================================

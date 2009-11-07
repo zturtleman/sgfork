@@ -440,6 +440,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\game\bg_parse.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\game\bg_pmove.c"
 				>
 			</File>
@@ -552,6 +556,10 @@
 			Name="Header Files"
 			Filter="h"
 			>
+			<File
+				RelativePath="..\..\code\game\bg_parse.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\code\game\bg_public.h"
 				>

@@ -119,28 +119,23 @@ System
 
 #define MAX_VOTE_ARGS 20
 
+// spawnflags for doors, dont forget to change for ClearItems
+#define DOOR_RETURN 8
+#define TRIGGER_DOOR 16
+
+// only for rotating doors
+#define DOOR_ROTATING_X_AXIS 32
+#define DOOR_ROTATING_Y_AXIS 64
+#define DOOR_ROTATING_ONE_WAY 128
+
 /*
 =============================
 Money system
 =============================
 */
 
-#define	START_MONEY				20.00
-#define MAX_MONEY				200.00
-#define	MIN_MONEY				20.00
-#define DU_MIN_MONEY			20.00
-#define SOCIAL_MONEY			28.00
-
-#define MAX_REWARD				"20"
-#define	LOSE_MONEY				7.00
-
-#define	ROUND_WIN_MONEY			"16"
-#define	ROUND_LOSE_MONEY		"10"
-
 //buy properties
 #define	BUY_TIME				60000
-
-//money-system end
 
 // Reward for player who rob the bank (added by Joe Kari)
 #define MAX_POINT_ROBBER_REWARD			5

@@ -244,7 +244,7 @@ void Cmd_Give_f (gentity_t *ent)
 	}
 
 	if (give_all || Q_stricmp(name, "money") == 0)
-		ent->client->ps.stats[STAT_MONEY] = MAX_MONEY;
+		ent->client->ps.stats[STAT_MONEY] = g_moneyMax.integer;
 
 	//give powerups
 	if (give_all || !Q_stricmp( name, "powerups")){
@@ -508,23 +508,23 @@ void SetTeam( gentity_t *ent, char *s ) {
 			int		counts[TEAM_NUM_TEAMS];
 
 			if(g_gametype.integer >= GT_RTP){
-				counts[TEAM_BLUE] = TeamCount( ent->client->ps.clientNum, TEAM_BLUE )+
-					TeamCount( ent->client->ps.clientNum, TEAM_BLUE_SPECTATOR );
-				counts[TEAM_RED] = TeamCount( ent->client->ps.clientNum, TEAM_RED )+
-					TeamCount( ent->client->ps.clientNum, TEAM_RED_SPECTATOR );
+				counts[TEAM_BLUE] = TeamCount( clientNum, TEAM_BLUE )+
+					TeamCount( clientNum, TEAM_BLUE_SPECTATOR );
+				counts[TEAM_RED] = TeamCount( clientNum, TEAM_RED )+
+					TeamCount( clientNum, TEAM_RED_SPECTATOR );
 			} else {
-				counts[TEAM_BLUE] = TeamCount( ent->client->ps.clientNum, TEAM_BLUE );
-				counts[TEAM_RED] = TeamCount( ent->client->ps.clientNum, TEAM_RED );
+				counts[TEAM_BLUE] = TeamCount( clientNum, TEAM_BLUE );
+				counts[TEAM_RED] = TeamCount( clientNum, TEAM_RED );
 			}
 
 			// We allow a spread of two
 			if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1 ) {
-				trap_SendServerCommand( ent->client->ps.clientNum,
+				trap_SendServerCommand( clientNum,
 					va("cp \"%s has too many players.\n\"", g_redteam.string) );
 				return; // ignore the request
 			}
 			if ( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > 1 ) {
-				trap_SendServerCommand( ent->client->ps.clientNum,
+				trap_SendServerCommand( clientNum,
 					va("cp \"%s has too many players.\n\"", g_blueteam.string) );
 				return; // ignore the request
 			}

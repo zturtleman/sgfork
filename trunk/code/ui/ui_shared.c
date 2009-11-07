@@ -2183,10 +2183,10 @@ qbool Item_Combo_HandleKey(itemDef_t *item, int key) {
 					int i;
 					h = w = 0;
 					for(i=0;i<multiPtr->count;i++) {
-						t = DC->textWidth(multiPtr->cvarList[i], comboPtr->boxtextscale, 0);
+						t = UI_Text_Width(multiPtr->cvarList[i], comboPtr->boxtextscale, 0);
 						if(t > w)
 							w = t;
-						t = DC->textHeight(multiPtr->cvarList[i], comboPtr->boxtextscale, 0);
+						t = UI_Text_Height(multiPtr->cvarList[i], comboPtr->boxtextscale, 0);
 						if(t > h)
 							h = t;
 					}
@@ -3079,18 +3079,18 @@ void Item_SetTextExtents(itemDef_t *item, int *width, int *height, const char *t
 
 	// keeps us from computing the widths and heights more than once
 	if (*width == 0 || (item->type == ITEM_TYPE_OWNERDRAW && item->textalignment == ITEM_ALIGN_CENTER)) {
-		int originalWidth = DC->textWidth(item->text, item->textscale, 0);
+		int originalWidth = UI_Text_Width(item->text, item->textscale, 0);
 
 		if (item->type == ITEM_TYPE_OWNERDRAW && (item->textalignment == ITEM_ALIGN_CENTER || item->textalignment == ITEM_ALIGN_RIGHT)) {
 			originalWidth += DC->ownerDrawWidth(item->window.ownerDraw, item->textscale);
 		} else if (item->type == ITEM_TYPE_EDITFIELD && item->textalignment == ITEM_ALIGN_CENTER && item->cvar) {
 			char buff[256];
 			DC->getCVarString(item->cvar, buff, 256);
-			originalWidth += DC->textWidth(buff, item->textscale, 0);
+			originalWidth += UI_Text_Width(buff, item->textscale, 0);
 		}
 
-		*width = DC->textWidth(textPtr, item->textscale, 0);
-		*height = DC->textHeight(textPtr, item->textscale, 0);
+		*width = UI_Text_Width(textPtr, item->textscale, 0);
+		*height = UI_Text_Height(textPtr, item->textscale, 0);
 		item->textRect.w = *width;
 		item->textRect.h = *height;
 		item->textRect.x = item->textalignx;
@@ -3169,7 +3169,7 @@ int Item_Text_AutoWrapped_Lines( itemDef_t *item )
   
   while( p )
   {
-    textWidth = DC->textWidth( buff, item->textscale, 0 );
+    textWidth = UI_Text_Width( buff, item->textscale, 0 );
     
     if( *p == ' ' || *p == '\t' || *p == '\n' || *p == '\0' )
     {
@@ -3300,7 +3300,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item )
       item->textRect.x = awc[ cache ].lineOffsets[ i ][ 0 ];
       item->textRect.y = awc[ cache ].lineOffsets[ i ][ 1 ];
       
-      DC->drawText( item->textRect.x, item->textRect.y, item->textscale, color,
+     UI_Text_Paint( item->textRect.x, item->textRect.y, item->textscale, color,
                     awc[ cache ].lines[ i ], 0, 0, item->textStyle );
     }
   }
@@ -3334,7 +3334,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item )
     
     while( p )
     {
-      textWidth = DC->textWidth( buff, item->textscale, 0 );
+      textWidth = UI_Text_Width( buff, item->textscale, 0 );
       
       if( *p == '^' )
       {
@@ -3382,7 +3382,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item )
 
           if( !skipLines )
           {
-            DC->drawText( item->textRect.x, item->textRect.y, item->textscale, color, buff, 0, 0, item->textStyle );
+            UI_Text_Paint( item->textRect.x, item->textRect.y, item->textscale, color, buff, 0, 0, item->textStyle );
 
             strcpy( awc[ cacheIndex ].lines[ lineNum ], buff );
             awc[ cacheIndex ].lineOffsets[ lineNum ][ 0 ] = item->textRect.x;
@@ -3465,12 +3465,12 @@ void Item_Text_Wrapped_Paint(itemDef_t *item) {
 	while (p && *p) {
 		strncpy(buff, start, p-start+1);
 		buff[p-start] = '\0';
-		DC->drawText(x, y, item->textscale, color, buff, 0, 0, item->textStyle);
+		UI_Text_Paint(x, y, item->textscale, color, buff, 0, 0, item->textStyle);
 		y += height + 5;
 		start += p - start + 1;
 		p = strchr(p+1, '\r');
 	}
-	DC->drawText(x, y, item->textscale, color, start, 0, 0, item->textStyle);
+	UI_Text_Paint(x, y, item->textscale, color, start, 0, 0, item->textStyle);
 }
 
 void Item_Text_Paint(itemDef_t *item) {
@@ -3520,7 +3520,7 @@ void Item_Text_Paint(itemDef_t *item) {
 
 	if (item->textStyle == ITEM_TEXTSTYLE_SHADOWED || item->textStyle == ITEM_TEXTSTYLE_OUTLINESHADOWED) {
 		Fade(&item->window.flags, &DC->Assets.shadowColor[3], DC->Assets.fadeClamp, &item->window.nextTime, DC->Assets.fadeCycle, qfalse);
-		DC->drawText(item->textRect.x + DC->Assets.shadowX, item->textRect.y + DC->Assets.shadowY, item->textscale, DC->Assets.shadowColor, textPtr, adjust);
+		UI_Text_Paint(item->textRect.x + DC->Assets.shadowX, item->textRect.y + DC->Assets.shadowY, item->textscale, DC->Assets.shadowColor, textPtr, adjust);
 	}
 */
 
@@ -3537,10 +3537,10 @@ void Item_Text_Paint(itemDef_t *item) {
 //		Text_Paint(item->textRect.x, item->textRect.y+1, item->textscale, item->window.foreColor, textPtr, adjust);
 //		Text_Paint(item->textRect.x+1, item->textRect.y+1, item->textscale, item->window.foreColor, textPtr, adjust);
 //		*/
-//		DC->drawText(item->textRect.x - 1, item->textRect.y + 1, item->textscale * 1.02, item->window.outlineColor, textPtr, adjust);
+//		UI_Text_Paint(item->textRect.x - 1, item->textRect.y + 1, item->textscale * 1.02, item->window.outlineColor, textPtr, adjust);
 //	}
 
-	DC->drawText(item->textRect.x, item->textRect.y, item->textscale, color, textPtr, 0, 0, item->textStyle);
+	UI_Text_Paint(item->textRect.x, item->textRect.y, item->textscale, color, textPtr, 0, 0, item->textStyle);
 }
 
 
@@ -3583,7 +3583,7 @@ void Item_TextField_Paint(itemDef_t *item) {
 		char cursor = DC->getOverstrikeMode() ? '_' : '|';
 		DC->drawTextWithCursor(item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, newColor, buff + editPtr->paintOffset, item->cursorPos - editPtr->paintOffset , cursor, editPtr->maxPaintChars, item->textStyle);
 	} else {
-		DC->drawText(item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, newColor, buff + editPtr->paintOffset, 0, editPtr->maxPaintChars, item->textStyle);
+		UI_Text_Paint(item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, newColor, buff + editPtr->paintOffset, 0, editPtr->maxPaintChars, item->textStyle);
 	}
 
 }
@@ -3668,7 +3668,7 @@ void Item_Combo_Paint(itemDef_t *item) {
  					}
  				}
  			}
-			t = DC->textWidth(textPtr, item->textscale, 0);
+			t = UI_Text_Width(textPtr, item->textscale, 0);
 			y = item->window.rect.y + item->textaligny;
 			x = item->window.rect.x + item->textalignx;
 			if(item->textalignment==ITEM_ALIGN_RIGHT) {
@@ -3677,7 +3677,7 @@ void Item_Combo_Paint(itemDef_t *item) {
 			if(item->textalignment==ITEM_ALIGN_CENTER) {
 				x = x - (t/2);
 			}
-			DC->drawText(x, y, item->textscale, item->window.foreColor, textPtr, 0, 0, item->textStyle);
+			UI_Text_Paint(x, y, item->textscale, item->window.foreColor, textPtr, 0, 0, item->textStyle);
 		}
 	}
 
@@ -3710,10 +3710,10 @@ void Item_ComboBox_Paint(itemDef_t *item) {
 		for(i=0;i<multiPtr->count;i++) {
 			y += comboPtr->maxheight;
 			if(i==comboPtr->comboItem) {
-				DC->drawText(x, y, comboPtr->boxtextscale, newColor, multiPtr->cvarList[i], 0, 0, item->textStyle);
+				UI_Text_Paint(x, y, comboPtr->boxtextscale, newColor, multiPtr->cvarList[i], 0, 0, item->textStyle);
 			}
 			else {
-				DC->drawText(x, y, comboPtr->boxtextscale, comboPtr->boxtextcolor, multiPtr->cvarList[i], 0, 0, item->textStyle);
+				UI_Text_Paint(x, y, comboPtr->boxtextscale, comboPtr->boxtextcolor, multiPtr->cvarList[i], 0, 0, item->textStyle);
 			}
 			y += BOXTEXTSTEP;
 		}
@@ -3739,9 +3739,9 @@ void Item_YesNo_Paint(itemDef_t *item) {
 
 	if (item->text) {
 		Item_Text_Paint(item);
-		DC->drawText(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, (value != 0) ? "Yes" : "No", 0, 0, item->textStyle);
+		UI_Text_Paint(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, (value != 0) ? "Yes" : "No", 0, 0, item->textStyle);
 	} else {
-		DC->drawText(item->textRect.x, item->textRect.y, item->textscale, newColor, (value != 0) ? "Yes" : "No", 0, 0, item->textStyle);
+		UI_Text_Paint(item->textRect.x, item->textRect.y, item->textscale, newColor, (value != 0) ? "Yes" : "No", 0, 0, item->textStyle);
 	}
 }
 
@@ -3764,9 +3764,9 @@ void Item_Multi_Paint(itemDef_t *item) {
 
 	if (item->text) {
 		Item_Text_Paint(item);
-		DC->drawText(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, text, 0, 0, item->textStyle);
+		UI_Text_Paint(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, text, 0, 0, item->textStyle);
 	} else {
-		DC->drawText(item->textRect.x, item->textRect.y, item->textscale, newColor, text, 0, 0, item->textStyle);
+		UI_Text_Paint(item->textRect.x, item->textRect.y, item->textscale, newColor, text, 0, 0, item->textStyle);
 	}
 }
 
@@ -4090,10 +4090,10 @@ void Item_Bind_Paint(itemDef_t *item) {
 	if (item->text) {
 		Item_Text_Paint(item);
 		BindingFromName(item->cvar, item->bindtype);
-		DC->drawText(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, g_nameBind1, 0, maxChars, item->textStyle);
+		UI_Text_Paint(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, g_nameBind1, 0, maxChars, item->textStyle);
 	} else {
 		BindingFromName(item->cvar, item->bindtype);
-		t = DC->textWidth(g_nameBind1, item->textscale, 0);
+		t = UI_Text_Width(g_nameBind1, item->textscale, 0);
 		y = item->window.rect.y + item->textaligny;
 		x = item->window.rect.x + item->textalignx;
 		if(item->textalignment==ITEM_ALIGN_RIGHT) {
@@ -4102,7 +4102,7 @@ void Item_Bind_Paint(itemDef_t *item) {
 		if(item->textalignment==ITEM_ALIGN_CENTER) {
 			x = x - (t/2);
 		}
-		DC->drawText(x, y, item->textscale, newColor, g_nameBind1, 0, maxChars, item->textStyle);
+		UI_Text_Paint(x, y, item->textscale, newColor, g_nameBind1, 0, maxChars, item->textStyle);
 	}
 }
 
@@ -4234,16 +4234,6 @@ qbool Item_Bind_HandleKey(itemDef_t *item, int key, qbool down) {
 	return qtrue;
 }
 
-
-
-void AdjustFrom640(float *x, float *y, float *w, float *h) {
-	//*x = *x * DC->scale + DC->bias;
-	*x *= DC->xscale;
-	*y *= DC->yscale;
-	*w *= DC->xscale;
-	*h *= DC->yscale;
-}
-
 void Item_Model_Paint(itemDef_t *item) {
 	float x, y, w, h;
 	refdef_t refdef;
@@ -4272,7 +4262,7 @@ void Item_Model_Paint(itemDef_t *item) {
 	w = item->window.rect.w-2;
 	h = item->window.rect.h-2;
 
-	AdjustFrom640( &x, &y, &w, &h );
+	UI_AdjustFrom640( &x, &y, &w, &h );
 
 	refdef.x = x;
 	refdef.y = y;
@@ -4511,7 +4501,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 							DC->drawHandlePic(x + 4 + listPtr->columnInfo[j].pos, y - 1 + listPtr->elementHeight / 2, listPtr->columnInfo[j].width, listPtr->columnInfo[j].width, optionalImage);
 						} else if (text && listPtr->columnInfo[j].maxChars>0) {
 							DC->setColor(item->window.foreColor);
-							DC->drawText(x + 4 + listPtr->columnInfo[j].pos, y + listPtr->elementHeight, item->textscale, item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle);
+							UI_Text_Paint(x + 4 + listPtr->columnInfo[j].pos, y + listPtr->elementHeight, item->textscale, item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle);
 						}
 					}
 				} else {
@@ -4520,7 +4510,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 						//DC->drawHandlePic(x + 4 + listPtr->elementHeight, y, listPtr->columnInfo[j].width, listPtr->columnInfo[j].width, optionalImage);
 					} else if (text) {
 						DC->setColor(item->window.foreColor);
-						DC->drawText(x + 4, y + listPtr->elementHeight, item->textscale, item->window.foreColor, text, 0, 0, item->textStyle);
+						UI_Text_Paint(x + 4, y + listPtr->elementHeight, item->textscale, item->window.foreColor, text, 0, 0, item->textStyle);
 					}
 				}
 
@@ -6693,7 +6683,7 @@ void Menu_PaintAll(void) {
 
 	if (debugMode) {
 		vec4_t v = {1, 1, 1, 1};
-		DC->drawText(5, 25, .5, v, va("fps: %f", DC->FPS), 0, 0, 0);
+		UI_Text_Paint(5, 25, .5, v, va("fps: %f", DC->FPS), 0, 0, 0);
 	}
 }
 
@@ -6862,3 +6852,341 @@ static qbool Menu_OverActiveItem(menuDef_t *menu, float x, float y) {
 	return qfalse;
 }
 
+//Main UI shared functions
+
+void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+	*x *= DC->xscale;
+	*y *= DC->yscale;
+	*w *= DC->xscale;
+	*h *= DC->yscale;
+}
+
+static void UI_Text_PaintChar( float x, float y, float width, float height,
+                               float scale, float s, float t, float s2, float t2, qhandle_t hShader )
+{
+  float w, h;
+  w = width * scale;
+  h = height * scale;
+  UI_AdjustFrom640( &x, &y, &w, &h );
+  DC->drawStretchPic( x, y, w, h, s, t, s2, t2, hShader );
+}
+
+void UI_Text_Paint_Limit( float *maxX, float x, float y, float scale,
+                          vec4_t color, const char *text, float adjust, int limit )
+{
+  int         len, count;
+  vec4_t      newColor;
+  glyphInfo_t *glyph;
+
+  if( text )
+  {
+    const char *s = text;
+    float max = *maxX;
+    float useScale;
+    fontInfo_t *font = &DC->Assets.textFont;
+
+    memcpy( &newColor[0], &color[0], sizeof( vec4_t ) );
+
+    if( scale <= DC->getCVarValue( "ui_smallFont" ) )
+      font = &DC->Assets.smallFont;
+    else if( scale > DC->getCVarValue( "ui_bigFont" ) )
+      font = &DC->Assets.bigFont;
+
+    useScale = scale * font->glyphScale;
+
+    DC->setColor( color );
+
+    len = strlen( text );
+
+    if( limit > 0 && len > limit )
+      len = limit;
+
+    count = 0;
+
+    while( s && *s && count < len )
+    {
+      float width, height, skip, yadj;
+
+      glyph = &font->glyphs[ ( unsigned char )*s ];
+      width = glyph->imageWidth * DC->aspectWidthScale;
+      height = glyph->imageHeight;
+      skip = glyph->xSkip * DC->aspectWidthScale;
+      yadj = useScale * glyph->top;
+
+      if( Q_IsColorString( s ) )
+      {
+        memcpy( newColor, g_color_table[ ColorIndex( *( s+1 ) ) ], sizeof( newColor ) );
+        newColor[ 3 ] = color[ 3 ];
+        DC->setColor( newColor );
+        s += 2;
+        continue;
+      }
+
+      if( UI_Text_Width( s, useScale, 1 ) + x > max )
+      {
+        *maxX = 0;
+        break;
+      }
+
+      UI_Text_PaintChar( x, y - yadj,
+                         width,
+                         height,
+                         useScale,
+                         glyph->s,
+                         glyph->t,
+                         glyph->s2,
+                         glyph->t2,
+                         glyph->glyph );
+      x += ( skip * useScale ) + adjust;
+      *maxX = x;
+      count++;
+      s++;
+    }
+
+    DC->setColor( NULL );
+  }
+}
+
+void UI_Text_Paint( float x, float y, float scale, vec4_t color, const char *text,
+                    float adjust, int limit, int style )
+{
+  int len, count;
+  vec4_t newColor;
+  glyphInfo_t *glyph;
+  float useScale;
+  fontInfo_t *font = &DC->Assets.textFont;
+
+  if( scale <= DC->getCVarValue( "ui_smallFont" ) )
+    font = &DC->Assets.smallFont;
+  else if( scale >= DC->getCVarValue( "ui_bigFont" ) )
+    font = &DC->Assets.bigFont;
+
+  useScale = scale * font->glyphScale;
+
+  if( text )
+  {
+    const char *s = text;
+    DC->setColor( color );
+    memcpy( &newColor[0], &color[0], sizeof( vec4_t ) );
+    len = strlen( text );
+
+    if( limit > 0 && len > limit )
+      len = limit;
+
+    count = 0;
+
+    while( s && *s && count < len )
+    {
+      float width, height, skip, yadj;
+
+      glyph = &font->glyphs[( unsigned char )*s];
+      width = glyph->imageWidth * DC->aspectWidthScale;
+      height = glyph->imageHeight;
+      skip = glyph->xSkip * DC->aspectWidthScale;
+      yadj = useScale * glyph->top;
+
+      if( Q_IsColorString( s ) )
+      {
+        memcpy( newColor, g_color_table[ColorIndex( *( s+1 ) )], sizeof( newColor ) );
+        newColor[3] = color[3];
+        DC->setColor( newColor );
+        s += 2;
+        continue;
+      }
+
+      if( style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE )
+      {
+        int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
+        colorBlack[3] = newColor[3];
+        DC->setColor( colorBlack );
+        UI_Text_PaintChar( x + ofs, y - yadj + ofs,
+                           width,
+                           height,
+                           useScale,
+                           glyph->s,
+                           glyph->t,
+                           glyph->s2,
+                           glyph->t2,
+                           glyph->glyph );
+        DC->setColor( newColor );
+        colorBlack[3] = 1.0;
+      }
+      else if( style == ITEM_TEXTSTYLE_NEON )
+      {
+        vec4_t glow, outer, inner, white;
+
+        glow[ 0 ] = newColor[ 0 ] * 0.5;
+        glow[ 1 ] = newColor[ 1 ] * 0.5;
+        glow[ 2 ] = newColor[ 2 ] * 0.5;
+        glow[ 3 ] = newColor[ 3 ] * 0.2;
+
+		Vector4Copy(newColor,outer);
+
+        inner[ 0 ] = newColor[ 0 ] * 1.5 > 1.0f ? 1.0f : newColor[ 0 ] * 1.5;
+        inner[ 1 ] = newColor[ 1 ] * 1.5 > 1.0f ? 1.0f : newColor[ 1 ] * 1.5;
+        inner[ 2 ] = newColor[ 2 ] * 1.5 > 1.0f ? 1.0f : newColor[ 2 ] * 1.5;
+        inner[ 3 ] = newColor[ 3 ];
+
+        white[ 0 ] = white[ 1 ] = white[ 2 ] = white[ 3 ] = 1.0f;
+
+        DC->setColor( glow );
+        UI_Text_PaintChar( x - 1.5, y - yadj - 1.5,
+                           width + 3,
+                           height + 3,
+                           useScale,
+                           glyph->s,
+                           glyph->t,
+                           glyph->s2,
+                           glyph->t2,
+                           glyph->glyph );
+
+        DC->setColor( outer );
+        UI_Text_PaintChar( x - 1, y - yadj - 1,
+                           width + 2,
+                           height + 2,
+                           useScale,
+                           glyph->s,
+                           glyph->t,
+                           glyph->s2,
+                           glyph->t2,
+                           glyph->glyph );
+
+        DC->setColor( inner );
+        UI_Text_PaintChar( x - 0.5, y - yadj - 0.5,
+                           width + 1,
+                           height + 1,
+                           useScale,
+                           glyph->s,
+                           glyph->t,
+                           glyph->s2,
+                           glyph->t2,
+                           glyph->glyph );
+
+        DC->setColor( white );
+      }
+
+      UI_Text_PaintChar( x, y - yadj,
+                         width,
+                         height,
+                         useScale,
+                         glyph->s,
+                         glyph->t,
+                         glyph->s2,
+                         glyph->t2,
+                         glyph->glyph );
+
+      x += ( skip * useScale ) + adjust;
+      s++;
+      count++;
+    }
+    DC->setColor( NULL );
+  }
+}
+
+float UI_Text_Width( const char *text, float scale, int limit )
+{
+  int count, len;
+  float out;
+  glyphInfo_t *glyph;
+  float useScale;
+  const char *s = text;
+  fontInfo_t *font = &DC->Assets.textFont;
+
+  if( scale <= DC->getCVarValue( "ui_smallFont" ) )
+    font = &DC->Assets.smallFont;
+  else if( scale >= DC->getCVarValue( "ui_bigFont" ) )
+    font = &DC->Assets.bigFont;
+
+  useScale = scale * font->glyphScale;
+  out = 0;
+
+  if( text )
+  {
+    len = Q_PrintStrlen( text );
+
+    if( limit > 0 && len > limit )
+      len = limit;
+
+    count = 0;
+
+    while( s && *s && count < len )
+    {
+      glyph = &font->glyphs[( unsigned char )*s];
+
+      if( Q_IsColorString( s ) )
+      {
+        s += 2;
+        continue;
+      }
+      out += ( glyph->xSkip * DC->aspectWidthScale );
+      s++;
+      count++;
+    }
+  }
+
+  return ( out * useScale );
+}
+
+float UI_Text_Height( const char *text, float scale, int limit )
+{
+  int len, count;
+  float max;
+  glyphInfo_t *glyph;
+  float useScale;
+  const char *s = text;
+  fontInfo_t *font = &DC->Assets.textFont;
+
+  if( scale <= DC->getCVarValue( "ui_smallFont" ) )
+    font = &DC->Assets.smallFont;
+  else if( scale >= DC->getCVarValue( "ui_bigFont" ) )
+    font = &DC->Assets.bigFont;
+
+  useScale = scale * font->glyphScale;
+  max = 0;
+
+  if( text )
+  {
+    len = strlen( text );
+
+    if( limit > 0 && len > limit )
+      len = limit;
+
+    count = 0;
+
+    while( s && *s && count < len )
+    {
+      if( Q_IsColorString( s ) )
+      {
+        s += 2;
+        continue;
+      }
+      else
+      {
+        glyph = &font->glyphs[( unsigned char )*s];
+
+        if( max < glyph->height )
+          max = glyph->height;
+
+        s++;
+        count++;
+      }
+    }
+  }
+
+  return max * useScale;
+}
+
+float UI_Text_EmWidth( float scale )
+{
+  return UI_Text_Width( "M", scale, 0 );
+}
+
+float UI_Text_EmHeight( float scale )
+{
+  return UI_Text_Height( "M", scale, 0 );
+}
+
+void UI_Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style){
+	int len = UI_Text_Width(text, scale, 0);
+	UI_Text_Paint(x - len/2, y, scale, color, text, adjust, limit, style);
+}

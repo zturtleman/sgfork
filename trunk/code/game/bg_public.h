@@ -74,9 +74,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #if defined QAGAME
+void QDECL G_Error( const char *fmt, ... );
 #define BG_Error G_Error
 #define BG_Printf G_Printf
 #elif defined CGAME
+void QDECL CG_Error( const char *msg, ... );
 #define BG_Error CG_Error
 #define BG_Printf CG_Printf
 #elif defined UI
@@ -971,7 +973,7 @@ gitem_t	*BG_ItemForHoldable( holdable_t pw );
 int	BG_PlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps);
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
-qbool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
+qbool	BG_CanItemBeGrabbed(int gametype, const entityState_t *ent, const playerState_t *ps,int MaxMoney);
 
 
 // g_dmflags->integer flags
@@ -1262,3 +1264,10 @@ int BG_WSNumByName( char *s );
 int BG_GitagNumByName( char *s );
 int BG_GitypeByName( char *s );
 
+// filesystem access
+// returns length of file
+int			trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void		trap_FS_Read( void *buffer, int len, fileHandle_t f );
+void		trap_FS_Write( const void *buffer, int len, fileHandle_t f );
+void		trap_FS_FCloseFile( fileHandle_t f );
+int			trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t

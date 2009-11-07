@@ -830,7 +830,7 @@ int BotGetItemLongTermGoal(bot_state_t *bs, int tfl, bot_goal_t *goal) {
 			!Q_stricmp(g_entities[goal->entitynum].classname, "freed") ||
 			!Q_stricmp(g_entities[goal->entitynum].classname, "player") ||
 			!Q_stricmp(g_entities[goal->entitynum].classname, "item_money") ||
-			(g_entities[goal->entitynum].s.eType == ET_ITEM && !BG_CanItemBeGrabbed(g_gametype.integer, &g_entities[goal->entitynum].s, &bs->cur_ps)));
+			(g_entities[goal->entitynum].s.eType == ET_ITEM && !BG_CanItemBeGrabbed(g_gametype.integer, &g_entities[goal->entitynum].s, &bs->cur_ps,g_moneyMax.integer)));
 
 
 		/*Com_Printf("yes %i %i %s %i return: %i\n", goal->iteminfo, goal->entitynum,

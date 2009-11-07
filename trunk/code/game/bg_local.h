@@ -88,5 +88,3 @@ void PM_AddEvent( int newEvent );
 
 qbool	PM_SlideMove( qbool gravity );
 void		PM_StepSlideMove( qbool gravity );
-
-

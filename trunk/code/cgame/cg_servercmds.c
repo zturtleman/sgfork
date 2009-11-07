@@ -162,6 +162,8 @@ void CG_ParseServerinfo( void ) {
 
 	cgs.scorelimit = atoi( Info_ValueForKey( info, "scorelimit" ) );
 	cgs.specsareflies = atoi( Info_ValueForKey( info, "g_specsareflies"));
+	//Money system
+	cgs.moneyMax = atoi( Info_ValueForKey( info, "g_moneyMax" ) );
 	cgs.timelimit = atoi( Info_ValueForKey( info, "timelimit" ) );
 	cgs.maxclients = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
 	mapname = Info_ValueForKey( info, "mapname" );

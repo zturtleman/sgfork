@@ -246,7 +246,7 @@ void VM_LoadSymbols( vm_t *vm ) {
 		return;
 	}
 
-	numInstructions = vm->instructionPointersLength >> 2;
+	numInstructions = vm->instructionCount;
 
 	// parse the symbols
 	text_p = mapfile.c;
@@ -334,7 +334,7 @@ Dlls will call this directly
 
   For speed, we just grab 15 arguments, and don't worry about exactly
    how many the syscall actually needs; the extra is thrown away.
-
+ 
 ============
 */
 intptr_t QDECL VM_DllSyscall( intptr_t arg, ... ) {
@@ -343,19 +343,20 @@ intptr_t QDECL VM_DllSyscall( intptr_t arg, ... ) {
   intptr_t args[16];
   int i;
   va_list ap;
-
+  
   args[0] = arg;
-
+  
   va_start(ap, arg);
   for (i = 1; i < sizeof (args) / sizeof (args[i]); i++)
     args[i] = va_arg(ap, intptr_t);
   va_end(ap);
-
+  
   return currentVM->systemCall( args );
 #else // original id code
 	return currentVM->systemCall( &arg );
 #endif
 }
+
 
 /*
 =================
@@ -424,7 +425,8 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qbool alloc ) {
 
 	// round up to next power of 2 so all data operations can
 	// be mask protected
-	dataLength = header.h->dataLength + header.h->litLength + header.h->bssLength;
+	dataLength = header.h->dataLength + header.h->litLength +
+		header.h->bssLength;
 	for ( i = 0 ; dataLength > ( 1 << i ) ; i++ ) {
 	}
 	dataLength = 1 << i;
@@ -516,9 +518,6 @@ If image ends in .qvm it will be interpreted, otherwise
 it will attempt to load as a system dll
 ================
 */
-
-#define	STACK_SIZE	0x20000
-
 vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *), 
 				vmInterpret_t interpret ) {
 	vm_t		*vm;
@@ -573,8 +572,8 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 	}
 
 	// allocate space for the jump targets, which will be filled in by the compile/prep functions
-	vm->instructionPointersLength = header->instructionCount * 4;
-	vm->instructionPointers = Hunk_Alloc( vm->instructionPointersLength, h_high );
+	vm->instructionCount = header->instructionCount;
+	vm->instructionPointers = Hunk_Alloc( vm->instructionCount*4, h_high );
 
 	// copy or compile the instructions
 	vm->codeLength = header->codeLength;
@@ -606,7 +605,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 
 	// the stack is implicitly at the end of the image
 	vm->programStack = vm->dataMask + 1;
-	vm->stackBottom = vm->programStack - STACK_SIZE;
+	vm->stackBottom = vm->programStack - PROGRAM_STACK_SIZE;
 
 	Com_Printf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
 
@@ -730,8 +729,6 @@ an OP_ENTER instruction, which will subtract space for
 locals from sp
 ==============
 */
-#define	MAX_STACK	256
-#define	STACK_MASK	(MAX_STACK-1)
 
 intptr_t	QDECL VM_Call( vm_t *vm, int callnum, ... ) {
 	vm_t	*oldVM;
@@ -892,7 +889,7 @@ void VM_VmInfo_f( void ) {
 			Com_Printf( "interpreted\n" );
 		}
 		Com_Printf( "    code length : %7i\n", vm->codeLength );
-		Com_Printf( "    table length: %7i\n", vm->instructionPointersLength );
+		Com_Printf( "    table length: %7i\n", vm->instructionCount*4 );
 		Com_Printf( "    data length : %7i\n", vm->dataMask + 1 );
 	}
 }

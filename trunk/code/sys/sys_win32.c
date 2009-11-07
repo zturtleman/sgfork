@@ -77,14 +77,6 @@ char *Sys_DefaultHomePath( void )
 		Q_strncpyz( homePath, szPath, sizeof( homePath ) );
 		Q_strcat( homePath, sizeof( homePath ), "\\SmokinGuns" );
 		FreeLibrary(shfolder);
-		if( !CreateDirectory( homePath, NULL ) )
-		{
-			if( GetLastError() != ERROR_ALREADY_EXISTS )
-			{
-				Com_Printf("Unable to create directory \"%s\"\n", homePath );
-				return NULL;
-			}
-		}
 	}
 
 	return homePath;
@@ -279,9 +271,13 @@ const char *Sys_Dirname( char *path )
 Sys_Mkdir
 ==============
 */
-void Sys_Mkdir( const char *path )
-{
-	_mkdir (path);
+qbool Sys_Mkdir( const char *path ) {
+	int result = _mkdir( path );
+
+	if( result != 0 )
+		return errno == EEXIST;
+
+	return qtrue;
 }
 
 /*
@@ -583,6 +579,25 @@ static qbool SDL_VIDEODRIVER_externallySet = qfalse;
 
 /*
 ==============
+Sys_GLimpSafeInit
+
+Windows specific "safe" GL implementation initialisation
+==============
+*/
+void Sys_GLimpSafeInit( void )
+{
+#ifndef DEDICATED
+	if( !SDL_VIDEODRIVER_externallySet )
+	{
+		// Here, we want to let SDL decide what do to unless
+		// explicitly requested otherwise
+		_putenv( "SDL_VIDEODRIVER=" );
+	}
+#endif
+}
+
+/*
+==============
 Sys_GLimpInit
 
 Windows specific GL implementation initialisation
@@ -634,6 +649,18 @@ void Sys_PlatformInit( void )
 #endif
 }
 
+/*
+==============
+Sys_SetEnv
+
+set/unset environment variables (empty value removes it)
+==============
+*/
+
+void Sys_SetEnv(const char *name, const char *value)
+{
+	_putenv(va("%s=%s", name, value));
+}
 /*
 ==============
 Sys_PlatformPostInit

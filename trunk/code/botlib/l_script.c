@@ -1119,7 +1119,7 @@ void StripDoubleQuotes(char *string)
 {
 	if (*string == '\"')
 	{
-		strcpy(string, string+1);
+		memmove(string, string+1, strlen(string));
 	} //end if
 	if (string[strlen(string)-1] == '\"')
 	{
@@ -1136,7 +1136,7 @@ void StripSingleQuotes(char *string)
 {
 	if (*string == '\'')
 	{
-		strcpy(string, string+1);
+		memmove(string, string+1, strlen(string));
 	} //end if
 	if (string[strlen(string)-1] == '\'')
 	{
@@ -1157,13 +1157,18 @@ float ReadSignedFloat(script_t *script)
 	PS_ExpectAnyToken(script, &token);
 	if (!strcmp(token.string, "-"))
 	{
+		if(!PS_ExpectAnyToken(script, &token))
+		{
+			ScriptError(script, "Missing float value\n", token.string);
+			return 0;
+		}
 		sign = -1.0;
-		PS_ExpectTokenType(script, TT_NUMBER, 0, &token);
-	} //end if
-	else if (token.type != TT_NUMBER)
+	}
+	if (token.type != TT_NUMBER)
 	{
 		ScriptError(script, "expected float value, found %s\n", token.string);
-	} //end else if
+		return 0;
+	}
 	return sign * token.floatvalue;
 } //end of the function ReadSignedFloat
 //============================================================================
@@ -1180,13 +1185,18 @@ signed long int ReadSignedInt(script_t *script)
 	PS_ExpectAnyToken(script, &token);
 	if (!strcmp(token.string, "-"))
 	{
+		if(!PS_ExpectAnyToken(script, &token))
+		{
+			ScriptError(script, "Missing integer value\n", token.string);
+			return 0;
+		}
 		sign = -1;
-		PS_ExpectTokenType(script, TT_NUMBER, TT_INTEGER, &token);
-	} //end if
-	else if (token.type != TT_NUMBER || token.subtype == TT_FLOAT)
+	}
+	if (token.type != TT_NUMBER || token.subtype == TT_FLOAT)
 	{
 		ScriptError(script, "expected integer value, found %s\n", token.string);
-	} //end else if
+		return 0;
+	}
 	return sign * token.intvalue;
 } //end of the function ReadSignedInt
 //============================================================================

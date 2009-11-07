@@ -394,9 +394,6 @@ typedef struct {
   void (*setColor) (const vec4_t v);
   void (*drawHandlePic) (float x, float y, float w, float h, qhandle_t asset);
   void (*drawStretchPic) (float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
-  void (*drawText) (float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style );
-  int (*textWidth) (const char *text, float scale, int limit);
-  int (*textHeight) (const char *text, float scale, int limit);
   qhandle_t (*registerModel) (const char *p);
   void (*modelBounds) (qhandle_t model, vec3_t min, vec3_t max);
   void (*fillRect) ( float x, float y, float w, float h, const vec4_t color);
@@ -440,11 +437,11 @@ typedef struct {
 	void (*drawCinematic)(int handle, float x, float y, float w, float h);
 	void (*runCinematicFrame)(int handle);
 
-  float			yscale;
-  float			xscale;
-  float			bias;
-  int				realTime;
-  int				frameTime;
+	float			yscale;
+	float			xscale;
+	float			aspectWidthScale;
+	int				realTime;
+	int				frameTime;
 	int				cursorx;
 	int				cursory;
 	qbool	debug;
@@ -514,6 +511,17 @@ qbool UI_OutOfMemory( void );
 void Controls_GetConfig( void );
 void Controls_SetConfig(qbool restart);
 void Controls_SetDefaults( void );
+
+//Shared draw
+void UI_AdjustFrom640( float *x, float *y, float *w, float *h );
+void UI_Text_Paint( float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style );
+void UI_Text_Paint_Limit( float *maxX, float x, float y, float scale,
+                          vec4_t color, const char* text, float adjust, int limit );
+void UI_Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
+float UI_Text_Width( const char *text, float scale, int limit );
+float UI_Text_Height( const char *text, float scale, int limit );
+float UI_Text_EmWidth( float scale );
+float UI_Text_EmHeight( float scale );
 
 int			trap_PC_AddGlobalDefine( char *define );
 int			trap_PC_LoadSource( const char *filename );

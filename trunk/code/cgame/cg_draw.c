@@ -46,170 +46,6 @@ char systemChat[256];
 char teamChat1[256];
 char teamChat2[256];
 
-int CG_Text_Width(const char *text, float scale, int limit) {
-  int count,len;
-	float out;
-	glyphInfo_t *glyph;
-	float useScale;
-// FIXME: see ui_main.c, same problem
-//	const unsigned char *s = text;
-	const char *s = text;
-	fontInfo_t *font = &cgDC.Assets.textFont;
-	if (scale <= cg_smallFont.value) {
-		font = &cgDC.Assets.smallFont;
-	} else if (scale > cg_bigFont.value) {
-		font = &cgDC.Assets.bigFont;
-	}
-	useScale = scale * font->glyphScale;
-  out = 0;
-  if (text) {
-    len = strlen(text);
-		if (limit > 0 && len > limit) {
-			len = limit;
-		}
-		count = 0;
-		while (s && *s && count < len) {
-			if ( Q_IsColorString(s) ) {
-				s += 2;
-				continue;
-			} else {
-				glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
-				out += glyph->xSkip;
-				s++;
-				count++;
-			}
-    }
-  }
-  return out * useScale;
-}
-
-int CG_Text_Height(const char *text, float scale, int limit) {
-  int len, count;
-	float max;
-	glyphInfo_t *glyph;
-	float useScale;
-// TTimo: FIXME
-//	const unsigned char *s = text;
-	const char *s = text;
-	fontInfo_t *font = &cgDC.Assets.textFont;
-	if (scale <= cg_smallFont.value) {
-		font = &cgDC.Assets.smallFont;
-	} else if (scale > cg_bigFont.value) {
-		font = &cgDC.Assets.bigFont;
-	}
-	useScale = scale * font->glyphScale;
-  max = 0;
-  if (text) {
-    len = strlen(text);
-		if (limit > 0 && len > limit) {
-			len = limit;
-		}
-		count = 0;
-		while (s && *s && count < len) {
-			if ( Q_IsColorString(s) ) {
-				s += 2;
-				continue;
-			} else {
-				glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
-	      if (max < glyph->height) {
-		      max = glyph->height;
-			  }
-				s++;
-				count++;
-			}
-    }
-  }
-  return max * useScale;
-}
-
-void CG_Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader) {
-  float w, h;
-  w = width * scale;
-  h = height * scale;
-  CG_AdjustFrom640( &x, &y, &w, &h );
-  trap_R_DrawStretchPic( x, y, w, h, s, t, s2, t2, hShader );
-}
-
-void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style) {
-	int len, count;
-	vec4_t newColor;
-	glyphInfo_t *glyph;
-	float useScale;
-	fontInfo_t *font = &cgDC.Assets.textFont;
-	if (scale <= cg_smallFont.value) {
-		font = &cgDC.Assets.smallFont;
-	} else if (scale > cg_bigFont.value) {
-		font = &cgDC.Assets.bigFont;
-	}
-	useScale = scale * font->glyphScale;
-	if (text) {
-// TTimo: FIXME
-//		const unsigned char *s = text;
-		const char *s = text;
-		trap_R_SetColor( color );
-		memcpy(&newColor[0], &color[0], sizeof(vec4_t));
-		len = strlen(text);
-		if (limit > 0 && len > limit) {
-			len = limit;
-		}
-		count = 0;
-		while (s && *s && count < len) {
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
-      //int yadj = Assets.textFont.glyphs[text[i]].bottom + Assets.textFont.glyphs[text[i]].top;
-      //float yadj = scale * (Assets.textFont.glyphs[text[i]].imageHeight - Assets.textFont.glyphs[text[i]].height);
-			if ( Q_IsColorString( s ) ) {
-				memcpy( newColor, g_color_table[ColorIndex(*(s+1))], sizeof( newColor ) );
-				newColor[3] = color[3];
-				trap_R_SetColor( newColor );
-				s += 2;
-				continue;
-			} else {
-				float yadj = useScale * glyph->top;
-				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
-					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
-					colorBlack[3] = newColor[3];
-					//check if current color already is black, if yes make a white shadow
-					if(color[0] == 0 && color[1] == 0 && color[2] == 0)
-						trap_R_SetColor(colorWhite);
-					else
-						trap_R_SetColor( colorBlack );
-					CG_Text_PaintChar(x + ofs, y - yadj + ofs,
-														glyph->imageWidth,
-														glyph->imageHeight,
-														useScale,
-														glyph->s,
-														glyph->t,
-														glyph->s2,
-														glyph->t2,
-														glyph->glyph);
-					colorBlack[3] = 1.0;
-					trap_R_SetColor( newColor );
-				}
-				CG_Text_PaintChar(x, y - yadj,
-													glyph->imageWidth,
-													glyph->imageHeight,
-													useScale,
-													glyph->s,
-													glyph->t,
-													glyph->s2,
-													glyph->t2,
-													glyph->glyph);
-				// CG_DrawPic(x, y - yadj, scale * cgDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * cgDC.Assets.textFont.glyphs[text[i]].imageHeight, cgDC.Assets.textFont.glyphs[text[i]].glyph);
-				x += (glyph->xSkip * useScale) + adjust;
-				s++;
-				count++;
-			}
-    }
-	  trap_R_SetColor( NULL );
-  }
-}
-
-void CG_Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style){
-	int len = CG_Text_Width(text, scale, 0);
-
-	CG_Text_Paint(x - len/2, y, scale, color, text, adjust, limit, style);
-}
-
 /*
 ==============
 CG_DrawField
@@ -349,7 +185,7 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandl
 		return;
 	}
 
-	CG_AdjustFrom640( &x, &y, &w, &h );
+	UI_AdjustFrom640( &x, &y, &w, &h );
 
 	memset( &refdef, 0, sizeof( refdef ) );
 
@@ -672,12 +508,12 @@ static int CG_DrawPickupItem( int y ) {
 			trap_R_SetColor( NULL );
 
 			if(!Q_stricmp(bg_itemlist[value].classname, "pickup_money")){
-				CG_Text_Paint(
+				UI_Text_Paint(
 				320 - 143 + size*bg_itemlist[value].xyrelation + 10,
 				y + (size/2) + 10, 0.35f, color,
 				va("Money: %i$", quantity), 0, -1, 3);
 			} else {
-				CG_Text_Paint(
+				UI_Text_Paint(
 					320 - 143 + size*bg_itemlist[value].xyrelation + 10,
 					y + (size/2) + 10, 0.35f, color,
 					bg_itemlist[ value ].pickup_name, 0, -1, 3);
@@ -1611,15 +1447,16 @@ static void CG_ScanForCrosshairEntity(int *changeCrosshairFlags) {
 	cg.crosshairClientNum = trace.entityNum;
 	cg.crosshairClientTime = cg.time;
 
-	if ( trace.entityNum <= MAX_CLIENTS && cg_entities[trace.entityNum].currentState.eType == ET_PLAYER) {
-		if(cgs.gametype >= GT_TEAM && cg.snap->ps.persistant[PERS_TEAM] < TEAM_SPECTATOR &&
-			    cgs.clientinfo[trace.entityNum].team == cg.snap->ps.persistant[PERS_TEAM]) {
+	if (trace.entityNum <= MAX_CLIENTS && cg_entities[trace.entityNum].currentState.eType == ET_PLAYER) {
+		if(cg.snap->ps.persistant[PERS_TEAM] < TEAM_SPECTATOR) {
+			if (cgs.gametype >= GT_TEAM && cgs.clientinfo[trace.entityNum].team == cg.snap->ps.persistant[PERS_TEAM]) {
 					// player is on same team
 					*changeCrosshairFlags |= CHANGE_CROSSHAIR_TEAMMATE;
-		} else {
-			// player is opponent and alive
-			if ( cgs.clientinfo[trace.entityNum].infoValid )
-				*changeCrosshairFlags |= CHANGE_CROSSHAIR_OPPONENT;
+			} else {
+				// player is opponent and alive
+				if (cgs.clientinfo[trace.entityNum].infoValid)
+					*changeCrosshairFlags |= CHANGE_CROSSHAIR_OPPONENT;
+			}
 		}
 	} else if (cg_entities[trace.entityNum].currentState.eType == ET_MOVER &&
 			   cg_entities[trace.entityNum].currentState.angles2[0] == -1000 &&
@@ -1673,8 +1510,8 @@ static void CG_DrawCrosshairNames(int isPlayer) {
 
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
 	color[3] *= 0.5f;
-	w = CG_Text_Width(name, 0.3f, 0);
-	CG_Text_Paint( 320 - w / 2, 190, 0.3f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
+	w = UI_Text_Width(name, 0.3f, 0);
+	UI_Text_Paint( 320 - w / 2, 190, 0.3f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 	trap_R_SetColor( NULL );
 }
 
@@ -1712,10 +1549,10 @@ static void CG_DrawSpectator(void) {
 		float color[] = {1.0f, 0.75f, 0.15f, 1.0f};
 
 		if(cg.introend >= cg.time)
-			CG_Text_PaintCenter(320, 320, 0.3f, color, "Use the buy-menu to buy new pistols.", 0, 0, 3);
+			UI_Text_PaintCenter(320, 320, 0.3f, color, "Use the buy-menu to buy new pistols.", 0, 0, 3);
 
 		if(cg.snap->ps.stats[STAT_FLAGS] & SF_DU_WON)
-			CG_Text_PaintCenter(320, 320, 0.3f, color, "Press \"FIRE\" to watch the remaining duels", 0, 0, 3);
+			UI_Text_PaintCenter(320, 320, 0.3f, color, "Press \"FIRE\" to watch the remaining duels", 0, 0, 3);
 	}
 }
 
@@ -1909,8 +1746,8 @@ static qbool CG_DrawFollow( void ) {
 		x = 0.5 * ( 640 - 10 * CG_DrawStrlen( "Following" ));
 		CG_DrawStringExt( x, 340, "Following", color, qfalse, qfalse, 10, 10, 0 );
 
-		w = CG_Text_Width(name, 0.5f, 0);
-		CG_Text_Paint( 320 - w / 2, 375, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
+		w = UI_Text_Width(name, 0.5f, 0);
+		UI_Text_Paint( 320 - w / 2, 375, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 	}
 
 	return qtrue;
@@ -1960,8 +1797,8 @@ static void CG_DrawWarmup( void ) {
 
 		if ( ci1 && ci2 ) {
 			s = va( "%s vs %s", ci1->name, ci2->name );
-			w = CG_Text_Width(s, 0.6f, 0);
-			CG_Text_Paint(320 - w / 2, 60, 0.6f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
+			w = UI_Text_Width(s, 0.6f, 0);
+			UI_Text_Paint(320 - w / 2, 60, 0.6f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 		}
 	} else {
 		if ( cgs.gametype == GT_FFA ) {
@@ -1971,8 +1808,8 @@ static void CG_DrawWarmup( void ) {
 		} else {
 			s = "";
 		}
-		w = CG_Text_Width(s, 0.6f, 0);
-		CG_Text_Paint(320 - w / 2, 90, 0.6f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
+		w = UI_Text_Width(s, 0.6f, 0);
+		UI_Text_Paint(320 - w / 2, 90, 0.6f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 		w = CG_DrawStrlen( s );
 		if ( w > 640 / GIANT_WIDTH ) {
 			cw = 640 / w;
@@ -2013,8 +1850,8 @@ static void CG_DrawWarmup( void ) {
 		break;
 	}
 
-		w = CG_Text_Width(s, scale, 0);
-		CG_Text_Paint(320 - w / 2, 125, scale, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
+		w = UI_Text_Width(s, scale, 0);
+		UI_Text_Paint(320 - w / 2, 125, scale, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 }
 
 //==================================================================================
