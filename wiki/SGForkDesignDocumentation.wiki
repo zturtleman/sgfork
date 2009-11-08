@@ -14,3 +14,4 @@ Main section:
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfNmQ1N3pyd2Zx&hl=en vanilla SG locational damage description]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMThmenZ6ejdjaA&hl=en SGFork UI description]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfNGM3azZrc2c1&hl=en SGFork competitive security description]
+  * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMTloaHo0Y2RmNw&hl=en SGFork merge of ioQuake updates]
