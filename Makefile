@@ -107,6 +107,10 @@ ifndef COPYDIR
 COPYDIR="/usr/local/games/sgfork"
 endif
 
+ifndef COPYBINDIR
+COPYBINDIR=$(COPYDIR)
+endif
+
 ifndef MOUNT_DIR
 MOUNT_DIR=code
 endif
@@ -222,6 +226,7 @@ ifneq ($(BUILD_CLIENT),0)
   endif
 endif
 
+# version info
 VERSION=1.1
 
 USE_SVN=
@@ -997,8 +1002,6 @@ release:
 targets: makedirs
 	@echo ""
 	@echo "Building $(SDK_GAME) in $(B):"
-	# IOQ3_REVISION can be defined in Makefile.local for SDK_GAMENAME mainteners
-	# to keep trace of the ioquake3 supported revision
 	@echo "  IOQ3_REVISION: $(IOQ3_REVISION)"
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
@@ -1695,6 +1698,7 @@ Q3CGOBJ_ = \
   \
   $(B)/$(SDK_GAMENAME)/cgame/cg_sg_utils.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_unlagged.o
+
 Q3CGOBJ = $(Q3CGOBJ_) $(B)/$(SDK_GAMENAME)/cgame/cg_syscalls.o
 Q3CGVMOBJ = $(Q3CGOBJ_:%.o=%.asm)
 
