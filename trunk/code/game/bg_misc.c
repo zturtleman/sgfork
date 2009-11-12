@@ -94,7 +94,7 @@ BG_ItemForWeapon
 gitem_t	*BG_ItemForWeapon( weapon_t weapon ) {
 	gitem_t	*it;
 
-	for ( it = &bg_itemlist[1] ; it->classname ; it++) {
+	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
 		if ( it->giType == IT_WEAPON && it->giTag == weapon ) {
 			return it;
 		}
@@ -113,7 +113,7 @@ BG_ItemForAmmo
 gitem_t	*BG_ItemForAmmo( weapon_t ammo ) {
 	gitem_t	*it;
 
-	for ( it = &bg_itemlist[1] ; it->classname ; it++) {
+	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
 		if ( it->giType == IT_AMMO && it->giTag == ammo ) {
 			return it;
 		}
@@ -148,7 +148,7 @@ by Spoon
 gitem_t	*BG_ItemByClassname( const char *classname ) {
 	gitem_t	*it;
 
-	for ( it = &bg_itemlist[1]; it->classname ; it++ ) {
+	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
 		if ( !Q_stricmp( it->classname, classname ) )
 			return it;
 	}
@@ -165,7 +165,7 @@ BG_Item
 gitem_t	*BG_Item( const char *pickupName ) {
 	gitem_t	*it;
 
-	for ( it = &bg_itemlist[1]; it->classname ; it++ ) {
+	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
 		if ( !Q_stricmp( it->pickup_name, pickupName ) )
 			return it;
 	}

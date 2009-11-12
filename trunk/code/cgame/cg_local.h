@@ -1823,12 +1823,6 @@ void CG_DrawInformation( void );
 void CG_LoadingStage( int amount);
 
 //
-// cg_scoreboard.c
-//
-qbool CG_DrawOldScoreboard( void );
-void CG_DrawOldTourneyScoreboard( void );
-
-//
 // cg_consolecmds.c
 //
 qbool CG_ConsoleCommand( void );

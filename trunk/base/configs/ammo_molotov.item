@@ -1,5 +1,6 @@
 classname = "ammo_molotov"
 pickup_sound = "sound/misc/am_pickup.wav"
+pickup_name = "Mol. Cocktails"
 world_model = < "models/weapons2/molotov/e_molotov.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/weapons/molotov"
 xyrelation = "3.000000"

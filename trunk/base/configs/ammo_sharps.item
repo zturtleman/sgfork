@@ -1,5 +1,6 @@
 classname = "ammo_sharps"
 pickup_sound = "sound/misc/am_pickup.wav"
+pickup_name = "Sharps Ammo"
 world_model = < "models/powerups/ammo/rifleammo.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/ammo_sharps"
 xyrelation = "5.300000"

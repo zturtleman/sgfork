@@ -1768,7 +1768,7 @@ BotCheckBuy
 ==================
 */
 void BotCheckBuy(bot_state_t *bs){
-	int money, i, mark, mark2;
+	int money, mark, mark2;
 	gitem_t *item;
 
 	if(g_gametype.integer >= GT_RTP){
@@ -1796,15 +1796,10 @@ void BotCheckBuy(bot_state_t *bs){
 	bs->buytime = level.time + 3000 + rand()%4000;
 
 	// first try to buy a weapon
-	for(i=1, mark = -1, mark2 = -1; ; i++){
+	for(item = &bg_itemlist[1], mark = -1, mark2 = -1; ITEM_INDEX(item) < IT_NUM_ITEMS ;item++){
 		gitem_t *temp;
 		int j;
 		qbool qcontinue = qfalse;
-
-		item = &bg_itemlist[i];
-
-		if(!item->classname)
-			break;
 
 		// if the item has no price
 		if(item->prize == 0 || item->weapon_sort == WS_MISC ||
@@ -1833,7 +1828,6 @@ void BotCheckBuy(bot_state_t *bs){
 			// if it's a WPS_GUN
 			if(bg_itemlist[j].weapon_sort == WPS_GUN &&
 				temp->prize > item->prize){
-				i++;
 				qcontinue = qtrue;
 			}
 			j++;
@@ -1842,7 +1836,7 @@ void BotCheckBuy(bot_state_t *bs){
 		if(qcontinue) continue;
 
 		if(mark == -1){
-			mark = i;
+			mark = ITEM_INDEX(item);
 			continue;
 		}
 
@@ -1850,7 +1844,7 @@ void BotCheckBuy(bot_state_t *bs){
 			(item->prize > (&bg_itemlist[mark])->prize ||
 			item->prize > (&bg_itemlist[mark2])->prize)){
 			mark2 = mark;
-			mark = i;
+			mark = ITEM_INDEX(item);
 		}
 	}
 
@@ -1873,12 +1867,7 @@ void BotCheckBuy(bot_state_t *bs){
 	}
 
 	// if still some money, buy a misc item
-	for(i=1, mark = -1, mark2 = -1; ; i++){
-
-		item = &bg_itemlist[i];
-
-		if(!item->classname)
-			break;
+	for(item = &bg_itemlist[1], mark = -1, mark2 = -1; ITEM_INDEX(item) < IT_NUM_ITEMS ;item++){
 
 		// if the item has no price
 		if(item->prize == 0 || item->weapon_sort != WS_MISC)
@@ -1894,13 +1883,13 @@ void BotCheckBuy(bot_state_t *bs){
 			continue;
 
 		if(mark == -1){
-			mark = i;
+			mark = ITEM_INDEX(item);
 			continue;
 		}
 
 		if(item->prize <= money){
 			mark2 = mark;
-			mark = i;
+			mark = ITEM_INDEX(item);
 		}
 	}
 

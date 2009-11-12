@@ -649,7 +649,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	g_gametype.integer = prefix_gametype;
 
 	G_Printf ("-----------------------------------\n");
-  config_GetInfos( PFT_WEAPONS | PFT_ITEMS | PFT_GRAVITY );
+	config_GetInfos( PFT_WEAPONS | PFT_ITEMS | PFT_GRAVITY );
 	G_Printf ("-----------------------------------\n");
 
 	//read shader info
@@ -3362,7 +3362,7 @@ void G_RunFrame( int levelTime ) {
 	level.time = levelTime;
 	msec = level.time - level.previousTime;
   
-  trap_RealTime( &level.qtime );
+	trap_RealTime(&level.qtime);
 
 	// get any cvar changes
 	G_UpdateCvars();

@@ -1332,6 +1332,8 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.flagShaders[1] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_capture.tga");
 	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
 
+	CG_Printf("Just about to load sever speciefic models\n");
+
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
 		const char		*modelName;
@@ -2337,14 +2339,14 @@ void CG_LoadHudMenu( void ) {
 
 	Menu_Reset();
 
-  trap_Cvar_VariableStringBuffer( "cg_hudFiles", buff, sizeof( buff ) );
-  hudSet = buff;
+	trap_Cvar_VariableStringBuffer( "cg_hudFiles", buff, sizeof( buff ) );
+	hudSet = buff;
 
-  if( !cg_hudFilesEnable.integer || hudSet[ 0 ] == '\0' )
-    hudSet = "ui/hud.txt";
+	if( !cg_hudFilesEnable.integer || hudSet[ 0 ] == '\0' )
+		hudSet = "ui/hud.txt";
 
 	CG_LoadMenus(hudSet);
-  cgDC.hudloading = qfalse;
+	cgDC.hudloading = qfalse;
 }
 
 void CG_AssetCache( void ) {

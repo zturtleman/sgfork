@@ -2019,13 +2019,10 @@ float	color[6][4] = {
 // set up the item-menu
 static void CG_SetupItemMenu(void){
 	gitem_t *item;
-	int	i;
 	int count = 0;
 	qbool clone = qfalse; // second "cloned" pistol
 
-	item = &bg_itemlist[1];
-
-	for(i = 1; item->classname; item++){
+	for(item = &bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++){
 		int belt = 1;
 
 		if(cg.snap->ps.powerups[PW_BELT])
@@ -2070,7 +2067,6 @@ static void CG_SetupItemMenu(void){
 		} else menu_items[count].money = qtrue;
 
 		count++;
-		i++;
 	}
 
 	menuItemCount = count;
@@ -2158,9 +2154,7 @@ static gitem_t *CG_GetBuyItem(void){
 	gitem_t *item;
 	int	j;
 
-	item = &bg_itemlist[1];
-
-	for(j = 0; item->classname; item++){
+	for(item = &bg_itemlist[1], j = 0; ITEM_INDEX(item) < IT_NUM_ITEMS ; item++){
 		if ( item->weapon_sort != cg.menustat )
 			continue;
 		j++;
@@ -2297,7 +2291,7 @@ static void CG_DrawBuyMenu( void ) {
 				else
 					item = BG_ItemForAmmo(WP_CART_CLIP);
 
-				if(item->classname){
+				if(item){
 					trap_SendConsoleCommand(va("cg_buy %s\n", item->classname));
 					cg.oldbutton = qtrue;
 

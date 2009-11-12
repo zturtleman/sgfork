@@ -128,13 +128,13 @@ void CG_RegisterWeapon( int weaponNum ) {
 	memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 	weaponInfo->registered = qtrue;
 
-  for( item= &bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++ ) {
+	for(item= &bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++) {
 		if ( item->giType == IT_WEAPON && item->giTag == weaponNum ) {
 			weaponInfo->item = item;
 			break;
 		}
 	}
-	if ( !item->classname ) {
+	if ( !(ITEM_INDEX(item) < IT_NUM_ITEMS) ) {
 		CG_Error( "Couldn't find weapon %i", weaponNum );
 	}
 	CG_RegisterItemVisuals( ITEM_INDEX(item) );
@@ -151,12 +151,12 @@ void CG_RegisterWeapon( int weaponNum ) {
 	weaponInfo->weaponIcon = trap_R_RegisterShader( item->icon );
 	weaponInfo->ammoIcon = trap_R_RegisterShader( item->icon );
 
-  for( ammo = &bg_itemlist[1]; ITEM_INDEX(ammo) < IT_NUM_ITEMS; ammo++ ) {
+	for(ammo = &bg_itemlist[1]; ITEM_INDEX(ammo) < IT_NUM_ITEMS; ammo++) {
 		if ( ammo->giType == IT_AMMO && ammo->giTag == weaponNum ) {
 			break;
 		}
 	}
-	if ( ammo->classname && ammo->world_model[0] ) {
+	if (ITEM_INDEX(ammo) < IT_NUM_ITEMS) {
 		weaponInfo->ammoModel = trap_R_RegisterModel( ammo->world_model[0] );
 	}
 
@@ -305,7 +305,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	//
 	if ( item->giType == IT_POWERUP || item->giType == IT_HEALTH ||
 		item->giType == IT_ARMOR || item->giType == IT_HOLDABLE ) {
-		if ( item->world_model[1] ) {
+		if (!Q_stricmp(item->world_model[1],"<NULL>")) {
 			itemInfo->models[1] = trap_R_RegisterModel( item->world_model[1] );
 		}
 	}

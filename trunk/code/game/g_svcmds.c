@@ -499,8 +499,7 @@ void Svcmd_GameWeapon_f( char *cmd ) {
   fileHandle_t f;
 
 
-  if( !g_cheats.integer )
-  {
+  if(!g_cheats.integer){
     Com_Printf( "Svcmd_GameWeapon_f: Cheats off.\n" );
     return;
   }
@@ -604,6 +603,7 @@ void Svcmd_GameWeapon_f( char *cmd ) {
               item->world_model[0], item->world_model[1], item->world_model[2], item->world_model[3] ) );
         Q_strcat( buf, bsize, va( "icon = \"%s\"\n", item->icon ) );
         Q_strcat( buf, bsize, va( "xyrelation = \"%f\"\n", item->xyrelation ) );
+		Q_strcat( buf, bsize, va( "pickup_name = \"%s\"\n", item->pickup_name ) );
         Q_strcat( buf, bsize, va( "quantity = \"%i\"\n", item->quantity ) );
         Q_strcat( buf, bsize, va( "giType = \"%s\"\n", psf_itemTypes[ item->giType ] ) );
         Q_strcat( buf, bsize, va( "giTag = \"%s\"\n", psf_weapons_config[ item->giTag ].numNames ) );

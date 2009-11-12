@@ -2195,9 +2195,8 @@ void CG_OwnerDraw(itemDef_t *item, float x, float y, float w, float h, float tex
 
 	case CG_ITEMBOX:
 		// first draw the info
-		buyitem = bg_itemlist+1;
 
-		for(j = 0; buyitem->classname; buyitem++){
+		for(buyitem = &bg_itemlist[1],j = 0; ITEM_INDEX(buyitem)<IT_NUM_ITEMS; buyitem++){
 			const int width = rect.w-2*26;
 			int height;
 			int newy;

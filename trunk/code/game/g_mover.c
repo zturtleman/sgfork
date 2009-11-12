@@ -438,8 +438,6 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	trajectory_t*	tr;
 
 
-	if ( ent->moverState == MOVER_STATIC )  return ;
-
 	ent->moverState = moverState;
 
 	if(!Q_stricmp(ent->classname, "func_door_rotating"))
@@ -460,19 +458,19 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	case MOVER_1TO2:
 		VectorCopy( ent->pos1, tr->trBase );
 		VectorSubtract( ent->pos2, ent->pos1, delta );
-		f = 1000.0 / ent->s.pos.trDuration;
+		f = 1000.0 / tr->trDuration;
 		VectorScale( delta, f, tr->trDelta );
 		tr->trType = TR_LINEAR_STOP;
 		break;
 	case MOVER_2TO1:
 		VectorCopy( ent->pos2, tr->trBase );
 		VectorSubtract( ent->pos1, ent->pos2, delta );
-		f = 1000.0 / ent->s.pos.trDuration;
+		f = 1000.0 / tr->trDuration;
 		VectorScale( delta, f, tr->trDelta );
 		tr->trType = TR_LINEAR_STOP;
 		break;
 	}
-	BG_EvaluateTrajectory( tr, level.time, ent->r.currentOrigin );	
+	BG_EvaluateTrajectory(&ent->s.pos, level.time, ent->r.currentOrigin);
 	trap_LinkEntity( ent );
 }
 
@@ -1148,7 +1146,6 @@ void func_breakable_die( gentity_t *self, gentity_t *inflictor, gentity_t *attac
 	self->r.contents = CONTENTS_MOVER;
 	self->takedamage = qfalse;
 	self->flags |= EF_BROKEN;
-	self->s.powerups = FARCLIP_NONE ;
 	// respawn breakable in deathmatch
 	if (g_breakspawndelay.integer > 0)
 		self->wait = level.time + g_breakspawndelay.integer * 1000;
@@ -1215,16 +1212,11 @@ void SP_func_breakable (gentity_t *ent){
 	}
 
 	trap_SetBrushModel( ent, ent->model );
-	
-	// Joe Kari: this prevent from collision with func_static far clipping
-	ent->s.powerups = FARCLIP_NONE ;
 
 	//set weapon by which it can be destroyed, 0 = every weapon
 	if(!ent->s.weapon){
-		G_SpawnString( "weapon", "", &s );
-		item = BG_ItemByClassname(s);
-
-		if(item){
+		if(G_SpawnString("weapon", "", &s)){
+			item = BG_ItemByClassname(s);
 			if(item->giType == IT_WEAPON)
 				ent->s.weapon = item->giTag;
 		} else {

@@ -1101,7 +1101,7 @@ char *ClientConnect( int clientNum, qbool firstTime, qbool isBot ) {
 //	char		*areabits;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
-  char *ip;
+	char *ip;
 	gentity_t	*ent;
 
 	ent = &g_entities[ clientNum ];
@@ -1411,20 +1411,18 @@ void ClientSpawn(gentity_t *ent) {
 						!!(ent->r.svFlags & SVF_BOT));
 		}
 	} else {
-		do {
-			// the first spawn should be at a good looking spot
-			if ( !client->pers.initialSpawn && client->pers.localClient ) {
-				client->pers.initialSpawn = qtrue;
-				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles, ent->mappart, ent->client,
-					!!(ent->r.svFlags & SVF_BOT));
-			} else {
-				// don't spawn near existing origin if possible
-				spawnPoint = SelectSpawnPoint (
-					client->ps.origin,
-					spawn_origin, spawn_angles, ent->mappart, client,
-					!!(ent->r.svFlags & SVF_BOT));
-			}
-		} while ( 1 );
+		// the first spawn should be at a good looking spot
+		if ( !client->pers.initialSpawn && client->pers.localClient ) {
+			client->pers.initialSpawn = qtrue;
+			spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles, ent->mappart, ent->client,
+				!!(ent->r.svFlags & SVF_BOT));
+		} else {
+			// don't spawn near existing origin if possible
+			spawnPoint = SelectSpawnPoint (
+				client->ps.origin,
+				spawn_origin, spawn_angles, ent->mappart, client,
+				!!(ent->r.svFlags & SVF_BOT));
+		}
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 
@@ -1486,7 +1484,7 @@ void ClientSpawn(gentity_t *ent) {
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags = 0;
-  ent->client->maxAmmo = 1.0f;
+	ent->client->maxAmmo = 1.0f;
 
 	VectorCopy (playerMins, ent->r.mins);
 	VectorCopy (playerMaxs, ent->r.maxs);
