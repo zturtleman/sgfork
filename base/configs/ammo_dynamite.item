@@ -1,5 +1,6 @@
 classname = "ammo_dynamite"
 pickup_sound = "sound/misc/am_pickup.wav"
+pickup_name = "Dynamite"
 world_model = < "models/powerups/ammo/dynammo.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/weapons/dynamite"
 xyrelation = "3.000000"

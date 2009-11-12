@@ -68,7 +68,7 @@ tryagain:
 		return;
 	}
 
-  for( item=&bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++ ) {
+	for(item=&bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++){
 		if ( item->giType != IT_WEAPON ) {
 			continue;
 		}
@@ -77,7 +77,7 @@ tryagain:
 		}
 	}
 
-	if ( item->classname ) {
+	if (ITEM_INDEX(item) < IT_NUM_ITEMS){
 		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
 	}
 

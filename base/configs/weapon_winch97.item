@@ -1,5 +1,6 @@
 classname = "weapon_winch97"
 pickup_sound = "sound/misc/w_pickup.wav"
+pickup_name = "Winchester 1897"
 world_model = < "models/weapons2/winch97/e_winch97.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/weapons/winch97"
 xyrelation = "3.000000"

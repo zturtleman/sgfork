@@ -4804,7 +4804,9 @@ void _UI_Init( qbool inGameLoad ) {
 	UI_RegisterCvars();
 	UI_InitMemory();
 
-  config_GetInfos( PFT_WEAPONS | PFT_ITEMS );
+	Com_Printf ("-----------------------------------\n");
+	config_GetInfos( PFT_WEAPONS | PFT_ITEMS );
+	Com_Printf ("-----------------------------------\n");
 
 	// cache redundant calulations
 	trap_GetGlconfig( &uiInfo.uiDC.glconfig );
@@ -4814,11 +4816,10 @@ void _UI_Init( qbool inGameLoad ) {
 	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight / 480.0f;
 
 	// wide screen
-	uiInfo.uiDC.aspectWidthScale = ( ( 640.0f * uiInfo.uiDC.glconfig.vidHeight ) /
-									( 480.0f * uiInfo.uiDC.glconfig.vidWidth ) );
+	uiInfo.uiDC.aspectWidthScale = ((640.0f * uiInfo.uiDC.glconfig.vidHeight) /
+									(480.0f * uiInfo.uiDC.glconfig.vidWidth));
 
-
-  //UI_Load();
+	//UI_Load();
 	uiInfo.uiDC.registerShaderNoMip = &trap_R_RegisterShaderNoMip;
 	uiInfo.uiDC.setColor = &UI_SetColor;
 	uiInfo.uiDC.drawHandlePic = &UI_DrawHandlePic;

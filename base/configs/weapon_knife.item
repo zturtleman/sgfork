@@ -1,5 +1,6 @@
 classname = "weapon_knife"
 pickup_sound = "sound/misc/w_pickup.wav"
+pickup_name = "Bowie Knife"
 world_model = < "models/weapons2/knife/e_knife.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/weapons/knife"
 xyrelation = "3.000000"

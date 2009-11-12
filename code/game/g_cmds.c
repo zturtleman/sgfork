@@ -1845,6 +1845,9 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 	qbool gatling = (ent->client->ps.weapon == WP_GATLING &&
 		ent->client->ps.stats[STAT_GATLING_MODE]);
 
+	trap_Argv( 1, arg1, sizeof( arg1 ) );
+	item = BG_ItemByClassname( arg1 );
+
 	if( ent->client->ps.stats[STAT_HEALTH] <= 0 || item->prize <= 0 )
 		return;
 
@@ -1857,10 +1860,6 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 		trap_SendServerCommand( ent-g_entities, va("print \"60 seconds have passed ... you can't buy anything\n\""));
 		return;
 	}
-
-	trap_Argv( 1, arg1, sizeof( arg1 ) );
-
-	item = BG_ItemByClassname( arg1 );
 
 	if(ent->client->sess.sessionTeam >= TEAM_SPECTATOR && !cgame ){
 		trap_SendServerCommand( ent-g_entities, va("print \"You can't buy while in spectator mode!\n\""));

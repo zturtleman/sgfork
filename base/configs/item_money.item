@@ -1,5 +1,6 @@
 classname = "item_money"
 pickup_sound = "sound/misc/m_pickup.wav"
+pickup_name = "Moneybag"
 world_model = < "models/items/moneybag.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/weapons/moneybag"
 xyrelation = "1.000000"

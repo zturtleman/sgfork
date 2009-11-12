@@ -913,7 +913,7 @@ else
   STRIP_FLAG = -s
 endif
 
-BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
+BASE_CFLAGS += -DPRODUCT_VERSION=$(VERSION)
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -1686,7 +1686,6 @@ Q3CGOBJ_ = \
   $(B)/$(SDK_GAMENAME)/cgame/cg_players.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_playerstate.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_predict.o \
-  $(B)/$(SDK_GAMENAME)/cgame/cg_scoreboard.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_servercmds.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_snapshot.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_view.o \

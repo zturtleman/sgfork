@@ -1,5 +1,6 @@
 classname = "ammo_cartridges"
 pickup_sound = "sound/misc/am_pickup.wav"
+pickup_name = "Cartridges"
 world_model = < "models/powerups/ammo/rifleammo.md3" "<NULL>" "<NULL>" "<NULL>" >
 icon = "hud/ammo_cart"
 xyrelation = "4.100000"

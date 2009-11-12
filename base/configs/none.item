@@ -1,5 +1,6 @@
 classname = "<NULL>"
 pickup_sound = "<NULL>"
+pickup_name = "<NULL>"
 world_model = < "<NULL>" "<NULL>" "<NULL>" "<NULL>" >
 icon = "<NULL>"
 xyrelation = "0.000000"

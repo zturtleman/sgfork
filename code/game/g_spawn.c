@@ -290,8 +290,7 @@ qbool G_CallSpawn( gentity_t *ent ) {
 	}
 
 	// check item spawn functions
-	//for ( item=bg_itemlist+1 ; item->classname ; item++ ) {
-  for( item=&bg_itemlist[1]; (item - bg_itemlist) < IT_NUM_ITEMS; item++ ) {
+	for(item=&bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++){
 		if ( !strcmp(item->classname, ent->classname) ) {
 
 			if(g_gametype.integer != GT_BR && !Q_stricmp(item->classname, "item_money"))

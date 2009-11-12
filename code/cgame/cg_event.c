@@ -677,23 +677,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		{
 			gitem_t	*item;
 
-			int		quantity;
-			int		index = 1;
-			quantity = es->eventParm;		// player predicted
-
-			item = &bg_itemlist[1];
-			for( ;item->classname; item++){
-				if(!Q_stricmp(item->classname, "pickup_money"))
-					break;
-				index++;
-			}
-
+			item = BG_ItemByClassname("pickup_money");
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 
 			// show icon and name on status bar
 			if ( es->number == cg.snap->ps.clientNum ) {
-				cg.itemPickupQuant = quantity;
-				cg.itemPickup = index;
+				cg.itemPickupQuant = es->eventParm;		// player predicted
+				cg.itemPickup = ITEM_INDEX(item);
 				cg.itemPickupTime = cg.time;
 				cg.itemPickupBlendTime = cg.time;
 			}

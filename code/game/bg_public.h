@@ -101,52 +101,6 @@ typedef enum {
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
 /*
------------------------
-Far clipping form definition
-(by Joe Kari)
------------------------
-*/
-// !! Don't re-order this: it is used in this order for a function pointer array !!
-typedef enum {
-        FARCLIP_NONE ,			// no clipping
-	FARCLIP_SPHERE ,		// Standard default spherical clipping
-        FARCLIP_ELLIPSE_X ,		// X-axis rescaled sphere
-        FARCLIP_ELLIPSE_Y ,		// Y-axis rescaled
-        FARCLIP_ELLIPSE_Z ,		// Z-axis rescaled
-        FARCLIP_CYLINDER_X ,		// X-axis cylinder for its axis length)
-        FARCLIP_CYLINDER_Y ,		// Y-axis 
-        FARCLIP_CYLINDER_Z ,		// Z-axis 
-        FARCLIP_CUBE ,			// Cubic clipping (along axis), bounding-box clipping
-        FARCLIP_BOX_X ,			// X-axis rescaled cube
-        FARCLIP_BOX_Y ,			
-        FARCLIP_BOX_Z ,
-        FARCLIP_CONE_X ,		// distance along X-axis is substracted from YZ-axis distance calculation
-        FARCLIP_CONE_Y ,
-        FARCLIP_CONE_Z ,		// could be usefull for clipping grass brush/models
-        FARCLIP_PYRAMID_X ,		// distance along X-axis is substracted from YZ-axis bounding box calculation
-        FARCLIP_PYRAMID_Y ,
-        FARCLIP_PYRAMID_Z ,
-        FARCLIP_CIRCLE_INFINITE_X ,	// X-axis is not used while calculating distance (cylinder with infinite length)
-        FARCLIP_CIRCLE_INFINITE_Y ,
-        FARCLIP_CIRCLE_INFINITE_Z ,
-        FARCLIP_SQUARE_INFINITE_X ,	// X-axis is not used while calculating bounding box (box with infinite length on X-axis)
-        FARCLIP_SQUARE_INFINITE_Y ,
-        FARCLIP_SQUARE_INFINITE_Z
-} farclip_t ;
-
-/*
------------------------
-Map LOD (Level Of Detail)
-(by Joe Kari)
------------------------
-*/
-#define MAPLOD_BINARY_MASK	0x400		// bit on => LOD definition, bit off => no LOD definition: always displayed
-#define	MAPLOD_GTE_BINARY_MASK	0x800 		// bit on => object is displayed if LOD is GreaTer or Equal (GTE) to the value
-						// bit off => object is displayed if LOD is less or equal to the value
-        
-
-
-/*
 ===================================================================================
 
 PMOVE MODULE
