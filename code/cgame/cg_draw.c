@@ -1136,33 +1136,112 @@ CROSSHAIR
 ================================================================================
 */
 
+static void CG_DrawOneCrosshair(float crosshairSize, float crosshairWidthRatio,int crosshairPickUpPulse,
+								int crosshairX,int crosshairY,int crosshairFriendColor, int crosshairOpponentColor,
+								int crosshairActivateColor, int crosshairColor, float crosshairTransparency,
+								int crosshairHealth, int crosshairDrawFriend, int drawCrosshair,
+								int changeCrosshairFlags)
+{
+	int			ca;
+	float		w, h;
+	float		x, y;
+	qhandle_t	hShader;
+	vec4_t		hcolor;
+
+	//Size section
+	w = h = crosshairSize;
+	w *= crosshairWidthRatio * cgDC.xscale * cgDC.aspectWidthScale;
+	h *= cgDC.yscale;
+
+	if(crosshairPickUpPulse){
+		float	f;
+		// pulse the size of the crosshair when picking up items
+		f = cg.time - cg.itemPickupBlendTime;
+		if(f > 0 && f < ITEM_BLOB_TIME){
+			f /= ITEM_BLOB_TIME;
+			w *= (1 + f);
+			h *= (1 + f);
+		}
+	}
+
+	//Position section
+	x = crosshairX;
+	y = crosshairY;
+
+	//Color section
+	if(changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE){
+		//Target is teammate
+		hcolor[0] = g_color_table[crosshairFriendColor & Q_COLORS_COUNT][0];
+		hcolor[1] = g_color_table[crosshairFriendColor & Q_COLORS_COUNT][1];
+		hcolor[2] = g_color_table[crosshairFriendColor & Q_COLORS_COUNT][2];
+	}else if(changeCrosshairFlags & CHANGE_CROSSHAIR_OPPONENT){
+		//Target is opponent
+		hcolor[0] = g_color_table[crosshairOpponentColor & Q_COLORS_COUNT][0];
+		hcolor[1] = g_color_table[crosshairOpponentColor & Q_COLORS_COUNT][1];
+		hcolor[2] = g_color_table[crosshairOpponentColor & Q_COLORS_COUNT][2];
+	}else if(changeCrosshairFlags & CHANGE_CROSSHAIR_ACTIVATE){
+		//Target is item to activate
+		hcolor[0] = g_color_table[crosshairActivateColor & Q_COLORS_COUNT][0];
+		hcolor[1] = g_color_table[crosshairActivateColor & Q_COLORS_COUNT][1];
+		hcolor[2] = g_color_table[crosshairActivateColor & Q_COLORS_COUNT][2];
+	}else{
+		// set color based on health
+		if(crosshairHealth && cg.snap->ps.stats[STAT_HEALTH] < HEALTH_USUAL){
+			CG_GetColorForHealth(cg.snap->ps.stats[STAT_HEALTH],hcolor);
+		}else{
+			//Usual color
+			hcolor[0] = g_color_table[crosshairColor & Q_COLORS_COUNT][0];
+			hcolor[1] = g_color_table[crosshairColor & Q_COLORS_COUNT][1];
+			hcolor[2] = g_color_table[crosshairColor & Q_COLORS_COUNT][2];
+		}
+	}
+	//Transparency section
+	if(cgs.gametype == GT_DUEL && 
+		cg.time >= cg.introend - DU_INTRO_DRAW &&
+		cg.time <= cg.introend + DU_CROSSHAIR_FADE){
+			//Duel fade out
+			hcolor[3] = 0.0f;
+			if(cg.time >= cg.introend + DU_CROSSHAIR_START)
+				hcolor[3] = (float)(cg.time - cg.introend - DU_CROSSHAIR_START)/DU_CROSSHAIR_FADE;
+	}else
+		hcolor[3] = (crosshairTransparency <= 1.0f) ? crosshairTransparency : 1.0f;
+	trap_R_SetColor(hcolor);
+	//Shader section
+	if(crosshairDrawFriend && changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE){
+		//Change crosshair to indicate that target is a teammate
+		hShader = cgs.media.crosshairFriendShader;
+	}else{
+		ca = drawCrosshair;
+		if(ca < 0){
+			ca = 0;
+		}
+		hShader = cgs.media.crosshairShader1[ca % NUM_CROSSHAIRS];
+	}
+
+	trap_R_DrawStretchPic(x + 0.5 * (cgs.glconfig.vidWidth - w), 
+		y + 0.5 * (cgs.glconfig.vidHeight - h), 
+		w, h, 0, 0, 1, 1, hShader);
+}
 
 /*
 =================
 CG_DrawCrosshair
 =================
 */
-static void CG_DrawCrosshair( int changeCrosshairFlags )
-{
-	int			ca;
-	float		w, h;
+static void CG_DrawCrosshair(int changeCrosshairFlags){
 	qhandle_t	hShader;
-	float		f;
-	float		x, y;
-	vec4_t		hcolor;
 
-	if ( cg.snap->ps.persistant[PERS_TEAM] >= TEAM_SPECTATOR) {
-		return;
-	}
 
-	if ( cg.renderingThirdPerson ) {
+	if (cg.snap->ps.persistant[PERS_TEAM] >= TEAM_SPECTATOR)
 		return;
-	}
+
+	if(cg.renderingThirdPerson)
+		return;
 
 	//Sharps rifle crosshair
 	if( cg.snap->ps.stats[STAT_WP_MODE]==1 && cg.snap->ps.weapon == WP_SHARPS){
 		hShader = cgs.media.scopeShader;
-		CG_DrawPic(0.0f, 0.0f, 640.0f, 480.0f, hShader);
+		CG_DrawPic(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, hShader);
 
 		if ( changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE)
 			trap_R_SetColor( g_color_table[cg_crosshair1FriendColor.integer & Q_COLORS_COUNT] );
@@ -1181,154 +1260,20 @@ static void CG_DrawCrosshair( int changeCrosshairFlags )
 	CG_ZoomUp_f();
 	
 	//Crosshair1
-	if ( cg_drawCrosshair1.integer ) {
-		//Size section
-		w = h = cg_crosshair1Size.value;
-		w *= cg_crosshair1WidthRatio.value;
-
-		if (cg_crosshair1PickUpPulse.integer) {
-			// pulse the size of the crosshair when picking up items
-			f = cg.time - cg.itemPickupBlendTime;
-			if ( f > 0 && f < ITEM_BLOB_TIME ) {
-				f /= ITEM_BLOB_TIME;
-				w *= ( 1 + f );
-				h *= ( 1 + f );
-			}
-		}
-
-		//Position section
-		x = cg_crosshair1X.integer;
-		y = cg_crosshair1Y.integer;
-
-		//Color section
-		if (changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE) {
-			//Target is teammate
-			hcolor[0] = g_color_table[cg_crosshair1FriendColor.integer & Q_COLORS_COUNT][0];
-			hcolor[1] = g_color_table[cg_crosshair1FriendColor.integer & Q_COLORS_COUNT][1];
-			hcolor[2] = g_color_table[cg_crosshair1FriendColor.integer & Q_COLORS_COUNT][2];
-		} else if (changeCrosshairFlags & CHANGE_CROSSHAIR_OPPONENT) {
-			//Target is opponent
-			hcolor[0] = g_color_table[cg_crosshair1OpponentColor.integer & Q_COLORS_COUNT][0];
-			hcolor[1] = g_color_table[cg_crosshair1OpponentColor.integer & Q_COLORS_COUNT][1];
-			hcolor[2] = g_color_table[cg_crosshair1OpponentColor.integer & Q_COLORS_COUNT][2];
-		} else if (changeCrosshairFlags & CHANGE_CROSSHAIR_ACTIVATE) {
-			//Target is item to activate
-			hcolor[0] = g_color_table[cg_crosshair1ActivateColor.integer & Q_COLORS_COUNT][0];
-			hcolor[1] = g_color_table[cg_crosshair1ActivateColor.integer & Q_COLORS_COUNT][1];
-			hcolor[2] = g_color_table[cg_crosshair1ActivateColor.integer & Q_COLORS_COUNT][2];
-		} else {
-			// set color based on health
-			if ( cg_crosshair1Health.integer && cg.snap->ps.stats[STAT_HEALTH] < HEALTH_USUAL) {
-				CG_GetColorForHealth(cg.snap->ps.stats[STAT_HEALTH],hcolor);
-			} else {
-				//Usual color
-				hcolor[0] = g_color_table[cg_crosshair1Color.integer & Q_COLORS_COUNT][0];
-				hcolor[1] = g_color_table[cg_crosshair1Color.integer & Q_COLORS_COUNT][1];
-				hcolor[2] = g_color_table[cg_crosshair1Color.integer & Q_COLORS_COUNT][2];
-			}
-		}
-		//Transparency section
-		if (cgs.gametype == GT_DUEL && 
-			cg.introend - DU_INTRO_DRAW <= cg.time &&
-			cg.introend + DU_CROSSHAIR_FADE >= cg.time ) {
-				//Duel fade out
-				if (cg.introend + DU_CROSSHAIR_START <= cg.time )
-					hcolor[3] = (float)(cg.time - cg.introend - DU_CROSSHAIR_START)/DU_CROSSHAIR_FADE;
-		} else {
-			hcolor[3] = (cg_crosshair1Transparency.value <= 1.0) ? cg_crosshair1Transparency.value : 1.0;
-			trap_R_SetColor( hcolor );
- 		}
-		//Shader section
-		if( changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE && cg_crosshairDrawFriend.integer) {
-			//Change crosshair to indicate that target is a teammate
-			hShader = cgs.media.crosshairFriendShader;
-		} else {
-			ca = cg_drawCrosshair1.integer;
-			if (ca < 0) {
-				ca = 0;
-			}
-			hShader = cgs.media.crosshairShader1[ ca % NUM_CROSSHAIRS ];
-		}
-
-		trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
-			y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
-			w, h, 0, 0, 1, 1, hShader );
-	}
+	if(cg_drawCrosshair1.integer)
+		CG_DrawOneCrosshair(cg_crosshair1Size.value, cg_crosshair1WidthRatio.value, cg_crosshair1PickUpPulse.integer,
+							cg_crosshair1X.integer, cg_crosshair1Y.integer, cg_crosshair1FriendColor.integer, cg_crosshair1OpponentColor.integer,
+							cg_crosshair1ActivateColor.integer, cg_crosshair1Color.integer, cg_crosshair1Transparency.value,
+							cg_crosshair1Health.integer, cg_crosshairDrawFriend.integer, cg_drawCrosshair1.integer,
+							changeCrosshairFlags);
 
 	//Crosshair2
-	if ( cg_drawCrosshair2.integer ) {
-		//Size section
-		w = h = cg_crosshair2Size.value;
-		w *= cg_crosshair2WidthRatio.value;
-
-		if (cg_crosshair2PickUpPulse.integer) {
-			// pulse the size of the crosshair when picking up items
-			f = cg.time - cg.itemPickupBlendTime;
-			if ( f > 0 && f < ITEM_BLOB_TIME ) {
-				f /= ITEM_BLOB_TIME;
-				w *= ( 1 + f );
-				h *= ( 1 + f );
-			}
-		}
-
-		//Position section
-		x = cg_crosshair2X.integer;
-		y = cg_crosshair2Y.integer;
-
-		//Color section
-		if (changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE) {
-			//Target is teammate
-			hcolor[0] = g_color_table[cg_crosshair2FriendColor.integer & Q_COLORS_COUNT][0];
-			hcolor[1] = g_color_table[cg_crosshair2FriendColor.integer & Q_COLORS_COUNT][1];
-			hcolor[2] = g_color_table[cg_crosshair2FriendColor.integer & Q_COLORS_COUNT][2];
-		} else if (changeCrosshairFlags & CHANGE_CROSSHAIR_OPPONENT) {
-			//Target is opponent
-			hcolor[0] = g_color_table[cg_crosshair2OpponentColor.integer & Q_COLORS_COUNT][0];
-			hcolor[1] = g_color_table[cg_crosshair2OpponentColor.integer & Q_COLORS_COUNT][1];
-			hcolor[2] = g_color_table[cg_crosshair2OpponentColor.integer & Q_COLORS_COUNT][2];
-		} else if (changeCrosshairFlags & CHANGE_CROSSHAIR_ACTIVATE) {
-			//Target is item to activate
-			hcolor[0] = g_color_table[cg_crosshair2ActivateColor.integer & Q_COLORS_COUNT][0];
-			hcolor[1] = g_color_table[cg_crosshair2ActivateColor.integer & Q_COLORS_COUNT][1];
-			hcolor[2] = g_color_table[cg_crosshair2ActivateColor.integer & Q_COLORS_COUNT][2];
-		} else {
-			// set color based on health
-			if ( cg_crosshair2Health.integer && cg.snap->ps.stats[STAT_HEALTH] < HEALTH_USUAL) {
-				CG_GetColorForHealth(cg.snap->ps.stats[STAT_HEALTH],hcolor);
-			} else {
-				//Usual color
-				hcolor[0] = g_color_table[cg_crosshair2Color.integer & Q_COLORS_COUNT][0];
-				hcolor[1] = g_color_table[cg_crosshair2Color.integer & Q_COLORS_COUNT][1];
-				hcolor[2] = g_color_table[cg_crosshair2Color.integer & Q_COLORS_COUNT][2];
-			}
-		}
-		//Transparency section
-		if (cgs.gametype == GT_DUEL && 
-			cg.introend - DU_INTRO_DRAW <= cg.time &&
-			cg.introend + DU_CROSSHAIR_FADE >= cg.time ) {
-				//Duel fade out
-				if (cg.introend + DU_CROSSHAIR_START <= cg.time )
-					hcolor[3] = (float)(cg.time - cg.introend - DU_CROSSHAIR_START)/DU_CROSSHAIR_FADE;
-		} else {
-			hcolor[3] = (cg_crosshair2Transparency.value <= 1.0) ? cg_crosshair2Transparency.value : 1.0;
-			trap_R_SetColor( hcolor );
- 		}
-		//Shader section
-		if( changeCrosshairFlags & CHANGE_CROSSHAIR_TEAMMATE && cg_crosshairDrawFriend.integer) {
-			//Change crosshair to indicate that target is a teammate
-			hShader = cgs.media.crosshairFriendShader;
-		} else {
-			ca = cg_drawCrosshair2.integer;
-			if (ca < 0) {
-				ca = 0;
-			}
-			hShader = cgs.media.crosshairShader2[ ca % NUM_CROSSHAIRS ];
-		}
-
-		trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
-			y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
-			w, h, 0, 0, 1, 1, hShader );
-	}
+	if(cg_drawCrosshair2.integer)
+		CG_DrawOneCrosshair(cg_crosshair2Size.value, cg_crosshair2WidthRatio.value, cg_crosshair2PickUpPulse.integer,
+							cg_crosshair2X.integer, cg_crosshair2Y.integer, cg_crosshair2FriendColor.integer, cg_crosshair2OpponentColor.integer,
+							cg_crosshair2ActivateColor.integer, cg_crosshair2Color.integer, cg_crosshair2Transparency.value,
+							cg_crosshair2Health.integer, cg_crosshairDrawFriend.integer, cg_drawCrosshair2.integer,
+							changeCrosshairFlags);
 }
 
 /*

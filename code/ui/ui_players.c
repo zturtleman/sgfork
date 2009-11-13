@@ -58,36 +58,29 @@ static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
 	char		path[MAX_QPATH];
 
 	pi->currentWeapon = weaponNum;
-tryagain:
 	pi->realWeapon = weaponNum;
 	pi->weaponModel = 0;
 	pi->barrelModel = 0;
 	pi->flashModel = 0;
 
-	if ( weaponNum == WP_NONE ) {
+	if(weaponNum == WP_NONE)
 		return;
-	}
 
 	for(item=&bg_itemlist[1]; ITEM_INDEX(item) < IT_NUM_ITEMS; item++){
-		if ( item->giType != IT_WEAPON ) {
+		if(item->giType != IT_WEAPON)
 			continue;
-		}
-		if ( item->giTag == weaponNum ) {
+		if(item->giTag == weaponNum)
 			break;
-		}
 	}
 
-	if (ITEM_INDEX(item) < IT_NUM_ITEMS){
-		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
-	}
+	if (ITEM_INDEX(item) < IT_NUM_ITEMS)
+		pi->weaponModel = trap_R_RegisterModel(item->world_model[0]);
 
-	if( pi->weaponModel == 0 ) {
-		if( weaponNum == WP_PEACEMAKER ) {
-			weaponNum = WP_NONE;
-			goto tryagain;
-		}
-		weaponNum = WP_PEACEMAKER;
-		goto tryagain;
+	if(pi->weaponModel == 0 || ITEM_INDEX(item) >= IT_NUM_ITEMS){
+		weaponNum = WP_NONE;
+		pi->currentWeapon = weaponNum;
+		pi->realWeapon = weaponNum;
+		return;
 	}
 
 	if ( weaponNum == WP_PEACEMAKER || weaponNum == WP_KNIFE ) {

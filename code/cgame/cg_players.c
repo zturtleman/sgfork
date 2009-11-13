@@ -3238,4 +3238,3 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 		cg.markedweapon = 0;
 	}
 }
-
