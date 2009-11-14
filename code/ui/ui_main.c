@@ -63,6 +63,7 @@ static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
 	{"All", ""},
+	{"SGFork", BASEGAME},
 };
 
 static const char *teamArenaGameTypes[] = {
@@ -1587,37 +1588,31 @@ static void UI_DrawMapPreview(rectDef_t *rect, float scale, vec4_t color, qbool 
 }
 
 static qbool updateModel = qtrue;
-static qbool q3Model = qfalse;
-
 static void UI_DrawPlayerModel(rectDef_t *rect) {
-	char model[MAX_QPATH];
-	vec3_t	viewangles;
-	vec3_t	moveangles;
+	if (updateModel){
+		char model[MAX_QPATH];
+		vec3_t	viewangles;
+		vec3_t	moveangles;
 
-	strcpy(model, UI_Cvar_VariableString("model"));
-	//strcpy(head, UI_Cvar_VariableString("headmodel"));
-	if (!q3Model) {
-		q3Model = qtrue;
-		updateModel = qtrue;
-		UI_PlayerInfo_SetModel( &uiInfo.info, model);
-		//UI_PlayerInfo_SetModel( &uiInfo.info, model, head);
-	}
-
-	if (updateModel) {
+		strcpy(model, UI_Cvar_VariableString("model"));
+		memset(&uiInfo.info, 0, sizeof(playerInfo_t));
 		viewangles[YAW]   = trap_Cvar_VariableValue("ui_PlayerViewAngleYaw");
 		viewangles[PITCH] = trap_Cvar_VariableValue("ui_PlayerViewAnglePitch");
 		viewangles[ROLL]  = 0;
 		moveangles[YAW]   = trap_Cvar_VariableValue("ui_PlayerMoveAngleYaw");
 		moveangles[PITCH] = trap_Cvar_VariableValue("ui_PlayerMoveAnglePitch");
 		moveangles[ROLL]  = 0;
-		UI_PlayerInfo_SetInfo( &uiInfo.info, trap_Cvar_VariableValue("ui_LowerAnim"),
-			trap_Cvar_VariableValue("ui_UpperAnim"), viewangles, moveangles,
-			trap_Cvar_VariableValue("ui_Weapon"), qfalse );
+		UI_PlayerInfo_SetModel(&uiInfo.info, model);
+		UI_PlayerInfo_SetInfo(&uiInfo.info,
+			trap_Cvar_VariableValue("ui_LowerAnim"),
+			trap_Cvar_VariableValue("ui_UpperAnim"),
+			viewangles,
+			moveangles,
+			trap_Cvar_VariableValue("ui_Weapon"),
+			qfalse);
 		updateModel = qfalse;
 	}
-
-  UI_DrawPlayer( rect->x, rect->y, rect->w, rect->h, &uiInfo.info, uiInfo.uiDC.realTime / 2);
-
+	UI_DrawPlayer( rect->x, rect->y, rect->w, rect->h, &uiInfo.info, uiInfo.uiDC.realTime / 2);
 }
 
 static void UI_DrawNetSource(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
@@ -1753,36 +1748,6 @@ static void UI_DrawTierMapName(rectDef_t *rect, float scale, vec4_t color, int t
 	}
 
   Text_Paint(rect->x, rect->y, scale, color, UI_EnglishMapName(uiInfo.tierList[i].maps[j]), 0, 0, textStyle);
-}
-
-static qbool updateOpponentModel = qtrue;
-static void UI_DrawOpponent(rectDef_t *rect) {
-  static playerInfo_t info2;
-  char model[MAX_QPATH];
-  char headmodel[MAX_QPATH];
-  char team[256];
-	vec3_t	viewangles;
-	vec3_t	moveangles;
-
-	if (updateOpponentModel) {
-
-		strcpy(model, UI_Cvar_VariableString("ui_opponentModel"));
-	  strcpy(headmodel, UI_Cvar_VariableString("ui_opponentModel"));
-		team[0] = '\0';
-
-  	memset( &info2, 0, sizeof(playerInfo_t) );
-  	viewangles[YAW]   = 180 - 10;
-  	viewangles[PITCH] = 0;
-  	viewangles[ROLL]  = 0;
-  	VectorClear( moveangles );
-    UI_PlayerInfo_SetModel( &info2, model);
-    UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_PISTOL_STAND, viewangles, vec3_origin, WP_PEACEMAKER, qfalse );
-	UI_RegisterClientModelname( &info2, model);
-    updateOpponentModel = qfalse;
-  }
-
-  UI_DrawPlayer( rect->x, rect->y, rect->w, rect->h, &info2, uiInfo.uiDC.realTime / 2);
-
 }
 
 static void UI_DrawAllMapsSelection(rectDef_t *rect, float scale, vec4_t color, int textStyle, qbool net) {
@@ -2503,12 +2468,6 @@ static qbool UI_GameType_HandleKey(int flags, float *special, int key, qbool res
 					ui_gameType.integer = 0;
 				}
 			} while (uiInfo.maskGameTypes[uiInfo.gameTypes[ui_gameType.integer].gtEnum]);
-		}
-
-		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_DUEL) {
-			trap_Cvar_Set("ui_Q3Model", "1");
-		} else {
-			trap_Cvar_Set("ui_Q3Model", "0");
 		}
 
 		trap_Cvar_Set("ui_gameType", va("%d", ui_gameType.integer));
@@ -4527,10 +4486,8 @@ static void UI_FeederSelection(float feederID, int index) {
 		if (feederID == FEEDER_MAPS) {
 			ui_currentMap.integer = actual;
 			trap_Cvar_Set("ui_currentMap", va("%d", actual));
-	  	uiInfo.mapList[ui_currentMap.integer].cinematic = trap_CIN_PlayCinematic(va("%s.roq", uiInfo.mapList[ui_currentMap.integer].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
+	  		uiInfo.mapList[ui_currentMap.integer].cinematic = trap_CIN_PlayCinematic(va("%s.roq", uiInfo.mapList[ui_currentMap.integer].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
 			UI_LoadBestScores(uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum);
-			trap_Cvar_Set("ui_opponentModel", uiInfo.mapList[ui_currentMap.integer].opponentName);
-			updateOpponentModel = qtrue;
 		} else {
 			// Tequila comment: Just fix shared map when new one is selected
 			// We pass here also when switching gametype now but that's supported
@@ -5477,7 +5434,6 @@ vmCvar_t	ui_fragLimit;
 vmCvar_t	ui_smallFont;
 vmCvar_t	ui_bigFont;
 vmCvar_t	ui_findPlayer;
-vmCvar_t	ui_Q3Model;
 vmCvar_t	ui_recordSPDemo;
 vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
@@ -5624,7 +5580,6 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 	{ &ui_findPlayer, "ui_findPlayer", "Sarge", CVAR_ARCHIVE},
-	{ &ui_Q3Model, "ui_q3model", "0", CVAR_ARCHIVE},
 	{ &ui_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE},
 	{ &ui_sgFirstRun, "ui_sgFirstRun", "0", CVAR_ARCHIVE},
 	{ &ui_realWarmUp, "g_warmup", "20", CVAR_ARCHIVE},

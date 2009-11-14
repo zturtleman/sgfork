@@ -1820,48 +1820,62 @@ void BotCheckBuy(bot_state_t *bs){
 
 		// if the bot already has a better weapon
 		j = WP_REM58;
-		while(BG_PlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps)){
-			j = BG_PlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps);
-
+		while(j = BG_PlayerWeapon(j, WP_DYNAMITE, &bs->cur_ps)){
 			temp = BG_ItemForWeapon(j);
 
 			// if it's a WPS_GUN
-			if(bg_itemlist[j].weapon_sort == WPS_GUN &&
+			if(temp->weapon_sort == WPS_GUN &&
 				temp->prize > item->prize){
 				qcontinue = qtrue;
+				break;
 			}
 			j++;
 		}
 
-		if(qcontinue) continue;
+		if(qcontinue)
+			continue;
+
+		if(item->prize >= money)
+			continue;
 
 		if(mark == -1){
 			mark = ITEM_INDEX(item);
 			continue;
 		}
 
-		if(item->prize <= money &&
-			(item->prize > (&bg_itemlist[mark])->prize ||
-			item->prize > (&bg_itemlist[mark2])->prize)){
-			mark2 = mark;
-			mark = ITEM_INDEX(item);
+		if(mark == -2){
+			if(item->prize > (&bg_itemlist[mark])->prize){
+				mark2 = ITEM_INDEX(item);
+			}else{
+				mark2 = mark;
+				mark = ITEM_INDEX(item);
+			}
+			continue;
+		}
+
+		if(item->prize > (&bg_itemlist[mark])->prize){
+			if(item->prize > (&bg_itemlist[mark2])->prize){
+				mark = mark2;
+				mark2 = ITEM_INDEX(item);
+			} else {
+				mark = ITEM_INDEX(item);
+			}
 		}
 	}
 
-	// now buy the weapon
-	if(rand()%2 || mark2 == -1)
-		item = &bg_itemlist[mark];
-	else
-		item = &bg_itemlist[mark2];
-
-	if(mark != -1 || mark2 != -1){
+	if(mark != -1){
+		// now buy the weapon
+		if(rand()%2 || mark2 == -1)
+			item = &bg_itemlist[mark];
+		else if(mark2 != -1)
+			item = &bg_itemlist[mark2];
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
 		money -= item->prize;
 	}
 
-	// now look if we have enough money to buy some money
-	if(money >= 5){
-		item = BG_ItemForAmmo(WP_CART_CLIP);
+	// now look if we have enough money to buy some ammo
+	item = BG_ItemForAmmo(WP_CART_CLIP);
+	if(money >= item->prize){
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
 		money -= item->prize;
 	}
@@ -1882,31 +1896,47 @@ void BotCheckBuy(bot_state_t *bs){
 		if(item->giType == IT_POWERUP && bs->cur_ps.powerups[item->giTag])
 			continue;
 
+		if(item->prize >= money)
+			continue;
+
 		if(mark == -1){
 			mark = ITEM_INDEX(item);
 			continue;
 		}
 
-		if(item->prize <= money){
-			mark2 = mark;
-			mark = ITEM_INDEX(item);
+		if(mark == -2){
+			if(item->prize > (&bg_itemlist[mark])->prize){
+				mark2 = ITEM_INDEX(item);
+			}else{
+				mark2 = mark;
+				mark = ITEM_INDEX(item);
+			}
+			continue;
+		}
+
+		if(item->prize > (&bg_itemlist[mark])->prize){
+			if(item->prize > (&bg_itemlist[mark2])->prize){
+				mark = mark2;
+				mark2 = ITEM_INDEX(item);
+			} else {
+				mark = ITEM_INDEX(item);
+			}
 		}
 	}
 
-	// now buy the item
-	if(rand()%2 || mark2 == -1)
-		item = &bg_itemlist[mark];
-	else
-		item = &bg_itemlist[mark2];
-
-	if(mark != -1 || mark2 != -1){
+	if(mark != -1){
+		// now buy the item
+		if(rand()%2 || mark2 == -1)
+			item = &bg_itemlist[mark];
+		else if (mark2 != -1)
+			item = &bg_itemlist[mark2];
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
 		money -= item->prize;
 	}
 
 	// if we have got some more money now, buy pistol ammo
-	if(money >= 5){
-		item = BG_ItemForAmmo(WP_BULLETS_CLIP);
+	item = BG_ItemForAmmo(WP_BULLETS_CLIP);
+	if(money >= item->prize){
 		trap_EA_Command(bs->client, va("cg_buy %s", item->classname));
 		money -= item->prize;
 	}
