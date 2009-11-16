@@ -677,12 +677,12 @@ void Window_Paint(Window *w, float fadeAmount, float fadeClamp, float fadeCycle)
   if (w->style == WINDOW_STYLE_FILLED) {
     // box, but possible a shader that needs filled
 		if (w->background) {
-		  Fade(&w->flags, &w->backColor[3], fadeClamp, &w->nextTime, fadeCycle, qtrue, fadeAmount);
-      DC->setColor(w->backColor);
-	    DC->drawHandlePic(fillRect.x, fillRect.y, fillRect.w, fillRect.h, w->background);
-		  DC->setColor(NULL);
+			Fade(&w->flags, &w->backColor[3], fadeClamp, &w->nextTime, fadeCycle, qtrue, fadeAmount);
+			DC->setColor(w->backColor);
+			DC->drawHandlePic(fillRect.x, fillRect.y, fillRect.w, fillRect.h, w->background);
+			DC->setColor(NULL);
 		} else {
-	    DC->fillRect(fillRect.x, fillRect.y, fillRect.w, fillRect.h, w->backColor);
+			DC->fillRect(fillRect.x, fillRect.y, fillRect.w, fillRect.h, w->backColor);
 		}
   } else if (w->style == WINDOW_STYLE_GRADIENT) {
     GradientBar_Paint(&fillRect, w->backColor);
@@ -3085,7 +3085,7 @@ void Item_SetTextExtents(itemDef_t *item, int *width, int *height, const char *t
 			originalWidth += DC->ownerDrawWidth(item->window.ownerDraw, item->textscale);
 		} else if (item->type == ITEM_TYPE_EDITFIELD && item->textalignment == ITEM_ALIGN_CENTER && item->cvar) {
 			char buff[256];
-			DC->getCVarString(item->cvar, buff, 256);
+			DC->getCVarString(item->cvar, buff, sizeof(buff));
 			originalWidth += UI_Text_Width(buff, item->textscale, 0);
 		}
 
