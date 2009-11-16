@@ -208,7 +208,7 @@ void Sys_AnsiColorPrint( const char *msg )
 {
 	static char buffer[ MAXPRINTMSG ];
 	int         length = 0;
-	static int  q3ToAnsi[ 8 ] =
+	static int  q3ToAnsi[ Q_COLORS_COUNT ] =
 	{
 		30, // COLOR_BLACK
 		31, // COLOR_RED
@@ -218,7 +218,7 @@ void Sys_AnsiColorPrint( const char *msg )
 		36, // COLOR_CYAN
 		35, // COLOR_MAGENTA
 		0   // COLOR_WHITE
-	};
+	}; //All colors after 7 will be white coloured
 
 	while( *msg )
 	{

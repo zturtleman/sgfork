@@ -4641,7 +4641,7 @@ static void UI_ParseGameInfo(const char *teamFile) {
 static void UI_Pause(qbool b) {
 	if (b) {
 		// pause the game and set the ui keycatcher
-	  trap_Cvar_Set( "cl_paused", "1" );
+		trap_Cvar_Set( "cl_paused", "1" );
 		trap_Key_SetCatcher( KEYCATCH_UI );
 	} else {
 		// unpause the game and clear the ui keycatcher
@@ -4788,7 +4788,6 @@ void _UI_Init( qbool inGameLoad ) {
 	uiInfo.uiDC.drawSides = &_UI_DrawSides;
 	uiInfo.uiDC.drawTopBottom = &_UI_DrawTopBottom;
 	uiInfo.uiDC.clearScene = &trap_R_ClearScene;
-	uiInfo.uiDC.drawSides = &_UI_DrawSides;
 	uiInfo.uiDC.addRefEntityToScene = &trap_R_AddRefEntityToScene;
 	uiInfo.uiDC.renderScene = &trap_R_RenderScene;
 	uiInfo.uiDC.registerFont = &trap_R_RegisterFont;
