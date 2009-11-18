@@ -206,9 +206,9 @@ Transform Q3 colour codes to ANSI escape sequences
 */
 void Sys_AnsiColorPrint( const char *msg )
 {
-	static char buffer[ MAXPRINTMSG ];
+	static char buffer[MAXPRINTMSG];
 	int         length = 0;
-	static int  q3ToAnsi[ Q_COLORS_COUNT ] =
+	static int  q3ToAnsi[Q_COLORS_COUNT + 1] =
 	{
 		30, // COLOR_BLACK
 		31, // COLOR_RED
@@ -217,8 +217,11 @@ void Sys_AnsiColorPrint( const char *msg )
 		34, // COLOR_BLUE
 		36, // COLOR_CYAN
 		35, // COLOR_MAGENTA
-		0   // COLOR_WHITE
-	}; //All colors after 7 will be white coloured
+		0,  // COLOR_WHITE (+reset all styles)
+		33,37,37,37,32,33,34,31, // These colors are just to mark that colored
+		33,35,36,36,35,36,35,37, // text was used. They are not the same as Q ones.
+		32,31,31,31,33,33,37,33  // No black color is used since it won't be distinguished
+	};							 // on black background. Only default ones are used (no bright ones, etc)
 
 	while( *msg )
 	{

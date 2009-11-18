@@ -985,7 +985,6 @@ extern	vmCvar_t	du_forcetrio;
 
 
 //Spoon Start
-extern	vmCvar_t	sg_rtppoints;
 extern	vmCvar_t	g_deathcam;
 
 // shows current version (make sure the game was updated correctly)
@@ -1038,14 +1037,12 @@ extern	qbool	g_robbed;
 extern	int			g_robteam;
 extern	int			g_defendteam;
 
-extern	int			sg_redspawn;
-extern	int			sg_bluespawn;
-
 extern	vmCvar_t	g_chaseonly;
 extern	vmCvar_t	g_specsareflies;
 
 extern	vmCvar_t	g_roundtime;
 extern	vmCvar_t	br_teamrole;
+extern	vmCvar_t	rtp_teamrole;
 
 extern	vmCvar_t	g_redteamcount;
 extern	vmCvar_t	g_blueteamcount;

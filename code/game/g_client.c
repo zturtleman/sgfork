@@ -117,7 +117,7 @@ qbool SpotWouldTelefrag( gentity_t *spot ) {
 	for (i=0 ; i<num ; i++) {
 		hit = &g_entities[touch[i]];
 		//if ( hit->client && hit->client->ps.stats[STAT_HEALTH] > 0 ) {
-		if ( hit->client) {
+		if (hit->client) {
 			return qtrue;
 		}
 	}
@@ -1393,7 +1393,7 @@ void ClientSpawn(gentity_t *ent) {
 			VectorCopy(ent->client->ps.viewangles, spawn_angles);
 			VectorCopy(ent->client->ps.origin, spawn_origin);
 		} else {
-			spawnPoint = SelectCTFSpawnPoint (
+			spawnPoint = SelectCTFSpawnPoint(
 				client->sess.sessionTeam,
 				client->pers.teamState.state,
 				spawn_origin, spawn_angles, ent->mappart,

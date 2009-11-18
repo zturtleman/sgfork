@@ -1851,18 +1851,21 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 	if( ent->client->ps.stats[STAT_HEALTH] <= 0 || item->prize <= 0 )
 		return;
 
-	if(!(ent->client->ps.stats[STAT_FLAGS] & SF_CANBUY) && g_gametype.integer >= GT_RTP && !cgame ) {
-		trap_SendServerCommand( ent-g_entities, va("print \"You're not in a buy-zone!\n\""));
-		return;
-  }
-
-	if(level.time - g_roundstarttime > BUY_TIME && g_gametype.integer >= GT_RTP && !cgame ){
-		trap_SendServerCommand( ent-g_entities, va("print \"60 seconds have passed ... you can't buy anything\n\""));
+	if(!(ent->client->ps.stats[STAT_FLAGS] & SF_CANBUY) && g_gametype.integer >= GT_RTP){
+		if(!cgame)
+			trap_SendServerCommand( ent-g_entities, va("print \"You're not in a buy-zone!\n\""));
 		return;
 	}
 
-	if(ent->client->sess.sessionTeam >= TEAM_SPECTATOR && !cgame ){
-		trap_SendServerCommand( ent-g_entities, va("print \"You can't buy while in spectator mode!\n\""));
+	if(level.time - g_roundstarttime > BUY_TIME && g_gametype.integer >= GT_RTP){
+		if(!cgame)
+			trap_SendServerCommand( ent-g_entities, va("print \"60 seconds have passed ... you can't buy anything\n\""));
+		return;
+	}
+
+	if(ent->client->sess.sessionTeam >= TEAM_SPECTATOR){
+		if(!cgame)
+			trap_SendServerCommand( ent-g_entities, va("print \"You can't buy while in spectator mode!\n\""));
 		return;
 	}
 
@@ -1871,8 +1874,9 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 		return;
 	}
 
-	if(ent->client->ps.stats[STAT_MONEY] < item->prize && !cgame ){
-		trap_SendServerCommand( ent-g_entities, va("print \"Not Enough Money!\n\""));
+	if(ent->client->ps.stats[STAT_MONEY] < item->prize){
+		if(!cgame)
+			trap_SendServerCommand( ent-g_entities, va("print \"Not Enough Money!\n\""));
 		return;
 	}
 
@@ -1948,14 +1952,16 @@ void Cmd_BuyItem_f( gentity_t *ent, qbool cgame) {
 			else
 				return;
 		}
-		if(ps->ammo[item->giTag] >= bg_weaponlist[i].maxAmmo*ent->client->maxAmmo && !cgame ){
-			trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
+		if(ps->ammo[item->giTag] >= bg_weaponlist[i].maxAmmo*ent->client->maxAmmo){
+			if(!cgame)
+				trap_SendServerCommand( ent-g_entities, va("print \"You can't carry any more!\n\""));
 			return;
 		}
 		break;
 	case IT_ARMOR:
-		if(ps->stats[STAT_ARMOR] && !cgame){
-			trap_SendServerCommand( ent-g_entities, va("print \"You already have a boiler plate!\n\""));
+		if(ps->stats[STAT_ARMOR]){
+			if(!cgame)
+				trap_SendServerCommand( ent-g_entities, va("print \"You already have a boiler plate!\n\""));
 			return;
 		}
 		break;

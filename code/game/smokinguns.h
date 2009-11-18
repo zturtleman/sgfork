@@ -135,11 +135,14 @@ Money system
 */
 
 //buy properties
-#define	BUY_TIME				60000
+#define	BUY_TIME						60000
 
 // Reward for player who rob the bank (added by Joe Kari)
 #define MAX_POINT_ROBBER_REWARD			5
 #define MIN_POINT_ROBBER_REWARD			0
+
+// Squre of maximum distance from spawn point where player is allowed to buy
+#define MAX_BUY_DISTANCE_SQUARE			90000
 
 /*
 =============================

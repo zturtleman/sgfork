@@ -176,138 +176,55 @@ qbool Team_GetLocationMsg(gentity_t *ent, char *loc, int loclen)
 ================
 SelectRandomTeamSpawnPoint
 
-go to a random point that doesn't telefrag
+Select a random point that doesn't telefrag
+team_CTF_(blue|red)player	- initial spawn points (for RTP and BR these are the only spawns)
+team_CTF_(blue|red)spawn	- spawn points during round
+In BR and RTP robbers are always has blue spawns and defenders red ones
 ================
 */
 #define	MAX_TEAM_SPAWN_POINTS	32
-gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team ) {
-	gentity_t	*spot;
-	int			count;
-	int			selection;
-	gentity_t	*goodspots[MAX_TEAM_SPAWN_POINTS];
-	gentity_t	**spots = goodspots;
-	// Tequila: In the case, we would telefrag, we would really select
-	// a random spawnpoint for delayed respawn, so we need to know the badspots list
-	gentity_t	*badspots[MAX_TEAM_SPAWN_POINTS];
-	int badcount = 0;
-	char		*classname;
+static gentity_t *SelectRandomTeamSpawnPoint(int teamstate, team_t team) {
+	gentity_t	*spot = NULL;
+	int			count = 0;
+	gentity_t	*spots [MAX_TEAM_SPAWN_POINTS];
+	const char	*classname;
 
-	if(g_gametype.integer == GT_BR){
+	if (team != TEAM_RED && team != TEAM_BLUE)
+		return NULL;
 
-		if(g_robteam == team)
+	if (g_gametype.integer == GT_BR || g_gametype.integer == GT_RTP) {
+		if (g_robteam == team)
 			classname = "team_CTF_blueplayer";
 		else
 			classname = "team_CTF_redplayer";
-
-	} else if (teamstate == TEAM_BEGIN) {
-		if (team == TEAM_RED)
-			if(g_gametype.integer == GT_RTP) {
-				switch(sg_redspawn){
-				case 0:
-					classname = "team_CTF_redplayer";
-					break;
-				case 1:
-					classname = "team_CTF_blueplayer";
-					break;
-				case 2:
-					classname = "team_CTF_redspawn";
-					break;
-				case 3:
-				default:
-					classname = "team_CTF_bluespawn";
-					break;
-				}
-			} else
-				classname = "team_CTF_redplayer";
-		else if (team == TEAM_BLUE)
-			if(g_gametype.integer == GT_RTP) {
-
-				switch(sg_bluespawn){
-				case 0:
-					classname = "team_CTF_redplayer";
-					break;
-				case 1:
-					classname = "team_CTF_blueplayer";
-					break;
-				case 2:
-					classname = "team_CTF_redspawn";
-					break;
-				case 3:
-				default:
-					classname = "team_CTF_bluespawn";
-					break;
-				}
-			} else
-				classname = "team_CTF_blueplayer";
-		else
-			return NULL;
 	} else {
-		if (team == TEAM_RED)
-			if(g_gametype.integer >= GT_RTP) {
-				switch(sg_redspawn){
-				case 0:
-					classname = "team_CTF_redplayer";
-					break;
-				case 1:
-					classname = "team_CTF_blueplayer";
-					break;
-				case 2:
-					classname = "team_CTF_redspawn";
-					break;
-				case 3:
-				default:
-					classname = "team_CTF_bluespawn";
-					break;
-				}
-			} else
+		if (teamstate == TEAM_BEGIN) {
+			if (team == TEAM_RED)
+				classname = "team_CTF_redplayer";
+			else if (team == TEAM_BLUE)
+				classname = "team_CTF_blueplayer";
+		} else {
+			if (team == TEAM_RED)
 				classname = "team_CTF_redspawn";
-		else if (team == TEAM_BLUE)
-			if(g_gametype.integer >= GT_RTP) {
-				switch(sg_bluespawn){
-				case 0:
-					classname = "team_CTF_redplayer";
-					break;
-				case 1:
-					classname = "team_CTF_blueplayer";
-					break;
-				case 2:
-					classname = "team_CTF_redspawn";
-					break;
-				case 3:
-				default:
-					classname = "team_CTF_bluespawn";
-					break;
-				}
-			} else
+			else if (team == TEAM_BLUE)
 				classname = "team_CTF_bluespawn";
-		else
-			return NULL;
+		}
 	}
-	count = 0;
 
-	spot = NULL;
-
-	while ((spot = G_Find (spot, FOFS(classname), classname)) != NULL) {
-		if ( SpotWouldTelefrag( spot ) ) {
-			badspots[ badcount ] = spot;
-			if (++badcount == MAX_TEAM_SPAWN_POINTS)
-				break;
+	while ((spot = G_Find(spot, FOFS(classname), classname)) != NULL) {
+		if (SpotWouldTelefrag(spot)) {
 			continue;
 		}
-		spots[ count ] = spot;
+		spots[count] = spot;
 		if (++count == MAX_TEAM_SPAWN_POINTS)
 			break;
 	}
 
-	if ( !count ) {	// no spots that won't telefrag
-		// Tequila: G_Find will always return the last spawnpoint, it's better
-		// now to return a random bad spawnpoint
-		spots = badspots ;
-		count = badcount ;
+	if (!count) {	// no spots that won't telefrag
+		return G_Find(NULL, FOFS(classname), classname);
 	}
 
-	selection = rand() % count;
-	return spots[ selection ];
+	return spots[rand() % count];
 }
 
 
