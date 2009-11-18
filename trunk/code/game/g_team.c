@@ -179,7 +179,7 @@ SelectRandomTeamSpawnPoint
 Select a random point that doesn't telefrag
 team_CTF_(blue|red)player	- initial spawn points (for RTP and BR these are the only spawns)
 team_CTF_(blue|red)spawn	- spawn points during round
-In BR and RTP robbers are always has blue spawns and defenders red ones
+In BR and RTP robbers always have blue spawns and defenders red ones
 ================
 */
 #define	MAX_TEAM_SPAWN_POINTS	32
@@ -240,6 +240,7 @@ gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3
 	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
 
 	if (!spot) {
+		G_LogPrintf("No CTFSpawnPoint was found for %s team\n", (team == TEAM_BLUE)  ? "blu" : "red");
 		return SelectSpawnPoint( vec3_origin, origin, angles, mappart, NULL, isbot );
 	}
 

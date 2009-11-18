@@ -126,91 +126,18 @@ qbool SpotWouldTelefrag( gentity_t *spot ) {
 }
 
 /*
-================
-SelectNearestDeathmatchSpawnPoint
-
-Find the spot that we DON'T want to use
-================
-*/
-#define	MAX_SPAWN_POINTS	128
-gentity_t *SelectNearestDeathmatchSpawnPoint( vec3_t from ) {
-	gentity_t	*spot;
-	vec3_t		delta;
-	float		dist, nearestDist;
-	gentity_t	*nearestSpot;
-
-	nearestDist = 999999;
-	nearestSpot = NULL;
-	spot = NULL;
-
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-
-		VectorSubtract( spot->s.origin, from, delta );
-		dist = VectorLength( delta );
-		if ( dist < nearestDist ) {
-			nearestDist = dist;
-			nearestSpot = spot;
-		}
-	}
-
-	return nearestSpot;
-}
-
-
-/*
-================
-SelectRandomDeathmatchSpawnPoint
-
-go to a random point that doesn't telefrag
-================
-*/
-#define	MAX_SPAWN_POINTS	128
-gentity_t *SelectRandomDeathmatchSpawnPoint(qbool isbot) {
-	gentity_t	*spot;
-	int			count;
-	int			selection;
-	gentity_t	*spots[MAX_SPAWN_POINTS];
-
-	count = 0;
-	spot = NULL;
-
-	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL && count < MAX_SPAWN_POINTS)
-	{
-		if(SpotWouldTelefrag(spot))
-			continue;
-
-		if(((spot->flags & FL_NO_BOTS) && isbot) ||
-		   ((spot->flags & FL_NO_HUMANS) && !isbot))
-		{
-			// spot is not for this human/bot player
-			continue;
-		}
-
-		spots[count] = spot;
-		count++;
-	}
-
-	if ( !count ) {	// no spots that won't telefrag
-		return G_Find( NULL, FOFS(classname), "info_player_deathmatch");
-	}
-
-	selection = rand() % count;
-	return spots[ selection ];
-}
-
-
-/*
 ===========
 SelectRandomFurthestSpawnPoint
 
 Chooses a player start, deathmatch start, etc
 ============
 */
+#define	MAX_SPAWN_POINTS	128
 #define IS_VALID_SPAWNPOINT(spot, client) \
  	( !( (client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_BOTS) )\
 		&& !( !(client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_HUMANS) ) )
 
-gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles,
+static gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles,
 										   int mappart, gclient_t *client, qbool isbot ) {
 	gentity_t	*spot;
 	vec3_t		delta;
