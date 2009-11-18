@@ -593,10 +593,6 @@ void SP_worldspawn( void ) {
 	G_SpawnString( "gravity", "900", &s );
 	trap_Cvar_Set( "g_gravity", s );
 
-	//Spoon for Round Teamplay points
-	//G_SpawnString( "startpoints", "4", &s );
-	//trap_Cvar_Set( "sg_rtppoints", s);
-
 	G_SpawnString( "enableDust", "0", &s );
 	trap_Cvar_Set( "g_enableDust", s );
 

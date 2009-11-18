@@ -393,92 +393,50 @@ void G_TouchTriggers( gentity_t *ent ) {
 	}
 }
 
-/*
-============
-G_TouchStartpoint
-
-Find all startpoints and see
-if the player can buy something
-============
-*/
-void G_TouchStartpoint( gentity_t *ent ) {
+static void G_TouchSpawnBuyPoint(gentity_t *ent) {
 	int			i;
-	gentity_t	*hit;
-	char		*classname;
-	static vec3_t	range = {300, 300, 300};
-	int			spawnnum=3;
+	const char	*classname;
 
-	if(g_gametype.integer < GT_RTP){
+	if (g_gametype.integer != GT_RTP && g_gametype.integer != GT_BR) {
 		return;
 	}
 
-	if ( !ent->client ) {
+	if (!ent->client) {
 		return;
 	}
 
-	if ( ent->client->sess.sessionTeam >= TEAM_SPECTATOR ) {
+	if (ent->client->sess.sessionTeam >= TEAM_SPECTATOR) {
 		return;
 	}
 
 	// dead clients don't activate triggers!
-	if ( ent->client->ps.stats[STAT_HEALTH] <= 0 ) {
+	if (ent->client->ps.stats[STAT_HEALTH] <= 0) {
 		return;
 	}
 
-	if(g_gametype.integer == GT_RTP){
-		if(ent->client->sess.sessionTeam == TEAM_RED)
-			spawnnum = sg_redspawn;
-		else
-			spawnnum = sg_bluespawn;
-	} else if (g_gametype.integer == GT_BR){
-		if(ent->client->sess.sessionTeam == g_robteam)
-			spawnnum = 1;
-		else if(ent->client->sess.sessionTeam == g_defendteam)
-			spawnnum = 0;
-	}
-
 	//get starpoint classname
-	switch(spawnnum){
-	case 0:
-		classname = "team_CTF_redplayer";
-		break;
-	case 1:
+	if (ent->client->sess.sessionTeam == g_robteam)
 		classname = "team_CTF_blueplayer";
-		break;
-	case 2:
-		classname = "team_CTF_redspawn";
-		break;
-	case 3:
-	default:
-		classname = "team_CTF_bluespawn";
-		break;
-	}
+	else if (ent->client->sess.sessionTeam == g_defendteam)
+		classname = "team_CTF_redplayer";
 
 	ent->client->ps.stats[STAT_FLAGS] &= ~SF_CANBUY;
 
-	for ( i=0 ; i<MAX_GENTITIES ; i++ ) {
-		hit = &g_entities[i];
+	for (i=0; i<MAX_GENTITIES; i++) {
+		gentity_t	*hit = &g_entities[i];
 
 		if (!hit->inuse)
 			continue;
 
-		if(!Q_stricmp(hit->classname, classname)){
+		if (!Q_stricmp(hit->classname, classname)) {
 			vec3_t distance;
-			int j;
-			qbool use =  qtrue;
 
 			VectorSubtract(ent->client->ps.origin, hit->r.currentOrigin, distance);
-
-			for(j=0;j<3;j++){
-				if(fabs(distance[j]) > range[j])
-					use = qfalse;
-			}
-
-			if(!use)
+			if (VectorLengthSquared(distance) > MAX_BUY_DISTANCE_SQUARE)
 				continue;
 
 			ent->client->ps.stats[STAT_FLAGS] |= SF_CANBUY;
-			return;
+				return;
 		}
 	}
 }
@@ -1230,7 +1188,7 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( !ent->client->noclip ) {
 		G_TouchTriggers( ent );
 		//check if player is able to buy something in rtp-games
-		G_TouchStartpoint( ent );
+		G_TouchSpawnBuyPoint(ent);
 	}
 
 	// NOTE: now copy the exact origin over otherwise clients can be snapped into solid

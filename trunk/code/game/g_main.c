@@ -83,11 +83,6 @@ vmCvar_t	g_blueteamcount;
 vmCvar_t	g_redteamscore;
 vmCvar_t	g_blueteamscore;
 
-
-//which spawnpoints shell be used?
-int			sg_redspawn;
-int			sg_bluespawn;
-
 vmCvar_t	g_chaseonly;
 vmCvar_t	sg_rtppoints;
 vmCvar_t	g_deathcam;
@@ -186,6 +181,9 @@ vmCvar_t	du_forcetrio;
 // BR cvars
 vmCvar_t	br_teamrole;
 
+//RTP CVars
+vmCvar_t	rtp_teamrole;
+
 
 // experimental cvars
 vmCvar_t	g_newShotgunPattern;
@@ -223,6 +221,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &du_forcetrio, "du_forcetrio", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
 	{ &br_teamrole, "br_teamrole", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{&rtp_teamrole, "rtp_teamrole", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue},
+	
 	{ &g_moneyRespawnMode, "g_moneyRespawnMode", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_countSocialHelp, "g_countSocialHelp", "3", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
 
@@ -316,7 +316,6 @@ static cvarTable_t		gameCvarTable[] = {
 //unlagged - server options
 		//Spoon
 	{ &g_roundtime, "g_roundtime", "4", CVAR_ARCHIVE|CVAR_SERVERINFO, 0, qtrue },
-	{ &sg_rtppoints, "sg_rtppoints", "4", CVAR_ARCHIVE|CVAR_ROM, 0, qtrue },
 	{ &g_deathcam, "g_deathcam", "1", CVAR_ARCHIVE|CVAR_SERVERINFO, 0, qtrue },
 	{ &g_chaseonly, "g_chaseonly", "0", CVAR_ARCHIVE|CVAR_SERVERINFO, 0, qtrue  },
 	{ &g_specsareflies, "g_specsareflies", "1", CVAR_ARCHIVE|CVAR_SERVERINFO, 0, qtrue  },
@@ -716,7 +715,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_SpawnEntitiesFromString();
 
 	//determinate max mapparts
-	if(g_gametype.integer == GT_DUEL){
+	if (g_gametype.integer == GT_DUEL) {
 		g_maxmapparts = 0;
 		for(i = 0; i < MAX_GENTITIES; i++){
 			if(g_entities[i].mappart && !Q_stricmp(g_entities[i].classname, "info_player_intermission"))
@@ -729,37 +728,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		G_Printf("mapparts found: %i\n", g_maxmapparts);
 
-	} else if(g_gametype.integer >= GT_RTP){
-		int startpoints = 0;
-		char points[5];
-
-		for(i=0; i < MAX_GENTITIES; i++){
-			gentity_t	*ent = &g_entities[i];
-			if(!Q_stricmp(ent->classname, "team_CTF_redplayer") && startpoints == 0){
-				startpoints = 1;
-				i = 0;
-			} else if(!Q_stricmp(ent->classname, "team_CTF_blueplayer") && startpoints == 1){
-				startpoints = 2;
-				i = 0;
-			} else if(!Q_stricmp(ent->classname, "team_CTF_redspawn") && startpoints == 2){
-				startpoints = 3;
-				i = 0;
-			} else if(!Q_stricmp(ent->classname, "team_CTF_bluespawn") && startpoints == 3){
-				startpoints = 4;
-				break;
-			}
-		}
-
-		if(startpoints < 2 || startpoints > 4){
-			startpoints = 2;
-			G_Printf("Error: RTP-Startpoints aren't set correctly!");
-		}
-
-		Com_sprintf(points, sizeof(points), "%i", startpoints);
-
-		trap_Cvar_Set( "sg_rtppoints", points);
-
-		G_Printf("%i team-startpoints parsed\n", startpoints);
 	}
 
 	// general initialization
@@ -1729,53 +1697,22 @@ void ClearItems(void){
 	}
 }
 
-//SetSpawnPos by Spoon
-
-void SetSpawnPos(int *teamblue, int *teamred) {
-	int i1 = rand()% sg_rtppoints.integer;
-	int i2 = rand()% sg_rtppoints.integer;
-
-	if(g_gametype.integer == GT_RTP){
-		while(i1 == i2)
-			i2 = rand() % sg_rtppoints.integer;
-
-		if(sg_rtppoints.integer ==2){
-			switch(g_round % 2){
-			case 0:
-				i1 = 0;
-				i2 = 1;
-				break;
-			default:
-			case 1:
-				i1 = 1;
-				i2 = 0;
-				break;
-			}
-		}
-		*teamblue = i1;
-		*teamred  = i2;
-
-	} else if(g_gametype.integer == GT_BR){
-		if(!g_robteam && !g_defendteam){
-			switch ( br_teamrole.integer ) {
-				case 2:
-					// team red always defend
-					g_defendteam = TEAM_RED;
-					g_robteam = TEAM_BLUE;
-					break;
-				case 3:
-					// team blue always defend
-					g_defendteam = TEAM_BLUE;
-					g_robteam = TEAM_RED;
-					break;
-				case 1:
-				case 4:
-				default:
-					g_robteam = (rand()%2)+1;
-					g_defendteam = g_robteam == TEAM_RED ? TEAM_BLUE : TEAM_RED;
-					break;
-			}
-		}
+static void SetTeamRoles(int teamrole){
+	switch(teamrole){
+		case 2:
+			// team red always defend
+			g_defendteam = TEAM_RED;
+			g_robteam = TEAM_BLUE;
+			break;
+		case 3:
+			// team blue always defend
+			g_defendteam = TEAM_BLUE;
+			g_robteam = TEAM_RED;
+			break;
+		default:
+			g_robteam = (rand() % 2) + 1;
+			g_defendteam = (g_robteam == TEAM_RED) ? TEAM_BLUE : TEAM_RED;
+			break;
 	}
 }
 
@@ -1827,7 +1764,10 @@ void Setup_NewRound(void){
 
 	G_LogPrintf( "ROUND: %i end.\n", (g_round));
 
-	SetSpawnPos( &sg_bluespawn, &sg_redspawn);
+	if(g_gametype.integer == GT_BR)
+		SetTeamRoles(br_teamrole.integer);
+	else if(g_gametype.integer == GT_RTP)
+		SetTeamRoles(rtp_teamrole.integer);
 
 	for (i = 0; i < level.maxclients; i++)
 	{

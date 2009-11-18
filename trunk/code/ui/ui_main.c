@@ -1914,15 +1914,15 @@ static void UI_DrawRedBlue(rectDef_t *rect, float scale, vec4_t color, int textS
 }
 
 static void UI_DrawCrosshair1(rectDef_t *rect, float scale) {
- 	trap_R_SetColor( g_color_table[uiInfo.crosshair1Color & Q_COLORS_COUNT ]  );
-	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader1[uiInfo.currentCrosshair1]);
- 	trap_R_SetColor( NULL );
+ 	trap_R_SetColor(g_color_table[uiInfo.crosshair1Color & Q_COLORS_COUNT]);
+	UI_DrawHandlePic(rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader1[uiInfo.currentCrosshair1]);
+ 	trap_R_SetColor(NULL);
 }
 
 static void UI_DrawCrosshair2(rectDef_t *rect, float scale) {
-	trap_R_SetColor( g_color_table[uiInfo.crosshair2Color & Q_COLORS_COUNT ] );
-	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader2[uiInfo.currentCrosshair2]);
- 	trap_R_SetColor( NULL );
+	trap_R_SetColor(g_color_table[uiInfo.crosshair2Color & Q_COLORS_COUNT]);
+	UI_DrawHandlePic(rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiDC.Assets.crosshairShader2[uiInfo.currentCrosshair2]);
+ 	trap_R_SetColor(NULL);
 }
 
 /*
