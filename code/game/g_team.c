@@ -234,14 +234,14 @@ SelectCTFSpawnPoint
 
 ============
 */
-gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, int mappart, qbool isbot ) {
+gentity_t *SelectCTFSpawnPoint(team_t team, int teamstate, vec3_t origin, vec3_t angles, qbool isbot) {
 	gentity_t	*spot;
 
-	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
+	spot = SelectRandomTeamSpawnPoint(teamstate, team);
 
 	if (!spot) {
-		G_LogPrintf("No CTFSpawnPoint was found for %s team\n", (team == TEAM_BLUE)  ? "blu" : "red");
-		return SelectSpawnPoint( vec3_origin, origin, angles, mappart, NULL, isbot );
+		G_LogPrintf("No CTFSpawnPoint was found for %s team\n",(team == TEAM_BLUE)? "blue":"red");
+		return SelectSpawnPoint(vec3_origin, origin, angles, team, isbot);
 	}
 
 	VectorCopy (spot->s.origin, origin);

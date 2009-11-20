@@ -125,6 +125,25 @@ qbool SpotWouldTelefrag( gentity_t *spot ) {
 	return qfalse;
 }
 
+gentity_t *SetPlayerToSpawnPoint(gentity_t *spot, vec3_t origin, vec3_t angles) {
+	VectorCopy(spot->s.origin, origin);
+	VectorCopy(spot->s.angles, angles);
+
+	// if it has a target, look towards it
+	if (spot->target) {
+		gentity_t *target;
+		vec3_t	dir;
+
+		target = G_PickTarget(spot->target);
+		if (target) {
+			VectorSubtract(target->s.origin, origin, dir);
+			vectoangles(dir, angles);
+		}
+	}
+
+	return spot;
+}
+
 /*
 ===========
 SelectRandomFurthestSpawnPoint
@@ -133,71 +152,27 @@ Chooses a player start, deathmatch start, etc
 ============
 */
 #define	MAX_SPAWN_POINTS	128
-#define IS_VALID_SPAWNPOINT(spot, client) \
- 	( !( (client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_BOTS) )\
-		&& !( !(client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_HUMANS) ) )
-
-static gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles,
-										   int mappart, gclient_t *client, qbool isbot ) {
-	gentity_t	*spot;
+static gentity_t *SelectRandomFurthestSpawnPoint(vec3_t avoidPoint, int ignoreTeam, qbool isbot) {
+	gentity_t	*spot = NULL;
 	vec3_t		delta;
 	float		dist;
 	float		list_dist[MAX_SPAWN_POINTS];
 	gentity_t	*list_spot[MAX_SPAWN_POINTS];
-	int			numSpots, rnd, i, j, ignoreTeam;
-	gentity_t *ent_client;
-	gentity_t	*allSpot[MAX_SPAWN_POINTS];
-	qbool	telefragSpot[MAX_SPAWN_POINTS];
-	int			availSpot[MAX_SPAWN_POINTS];
-	int			numAllSpots = 0;
-	int			numAvailSpots;
-	qbool perfectSpot = qfalse, telefrag;
-	int developer;
-
-	numSpots = 0;
-	spot = NULL;
+	int			numSpots = 0;
+	int			rnd, i, j;
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		telefrag = SpotWouldTelefrag( spot );
-		if (g_gametype.integer != GT_DUEL) {
-			if (numAllSpots < MAX_SPAWN_POINTS) {
-				allSpot[ numAllSpots ] = spot;
-				telefragSpot[ numAllSpots ] = telefrag;
-				numAllSpots++;
-			}
-		}
-
-		if ( telefrag && g_gametype.integer != GT_DUEL)
+		if (SpotWouldTelefrag(spot))
 			continue;
 
-		if(spot->mappart == mappart && g_gametype.integer == GT_DUEL && !spot->used){
-			// if this is a trio player, find a trio-spawnpoint
-			if(client && !spot->trio && client->trio)
-				continue;
-
-			spot->used = qtrue;
-			VectorCopy(spot->s.origin, origin);
-			VectorCopy(spot->s.angles, angles);
-
-			// if it has a target, look towards it
-			if ( spot->target ) {
-				gentity_t *target;
-				vec3_t	dir;
-
-				target = G_PickTarget( spot->target );
-				if ( target ) {
-					VectorSubtract( target->s.origin, origin, dir );
-					vectoangles( dir, angles );
-				}
-			}
-			return spot;
-			break;
-		} else if(g_gametype.integer == GT_DUEL)
+		// Check if spot is not for this human/bot player
+		if (((spot->flags & FL_NO_BOTS) && isbot) ||
+			((spot->flags & FL_NO_HUMANS) && !isbot))
 			continue;
 
 		// spots are inserted in sorted order, furthest away first
-		VectorSubtract( spot->s.origin, avoidPoint, delta );
-		dist = VectorLength( delta );
+		VectorSubtract(spot->s.origin, avoidPoint, delta);
+		dist = VectorLengthSquared(delta);
 		for (i = 0; i < numSpots; i++) {
 			if ( dist > list_dist[i] ) {
 				if ( numSpots >= MAX_SPAWN_POINTS )
@@ -221,158 +196,47 @@ static gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t ori
 		}
 	}
 
-	if(g_gametype.integer == GT_DUEL){
-		G_Printf("bug! couldn't find duel-spawnpoint!\n");
-		return NULL;
-	}
-
-	if (!numSpots) {
-		spot = G_Find( NULL, FOFS(classname), "info_player_deathmatch");
-		if (!spot)
-			G_Error( "Couldn't find a spawn point" );
-		VectorCopy (spot->s.origin, origin);
-		VectorCopy (spot->s.angles, angles);
-		return spot;
-	}
-
-	ignoreTeam = (g_gametype.integer == GT_TEAM)
-	             ? client->ps.persistant[PERS_TEAM] : -1;
-
-	// Get gentity_t from gclient_t
-	// We cannot use client->ps.clientNum because it is not yet initialized
-	ent_client = &g_entities[client - level.clients];
+	if (!numSpots)
+		return G_Find( NULL, FOFS(classname), "info_player_deathmatch");
 
 	// try find a spawn point that's not too close to another player
-	rnd = random() * (numSpots / 2);
-	for ( i = rnd; i >= 0; i-- ) {
+	i = rnd = rand() % (numSpots / 2);
+	while (1) {
 		spot = list_spot[i];
-		if ( !G_IsAnyClientWithinRadius(spot->s.origin, 700, ignoreTeam) ) {
-			// Check if the spawn point is appropriate for the bot or human player.
-			// If not, try another one.
-			if ( !IS_VALID_SPAWNPOINT(spot, ent_client) )
-				continue;
-			perfectSpot = qtrue;
-			rnd = i;
+		if (!G_IsAnyClientWithinRadius(spot->s.origin, MAX_FREESPAWN_ZONE_DISTANCE_SQUARE, ignoreTeam))
+			return spot;
+		if (i > 0 && i <= rnd)
+			i--;
+		else if (i <= 0)
+			i = rnd + 1;
+		else if (i < numSpots - 2)
+			i++;
+		else
 			break;
-		}
 	}
-	if ( i < 0 ) {
-		// try the rest, except the worst one
-		int highest = numSpots - 2;
-		for ( i = rnd+1; i <= highest; i++ ) {
-			spot = list_spot[i];
-			if ( !G_IsAnyClientWithinRadius(spot->s.origin, 700, ignoreTeam) ) {
-				// Check if the spawn point is appropriate for the bot or human player.
-				// If not, try another one.
-				if ( !IS_VALID_SPAWNPOINT(spot, ent_client) )
+
+	return list_spot[rnd];
+}
+
+static gentity_t *SelectDuelSpawnPoint(int mappart, qbool clientTrio, vec3_t origin, vec3_t angles) {
+	gentity_t	*spot = NULL;
+
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
+			if (spot->mappart == mappart && !spot->used) {
+				// if this is a trio player, find a trio-spawnpoint
+				if (clientTrio && !spot->trio)
 					continue;
-				perfectSpot = qtrue;
-				rnd = i;
+				spot->used = qtrue;
 				break;
-			}
-		}
+			} else
+				continue;
 	}
 
-	// No valid spawn point is found.
-	// By valid, we mean an allowed spawn point for bot or human AND
-	// no client within a radius of 700 units
-	if ( !perfectSpot && !IS_VALID_SPAWNPOINT(list_spot[rnd], ent_client) ) {
-		developer = trap_Cvar_VariableIntegerValue("developer");
+	if (spot)
+		return SetPlayerToSpawnPoint(spot, origin, angles);
 
-		numAvailSpots = 0;
-		for (i = 0; i < numSpots; i++) {
-			spot = list_spot[i];
-			if ( IS_VALID_SPAWNPOINT(spot, ent_client) ) {
-				availSpot[ numAvailSpots ] = i;
-				numAvailSpots++;
-			}
-		}
-		// At least one spot *SHOULD* be available
-		if (numAvailSpots > 0) {
-			i = random() * (numAvailSpots-1);
-			rnd = availSpot[i];
-			spot = list_spot[rnd];
-
-			if ( developer ) {
-				G_Printf("Error: Invalid %s spawn point\n", ent_client->r.svFlags & SVF_BOT ? "bot" : "human");
-				G_Printf("Fix: a valid spawn point has been elected. Is any client within radius ? %s\n",
-					G_IsAnyClientWithinRadius(spot->s.origin, 700, ignoreTeam) ? "Yes" : "No");
-			}
-		}
-		else {
-			// We *SHOULD NOT* be here, or we may experience a real spawn policy problem !
-			// Mostly happen, when there is no place to spawn, typically because telefrag would happen.
-			// -> Should we spawn in the place with the risk to telefrag somebody else ?
-			// -> Yes, as it is better than an infinite loop ;)
-			numAvailSpots = 0;
-			if ( developer ) {
-				G_Printf("Error: Invalid %s spawn point\n", ent_client->r.svFlags & SVF_BOT ? "bot" : "human");
-				for (i = 0; i < numAllSpots; i++) {
-					spot = allSpot[i];
-					if ( (ent_client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_BOTS) )
-						G_Printf("DumpInfo: spawnPoint[%i]: not allowed for you, bot, telefrag: %s\n", i, telefragSpot[i] ? "Yes" : "No");
-					else if ( !(ent_client->r.svFlags & SVF_BOT) && (spot->flags & FL_NO_HUMANS) )
-						G_Printf("DumpInfo: spawnPoint[%i]: not allowed for you, human, telefrag: %s\n", i, telefragSpot[i] ? "Yes" : "No");
-					else
-						G_Printf("DumpInfo: spawnPoint[%i]: allowed, telefrag: %s\n", i, telefragSpot[i] ? "Yes" : "No");
-
-					if ( IS_VALID_SPAWNPOINT(spot, ent_client) ) {
-						availSpot[ numAvailSpots ] = i;
-						numAvailSpots++;
-					}
-				}
-			}
-			else {
-				for (i = 0; i < numAllSpots; i++) {
-					spot = allSpot[i];
-					if ( IS_VALID_SPAWNPOINT(spot, ent_client) ) {
-						availSpot[ numAvailSpots ] = i;
-						numAvailSpots++;
-					}
-				}
-			}
-
-			if (numAvailSpots > 0) {
-				// We get all possible spawn points, even if telefrag would happen.
-				// Get a random one
-				i = random() * (numAvailSpots-1);
-				rnd = availSpot[i];
-				spot = allSpot[rnd];
-
-				if ( developer )
-					G_Printf("Fix: spawnPoint[%i] has been elected !\n", rnd);
-			}
-			else {
-				// Well, I can't do anything more ... :/.
-				// Should be really a spawn problem, and
-				// maybe FL_NO_BOTS and FL_NO_HUMANS have to be removed on *ALL* spawn points.
-				spot = list_spot[rnd];
-
-				if ( developer )
-					G_Printf("Fatal: %s spawn problem ! Maybe FL_NO_BOTS and FL_NO_HUMANS have to be removed on all spawn points ??\n",
-						ent_client->r.svFlags & SVF_BOT ? "bot" : "human");
-			}
-		}
-	}
-	else // Normal process, the random selected spawn point is OK
-		spot = list_spot[rnd];
-
-	VectorCopy (spot->s.origin, origin);
-	VectorCopy (spot->s.angles, angles);
-
-	// if it has a target, look towards it
-	if ( spot->target ) {
-		gentity_t *target;
-		vec3_t	dir;
-
-		target = G_PickTarget( spot->target );
-		if ( target ) {
-			VectorSubtract( target->s.origin, origin, dir );
-			vectoangles( dir, angles );
-		}
-	}
-
-	return spot;
+	G_Error("Couldn't find a duel-spawnpoint!\n");
+	return NULL;
 }
 
 /*
@@ -382,8 +246,15 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client, qbool isbot ) {
-	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, mappart, client, isbot );
+gentity_t *SelectSpawnPoint(vec3_t avoidPoint, vec3_t origin, vec3_t angles, int ignoreTeam, qbool isbot) {
+	gentity_t	*spot;
+
+	spot = SelectRandomFurthestSpawnPoint(avoidPoint, ignoreTeam, isbot);
+
+	if (!spot)
+		G_Error( "Couldn't find a spawn point" );
+
+	return SetPlayerToSpawnPoint(spot, origin, angles);
 }
 
 /*
@@ -394,31 +265,22 @@ Try to find a spawn point marked 'initial', otherwise
 use normal spawn selection.
 ============
 */
-gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, int mappart, gclient_t *client, qbool isbot ) {
-	gentity_t	*spot;
-
-	spot = NULL;
+static gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, int ignoreTeam, qbool isbot ) {
+	gentity_t	*spot = NULL;
 	
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
-	{
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
 		if(((spot->flags & FL_NO_BOTS) && isbot) ||
 		   ((spot->flags & FL_NO_HUMANS) && !isbot))
-		{
 			continue;
-		}
 		
 		if((spot->spawnflags & 0x01))
 			break;
 	}
 
 	if (!spot || SpotWouldTelefrag(spot))
-		return SelectSpawnPoint(vec3_origin, origin, angles, mappart, client , isbot);
+		return SelectSpawnPoint(vec3_origin, origin, angles, ignoreTeam, isbot);
 
-	VectorCopy (spot->s.origin, origin);
-	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
-
-	return spot;
+	return SetPlayerToSpawnPoint(spot, origin, angles);
 }
 
 /*
@@ -427,7 +289,7 @@ SelectSpectatorSpawnPoint
 
 ============
 */
-gentity_t *SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles, int mappart) {
+static gentity_t *SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles, int mappart) {
 	FindIntermissionPoint(mappart);
 
 	VectorCopy( level.intermission_origin, origin );
@@ -1313,7 +1175,6 @@ void ClientSpawn(gentity_t *ent) {
 		client->realspec)) {
 		spawnPoint = SelectSpectatorSpawnPoint (
 						spawn_origin, spawn_angles, ent->mappart);
-
 	} else if (g_gametype.integer >= GT_RTP ) {
 		if (client->sess.sessionTeam >= TEAM_SPECTATOR) {
 			spawnPoint = NULL;
@@ -1323,7 +1184,7 @@ void ClientSpawn(gentity_t *ent) {
 			spawnPoint = SelectCTFSpawnPoint(
 				client->sess.sessionTeam,
 				client->pers.teamState.state,
-				spawn_origin, spawn_angles, ent->mappart,
+				spawn_origin, spawn_angles,
 				!!(ent->r.svFlags & SVF_BOT));
 		}
 	} else if (g_gametype.integer == GT_DUEL){
@@ -1332,22 +1193,20 @@ void ClientSpawn(gentity_t *ent) {
 			VectorCopy(ent->client->ps.viewangles, spawn_angles);
 			VectorCopy(ent->client->ps.origin, spawn_origin);
 		} else {
-			spawnPoint = SelectSpawnPoint (
-						client->ps.origin,
-						spawn_origin, spawn_angles, ent->mappart, ent->client,
-						!!(ent->r.svFlags & SVF_BOT));
+			spawnPoint = SelectDuelSpawnPoint (ent->mappart, ent->client->trio,
+						spawn_origin, spawn_angles);
 		}
 	} else {
 		// the first spawn should be at a good looking spot
 		if ( !client->pers.initialSpawn && client->pers.localClient ) {
 			client->pers.initialSpawn = qtrue;
-			spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles, ent->mappart, ent->client,
+			spawnPoint = SelectInitialSpawnPoint(spawn_origin, spawn_angles, ent->client->ps.persistant[PERS_TEAM],
 				!!(ent->r.svFlags & SVF_BOT));
 		} else {
 			// don't spawn near existing origin if possible
 			spawnPoint = SelectSpawnPoint (
 				client->ps.origin,
-				spawn_origin, spawn_angles, ent->mappart, client,
+				spawn_origin, spawn_angles, ent->client->ps.persistant[PERS_TEAM],
 				!!(ent->r.svFlags & SVF_BOT));
 		}
 	}

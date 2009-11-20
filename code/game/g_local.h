@@ -647,7 +647,7 @@ float vectoyaw( const vec3_t vec );
 void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm );
 void G_AddEvent( gentity_t *ent, int event, int eventParm );
 void G_SetOrigin( gentity_t *ent, vec3_t origin );
-qbool G_IsAnyClientWithinRadius( const vec3_t org, float rad, int ignoreTeam );
+qbool G_IsAnyClientWithinRadius(const vec3_t org, float radiusSquare, int ignoreTeam);
 
 //
 // g_combat.c
@@ -728,7 +728,7 @@ team_t TeamCount( int ignoreClientNum, int team );
 int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
-gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, int mappart, gclient_t *client, qbool isbot);
+gentity_t *SelectSpawnPoint(vec3_t avoidPoint, vec3_t origin, vec3_t angles, int ignoreTeam, qbool isbot);
 void CopyToBodyQue( gentity_t *ent );
 void respawn (gentity_t *ent);
 void BeginIntermission (void);
@@ -742,6 +742,7 @@ void AddScoreRTP( gentity_t *ent, int score );
 void AddScoreRTPTeam( int team, int score );
 void CalculateRanks( void );
 qbool SpotWouldTelefrag( gentity_t *spot );
+gentity_t *SetPlayerToSpawnPoint(gentity_t *spot, vec3_t origin, vec3_t angles);
 
 //
 // g_svcmds.c
@@ -786,7 +787,7 @@ typedef struct gcmdsTable_s {
 //
 // g_main.c
 //
-void FindIntermissionPoint( int mappart );
+void FindIntermissionPoint(int mappart);
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);

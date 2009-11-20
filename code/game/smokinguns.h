@@ -128,6 +128,8 @@ System
 #define DOOR_ROTATING_Y_AXIS 64
 #define DOOR_ROTATING_ONE_WAY 128
 
+#define MAX_FREESPAWN_ZONE_DISTANCE_SQUARE	490000
+
 /*
 =============================
 Money system

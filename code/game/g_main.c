@@ -1150,7 +1150,7 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	}
 
 	// find the spot
-	if(g_gametype.integer == GT_DUEL && g_maxmapparts)
+	if (g_gametype.integer == GT_DUEL && g_maxmapparts)
 		FindIntermissionPoint((rand()%g_maxmapparts)+1);
 	else
 		FindIntermissionPoint(0);
@@ -1180,49 +1180,24 @@ FindIntermissionPoint
 This is also used for spectator spawns
 ==================
 */
-void FindIntermissionPoint( int mappart ) {
-	gentity_t	*ent, *target;
-	vec3_t		dir;
+void FindIntermissionPoint(int mappart) {
+	gentity_t	*ent = NULL;
 
 	// find the intermission spot
-	if(g_gametype.integer != GT_DUEL)
-		ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
-	else {
-		//find intermission spot for current mappart
-		ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
-
-		while(1){
-			if( ent == NULL){
-				ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
-				//G_Printf("Warning: No info_player_intermission for current mappart found. Using default\n");
+	if (g_gametype.integer == GT_DUEL) {
+		while ((ent = G_Find(ent, FOFS(classname), "info_player_intermission")) != NULL)
+			if (ent->mappart == mappart)
 				break;
-			}
+	} else
+		ent = G_Find(NULL, FOFS(classname), "info_player_intermission");
 
-			if(ent->mappart == mappart)
-				break;
-
-			ent = G_Find(ent, FOFS(classname), "info_player_intermission");
-		}
-	}
-
-	if ( !ent )	// the map creator forgot to put in an intermission point...
-		SelectSpawnPoint(vec3_origin, level.intermission_origin, level.intermission_angle, mappart, NULL, qfalse);
+	if (!ent)	// the map creator forgot to put in an intermission point...
+		SelectSpawnPoint(vec3_origin, level.intermission_origin, level.intermission_angle, -1, qfalse);
 	else {
-		VectorCopy (ent->s.origin, level.intermission_origin);
-		VectorCopy (ent->s.angles, level.intermission_angle);
-		// if it has a target, look towards it
-		if ( ent->target ) {
-			target = G_PickTarget( ent->target );
-			if ( target ) {
-				VectorSubtract( target->s.origin, level.intermission_origin, dir );
-				vectoangles( dir, level.intermission_angle );
-			}
-		}
-	}
-
-	// neccesary for cgame
-	if(ent)
+		SetPlayerToSpawnPoint(ent, level.intermission_origin, level.intermission_angle);
+		// neccesary for cgame
 		VectorCopy(level.intermission_angle, ent->s.angles);
+	}
 }
 
 /*
