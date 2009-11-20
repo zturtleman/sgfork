@@ -639,26 +639,17 @@ ignoreTeam can be TEAM_RED or TEAM_BLUE for team games that use
 spawnpoints that are spread out (unlike CTF), or -1 otherwise.
 ================
 */
-qbool G_IsAnyClientWithinRadius( const vec3_t org, float rad, int ignoreTeam ) {
-	int length, i, j;
-	float radSqr;
-	vec_t diff;
+qbool G_IsAnyClientWithinRadius(const vec3_t org, float radiusSquare, int ignoreTeam) {
+	int i;
+	vec3_t diff;
 	playerState_t *ps;
 
-	radSqr = rad * rad;  // to avoid using sqrt for getting vector length below
-
-	for ( i = 0; i < level.numPlayingClients; i++ ) {
+	for (i = 0; i < level.numPlayingClients; i++) {
 		ps = &level.clients[level.sortedClients[i]].ps;
-		if ( ps->stats[STAT_HEALTH] <= 0 || ps->persistant[PERS_TEAM] == ignoreTeam )
+		if (ps->stats[STAT_HEALTH] <= 0 || ps->persistant[PERS_TEAM] == ignoreTeam)
 			continue;
-
-		// find the difference vector and it's length
-		length = 0;
-		for ( j = 0; j < 3; j++ ) {
-			diff = org[j] - ps->origin[j];
-			length += diff * diff;
-		}
-		if ( length > radSqr )
+		VectorSubtract(org, ps->origin, diff);
+		if (VectorLengthSquared(diff) > radiusSquare)
 			continue;
 		return qtrue;
 	}

@@ -788,7 +788,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			item = NULL;
 			j = 0;
 
-			SelectSpawnPoint( ent->client->ps.origin, origin, angles, ent->mappart, ent->client, qfalse );
+			SelectSpawnPoint( ent->client->ps.origin, origin, angles, ent->client->ps.persistant[PERS_TEAM], qfalse );
 			TeleportPlayer( ent, origin, angles );
 			break;
 
