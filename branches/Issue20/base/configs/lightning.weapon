@@ -1,0 +1,87 @@
+WP_ANIM_CHANGE
+firstFrame = 0
+numFrames = 37
+loopFrames = 0
+frameLerp = 20
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_DROP
+firstFrame = 104
+numFrames = 10
+loopFrames = 0
+frameLerp = 30
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_IDLE
+firstFrame = 94
+numFrames = 10
+loopFrames = 0
+frameLerp = 70
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_FIRE
+firstFrame = 43
+numFrames = 20
+loopFrames = 0
+frameLerp = 35
+initialLerp = 10
+reversed = 0
+flipflop = 0
+
+WP_ANIM_ALT_FIRE
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_RELOAD
+firstFrame = 63
+numFrames = 31
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL
+firstFrame = 0
+numFrames = 0
+loopFrames = 0
+frameLerp = 0
+initialLerp = 0
+reversed = 0
+flipflop = 0
+
+WP_ANIM_SPECIAL2
+firstFrame = 67
+numFrames = 27
+loopFrames = 0
+frameLerp = 40
+initialLerp = 40
+reversed = 0
+flipflop = 0
+
+spread = 275.000000
+damage = 44.000000
+range = 1050
+addTime = 0
+count = 0
+clipAmmo = 12
+clip = WP_CART_CLIP
+maxAmmo = 12
+v_model = "models/weapons2/colt_light/v_lightning.md3"
+v_barrel = 0
+snd_fire = "sound/weapons/lightning_"
+snd_reload = 0
+name = "Colt Lightning"
+path = "models/weapons2/colt_light/"
+wp_sort = WPS_GUN

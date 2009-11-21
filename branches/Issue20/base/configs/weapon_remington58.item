@@ -1,0 +1,13 @@
+classname = "weapon_remington58"
+pickup_sound = "sound/misc/w_pickup.wav"
+pickup_name = "Remington58"
+world_model = < "models/weapons2/remington58/e_remington58.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/rem58"
+xyrelation = "3.000000"
+quantity = "6"
+giType = "IT_WEAPON"
+giTag = "WP_REM58"
+prize = "15"
+weapon_sort = "WS_PISTOL"
+precaches = ""
+sounds = ""

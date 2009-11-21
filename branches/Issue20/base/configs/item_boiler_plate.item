@@ -1,0 +1,13 @@
+classname = "item_boiler_plate"
+pickup_sound = "sound/misc/it_pickup.wav"
+pickup_name = "Boiler Plate"
+world_model = < "models/powerups/holdable/boiler.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/boiler"
+xyrelation = "1.000000"
+quantity = "60"
+giType = "IT_ARMOR"
+giTag = "WP_NONE"
+prize = "15"
+weapon_sort = "WS_MISC"
+precaches = ""
+sounds = ""

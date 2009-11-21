@@ -1,0 +1,13 @@
+classname = "weapon_sharps"
+pickup_sound = "sound/misc/w_pickup.wav"
+pickup_name = "Sharps Rifle"
+world_model = < "models/weapons2/sharps/e_sharps.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/sharps"
+xyrelation = "3.000000"
+quantity = "1"
+giType = "IT_WEAPON"
+giTag = "WP_SHARPS"
+prize = "40"
+weapon_sort = "WS_RIFLE"
+precaches = ""
+sounds = ""

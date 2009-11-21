@@ -1,0 +1,13 @@
+classname = "ammo_dynamite"
+pickup_sound = "sound/misc/am_pickup.wav"
+pickup_name = "Dynamite"
+world_model = < "models/powerups/ammo/dynammo.md3" "<NULL>" "<NULL>" "<NULL>" >
+icon = "hud/weapons/dynamite"
+xyrelation = "3.000000"
+quantity = "5"
+giType = "IT_AMMO"
+giTag = "WP_DYNAMITE"
+prize = "16"
+weapon_sort = "WS_NONE"
+precaches = ""
+sounds = ""
