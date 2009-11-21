@@ -76,6 +76,20 @@ sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt ) {
 	return SV_GentityNum( num );
 }
 
+void SendWeaponsChanges( char *weapon, char *an, char *dest, char *value ) {
+  if( !weapon || !an || !dest || !value )
+    return;
+
+  SV_SendServerCommand( NULL, va( "wpch %s %s %s %s", weapon, an, dest, value ) );
+}
+
+void SendItemsChanges( char *item, char *dest, char *value ) {
+  if( !item || !dest || !value )
+    return;
+
+  SV_SendServerCommand( NULL, va( "itch %s %s %s", item, dest, value ) );
+}
+
 /*
 ===============
 SV_GameSendServerCommand
@@ -347,8 +361,12 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_FS_SEEK:
 		return FS_Seek( args[1], args[2], args[3] );
 
-  case G_GET_LOCALTIME:
-    //Sys_GetTime( (char *)VMA(1), (char **)VMA(2) );
+  case G_CHANGE_WP_LIST:
+    SendWeaponsChanges( (char*)args[1], (char*)args[2], (char*)args[3], (char*)args[4] );
+    return 0;
+  case G_CHANGE_IT_LIST:
+    //SendItemsChanges( (char*)args[1], (char*)args[2], (char*)args[3] );
+    SendItemsChanges( (char*)VMA(1), (char*)VMA(2), (char*)VMA(3) );
     return 0;
 
 	case G_LOCATE_GAME_DATA:

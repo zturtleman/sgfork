@@ -46,6 +46,9 @@ equ trap_SnapVector			-43
 equ trap_TraceCapsule		-44
 equ trap_EntityContactCapsule	-45
 equ trap_FS_Seek -46
+equ trap_SendWeaponsChanges -47
+equ trap_SendItemsChanges -48
+
 
 equ	memset					-101
 equ	memcpy					-102

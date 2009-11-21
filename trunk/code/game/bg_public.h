@@ -1214,6 +1214,8 @@ extern void config_GetInfos( int fileType );
 extern int BG_ItemNumByName( char *name );
 extern int BG_AnimNumByName( char *anim );
 extern int BG_WeaponNumByName( char *wp );
+extern int BG_WeaponListChange( char *weapon, char *an, char *dest, char *value );
+extern int BG_ItemListChange( char *item, char *dest, char *value );
 int BG_WSNumByName( char *s );
 int BG_GitagNumByName( char *s );
 int BG_GitypeByName( char *s );
