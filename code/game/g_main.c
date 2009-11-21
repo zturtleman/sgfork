@@ -134,21 +134,20 @@ vmCvar_t	g_blood;
 vmCvar_t	g_podiumDist;
 vmCvar_t	g_podiumDrop;
 vmCvar_t	g_allowVote;
-vmCvar_t  g_allowSpecVote;
+vmCvar_t	g_allowSpecVote;
 vmCvar_t	g_allowVote_kick;
 vmCvar_t	g_allowVote_map_restart;
 vmCvar_t	g_allowVote_nextmap;
 vmCvar_t	g_allowVote_map;
 vmCvar_t	g_allowVote_g_gametype;
-vmCvar_t	g_allowVote_kick;
 vmCvar_t	g_allowVote_g_redteam;
 vmCvar_t	g_allowVote_g_blueteam;
 vmCvar_t	g_allowVote_g_doWarmup;
 vmCvar_t	g_allowVote_timelimit;
 vmCvar_t	g_allowVote_fraglimit;
 vmCvar_t	g_allowVote_mapcycle;
-vmCvar_t  g_allowVote_mute;
-vmCvar_t  g_allowVote_unmute;
+vmCvar_t	g_allowVote_mute;
+vmCvar_t	g_allowVote_unmute;
 vmCvar_t	g_teamAutoJoin;
 vmCvar_t	g_teamForceBalance;
 vmCvar_t	g_banIPs;
@@ -285,8 +284,9 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_podiumDrop, "g_podiumDrop", "70", 0, 0, qfalse },
 
 	{ &g_allowVote, "g_allowVote", "1", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
-  { &g_allowSpecVote, "g_allowSpecVote", "1", CVAR_ARCHIVE, 0, qfalse },
+	{ &g_allowSpecVote, "g_allowSpecVote", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_kick, "g_allowVote_kick", "1", CVAR_ARCHIVE, 0, qfalse },
+	{ &g_allowVote_map_restart, "g_allowVote_map_restart", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_nextmap, "g_allowVote_nextmap", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_map, "g_allowVote_map", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_g_gametype, "g_allowVote_g_gametype", "1", CVAR_ARCHIVE, 0, qfalse },
@@ -296,8 +296,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_allowVote_timelimit, "g_allowVote_timelimit", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_fraglimit, "g_allowVote_fraglimit", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_allowVote_mapcycle, "g_allowVote_mapcycle", "1", CVAR_ARCHIVE, 0, qfalse },
-  { &g_allowVote_mute, "g_allowVote_mute", "1", CVAR_ARCHIVE, 0, qfalse },
-  { &g_allowVote_unmute, "g_allowVote_unmute", "1", CVAR_ARCHIVE, 0, qfalse },
+	{ &g_allowVote_mute, "g_allowVote_mute", "1", CVAR_ARCHIVE, 0, qfalse },
+	{ &g_allowVote_unmute, "g_allowVote_unmute", "1", CVAR_ARCHIVE, 0, qfalse },
 
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
