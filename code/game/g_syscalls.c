@@ -86,6 +86,16 @@ int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
 	return syscall( G_FS_SEEK, f, offset, origin );
 }
 
+int trap_SendWeaponsChanges( char *weapon, char *an, char *dest, char *value ) {
+  syscall( G_CHANGE_WP_LIST, weapon, an, dest, value );
+  return 0;
+}
+
+int trap_SendItemsChanges( char *item, char *dest, char *value ) {
+  syscall( G_CHANGE_IT_LIST, item, dest, value );
+  return 0;
+}
+
 void	trap_SendConsoleCommand( int exec_when, const char *text ) {
 	syscall( G_SEND_CONSOLE_COMMAND, exec_when, text );
 }

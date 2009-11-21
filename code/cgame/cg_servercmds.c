@@ -490,7 +490,7 @@ Cmd_Argc() / Cmd_Argv()
 */
 static void CG_ServerCommand( void ) {
 	const char	*cmd;
-	char		text[MAX_SAY_TEXT];
+  char buf[4][MAX_SAY_TEXT];
 
 	cmd = CG_Argv(0);
 
@@ -519,22 +519,41 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
+  if( !strcmp( cmd, "wpch" ) ) {
+    Q_strncpyz( buf[0], CG_Argv(1), MAX_SAY_TEXT );
+    Q_strncpyz( buf[1], CG_Argv(2), MAX_SAY_TEXT );
+    Q_strncpyz( buf[2], CG_Argv(3), MAX_SAY_TEXT );
+    Q_strncpyz( buf[3], CG_Argv(4), MAX_SAY_TEXT );
+
+    BG_WeaponListChange( buf[0], buf[1], buf[2], buf[3] );
+    return;
+  }
+
+  if( !strcmp( cmd, "itch" ) ) {
+    Q_strncpyz( buf[0], CG_Argv(1), MAX_SAY_TEXT );
+    Q_strncpyz( buf[1], CG_Argv(2), MAX_SAY_TEXT );
+    Q_strncpyz( buf[2], CG_Argv(3), MAX_SAY_TEXT );
+
+    BG_ItemListChange( buf[0], buf[1], buf[2] );
+    return;
+  }
+
 	if ( !strcmp( cmd, "chat" ) ) {
 		if ( !cg_teamChatsOnly.integer ) {
 			CG_PlayTalkSound();
-			Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
-			CG_RemoveChatEscapeChar( text );
-			CG_Printf( "%s\n", text );
+			Q_strncpyz( buf[0], CG_Argv(1), MAX_SAY_TEXT );
+			CG_RemoveChatEscapeChar( buf[0] );
+			CG_Printf( "%s\n", buf[0] );
 		}
 		return;
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
 		CG_PlayTalkSound();
-		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
-		CG_RemoveChatEscapeChar( text );
-		CG_AddToTeamChat( text );
-		CG_Printf( "%s\n", text );
+		Q_strncpyz( buf[0], CG_Argv(1), MAX_SAY_TEXT );
+		CG_RemoveChatEscapeChar( buf[0] );
+		CG_AddToTeamChat( buf[0] );
+		CG_Printf( "%s\n", buf[0] );
 		return;
 	}
 

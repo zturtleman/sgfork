@@ -295,6 +295,9 @@ vmCvar_t		cg_farclipZoomValue;
 
 vmCvar_t		cg_mapLOD;
 
+vmCvar_t    cg_WeaponsListChangesEnable;
+vmCvar_t    cg_ItemsListChangesEnable;
+
 // experimental
 vmCvar_t		cg_newShotgunPattern;
 //vmCvar_t		cg_availablePlaylist;
@@ -434,6 +437,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_farclipZoomValue, "cg_farclipZoomValue", "3", CVAR_ARCHIVE},
 	
 	{ &cg_mapLOD, "cg_mapLOD", "2", CVAR_ARCHIVE},
+
+  { &cg_WeaponsListChangesEnable, "cg_WeaponsListChangesEnable", "1", CVAR_ARCHIVE },
+  { &cg_ItemsListChangesEnable, "cg_ItemsListChangesEnable", "1", CVAR_ARCHIVE },
 	
 	{ &cg_newShotgunPattern, "cg_newShotgunPattern", "0", CVAR_ROM},
 //	{ &cg_availablePlaylist, "cg_availablePlaylist", "0", CVAR_ROM},

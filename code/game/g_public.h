@@ -230,7 +230,9 @@ typedef enum {
 
 	// 1.32
 	G_FS_SEEK,
-  G_GET_LOCALTIME, // ( char *fmt, char *dest )
+
+  G_CHANGE_WP_LIST,
+  G_CHANGE_IT_LIST,
 
 	BOTLIB_SETUP = 200,				// ( void );
 	BOTLIB_SHUTDOWN,				// ( void );
@@ -427,7 +429,11 @@ typedef enum {
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return qfalse if the game doesn't recognize it as a command.
 
-	BOTAI_START_FRAME				// ( int time );
+	BOTAI_START_FRAME,				// ( int time );
+
+  GAME_WP_CHANGES,
+
+  GAME_IT_CHANGES,
 } gameExport_t;
 
 // hika comments: this part Spoon added is only for the mod

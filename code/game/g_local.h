@@ -1100,6 +1100,8 @@ int		trap_BotAllocateClient( void );
 void	trap_BotFreeClient( int clientNum );
 void	trap_GetUsercmd( int clientNum, usercmd_t *cmd );
 qbool	trap_GetEntityToken( char *buffer, int bufferSize );
+int trap_SendWeaponsChanges( char *weapon, char *an, char *dest, char *value );
+int trap_SendItemsChanges( char *item, char *dest, char *value );
 
 int		trap_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
 void	trap_DebugPolygonDelete(int id);

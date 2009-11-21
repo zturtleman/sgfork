@@ -1482,6 +1482,8 @@ extern	vmCvar_t		cg_farclipValue;
 extern	vmCvar_t		cg_farclipZoomValue;
 
 extern	vmCvar_t		cg_mapLOD;
+extern  vmCvar_t    cg_WeaponsListChangesEnable;
+extern  vmCvar_t    cg_ItemsListChangesEnable;
 
 extern	vmCvar_t		cg_newShotgunPattern;
 extern	vmCvar_t		cg_roundNoMoveTime;

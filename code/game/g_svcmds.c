@@ -603,7 +603,7 @@ void Svcmd_GameWeapon_f( char *cmd ) {
               item->world_model[0], item->world_model[1], item->world_model[2], item->world_model[3] ) );
         Q_strcat( buf, bsize, va( "icon = \"%s\"\n", item->icon ) );
         Q_strcat( buf, bsize, va( "xyrelation = \"%f\"\n", item->xyrelation ) );
-		Q_strcat( buf, bsize, va( "pickup_name = \"%s\"\n", item->pickup_name ) );
+        Q_strcat( buf, bsize, va( "pickup_name = \"%s\"\n", item->pickup_name ) );
         Q_strcat( buf, bsize, va( "quantity = \"%i\"\n", item->quantity ) );
         Q_strcat( buf, bsize, va( "giType = \"%s\"\n", psf_itemTypes[ item->giType ] ) );
         Q_strcat( buf, bsize, va( "giTag = \"%s\"\n", psf_weapons_config[ item->giTag ].numNames ) );
@@ -619,35 +619,8 @@ void Svcmd_GameWeapon_f( char *cmd ) {
     else if( !Q_stricmp( args[2], "load" ) )
       config_GetInfos( PFT_ITEMS );
     else if( !Q_stricmp( args[2], "modify" ) ) {
-      if( !Q_stricmp( args[4], "classname" ) )
-        Com_sprintf( item->classname, sizeof(item->classname), args[5] );
-      else if( !Q_stricmp( args[4], "pickup_sound" ) )
-        Com_sprintf( item->pickup_sound, sizeof(item->pickup_sound), args[5] );
-      else if( !Q_stricmp( args[4], "world_model" ) )
-      {
-        Com_sprintf( item->world_model[0], sizeof(item->world_model[0]), args[5] );
-        Com_sprintf( item->world_model[1], sizeof(item->world_model[0]), args[6] );
-        Com_sprintf( item->world_model[2], sizeof(item->world_model[0]), args[7] );
-        Com_sprintf( item->world_model[3], sizeof(item->world_model[0]), args[8] );
-      }
-      else if( !Q_stricmp( args[4], "icon" ) )
-        Com_sprintf( item->icon, sizeof(item->icon), args[5] );
-      else if( !Q_stricmp( args[4], "xyrelation" ) )
-        item->xyrelation = atof(args[5]);
-      else if( !Q_stricmp( args[4], "quantity" ) )
-        item->quantity = atoi(args[5]);
-      else if( !Q_stricmp( args[4], "giType" ) )
-        item->giType = BG_GitypeByName( args[5] );
-      else if( !Q_stricmp( args[4], "giTag" ) )
-        item->giTag = BG_GitagNumByName( args[5] );
-      else if( !Q_stricmp( args[4], "prize" ) )
-        item->prize = atoi( args[5] );
-      else if( !Q_stricmp( args[4], "weapon_sort" ) )
-        item->weapon_sort = BG_WSNumByName( args[5] );
-      else if( !Q_stricmp( args[4], "precaches" ) )
-        Com_sprintf( item->precaches, sizeof(item->precaches), args[5] );
-      else if( !Q_stricmp( args[4], "sounds" ) )
-        Com_sprintf( item->sounds, sizeof(item->sounds), args[5] );
+      BG_ItemListChange( args[3], args[4], args[5] );
+      trap_SendItemsChanges( args[3], args[4], args[5] );
     }
     else if( !Q_stricmp( args[1], "weapons" ) ) {
       wpinfo_t *wpinfo;
@@ -705,64 +678,13 @@ void Svcmd_GameWeapon_f( char *cmd ) {
       else if( !Q_stricmp( args[2], "modify" ) ) {
         if( !args[3] ) return;
 
-        wpinfo = &bg_weaponlist[ BG_WeaponNumByName(args[3]) ];
         if( !Q_stricmp( args[4], "anim" ) ) {
-          anim = &wpinfo->animations[ BG_AnimNumByName(args[5]) ];
-
-          if( !Q_stricmp( args[6], "firstFrame" ) )
-            anim->firstFrame = atoi(args[7]);
-          else if( !Q_stricmp( args[6], "numFrames" ) )
-            anim->numFrames = atoi(args[7]);
-          else if( !Q_stricmp( args[6], "loopFrames" ) )
-            anim->loopFrames = atoi(args[7]);
-          else if( !Q_stricmp( args[6], "frameLerp" ) )
-            anim->frameLerp = atoi(args[7]);
-          else if( !Q_stricmp( args[6], "initialLerp" ) )
-            anim->initialLerp = atoi(args[7]);
-          else if( !Q_stricmp( args[6], "reversed" ) )
-            anim->reversed = atoi(args[7]);
-          else if( !Q_stricmp( args[6], "flipflop" ) )
-            anim->flipflop = atoi(args[7]);
+          BG_WeaponListChange( args[3], args[5], args[6], args[7] );
+          trap_SendWeaponsChanges( args[3], args[5], args[6], args[7] );
         }
-        else if( !Q_stricmp( args[4], "spread" ) )
-          wpinfo->spread = atof( args[5] );
-        else if( !Q_stricmp( args[4], "damage" ) )
-          wpinfo->damage = atof( args[5] );
-        else if( !Q_stricmp( args[4], "range" ) )
-          wpinfo->range = atoi( args[5] );
-        else if( !Q_stricmp( args[4], "addTime" ) )
-          wpinfo->addTime = atoi( args[5] );
-        else if( !Q_stricmp( args[4], "count" ) )
-          wpinfo->count = atoi( args[5] );
-        else if( !Q_stricmp( args[4], "clipAmmo" ) )
-          wpinfo->clipAmmo = atoi( args[5] );
-        else if( !Q_stricmp( args[4], "clip" ) )
-        {
-          for(i=0; i <= WP_SEC_PISTOL; i++) {
-            if( !Q_stricmp( psf_weapons_config[i].numNames, args[5] ) )
-              wpinfo->clip = i;
-          }
-        }
-        else if( !Q_stricmp( args[4], "maxAmmo" ) )
-          wpinfo->maxAmmo = atoi( args[5] );
-        else if( !Q_stricmp( args[4], "v_model" ) )
-          Com_sprintf( wpinfo->v_model, sizeof(wpinfo->v_model), args[5] );
-        else if( !Q_stricmp( args[4], "v_barrel" ) )
-          Com_sprintf( wpinfo->v_barrel, sizeof( wpinfo->v_barrel), args[5] );
-        else if( !Q_stricmp( args[4], "snd_fire" ) )
-          Com_sprintf( wpinfo->snd_fire, sizeof( wpinfo->snd_fire), args[5] );
-        else if( !Q_stricmp( args[4], "snd_reload" ) )
-          Com_sprintf( wpinfo->snd_reload, sizeof( wpinfo->snd_reload ), args[5] );
-        else if( !Q_stricmp( args[4], "name" ) )
-          Com_sprintf( wpinfo->name, sizeof( wpinfo->name ), args[5] );
-        else if( !Q_stricmp( args[4], "path" ) )
-          Com_sprintf( wpinfo->path, sizeof( wpinfo->path ), args[5] );
-        else if( !Q_stricmp( args[4], "wp_sort" ) )
-        {
-          for( i = WPS_NONE; i < WPS_NUM_ITEMS; i++ ) {
-            if( !Q_stricmp( psf_weapon_sortNames[i], args[5] ) )
-              wpinfo->wp_sort = i;
-          }
+        else {
+          BG_WeaponListChange( args[3], NULL, args[4], args[5] );
+          trap_SendWeaponsChanges( args[3], NULL, args[4], args[5] );
         }
       }
     }

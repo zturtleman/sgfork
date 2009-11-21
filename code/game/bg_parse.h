@@ -91,6 +91,7 @@ const char *psf_weapon_animName[] = {
   "WP_ANIM_SPECIAL",
   "WP_ANIM_SPECIAL2",
 };
+int psf_weapon_numAnimName = sizeof(psf_weapon_animName)/sizeof(psf_weapon_animName[0]);
 
 const char *psf_weapon_buyType[] = {
   "WS_NONE",
