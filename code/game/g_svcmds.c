@@ -497,9 +497,11 @@ void Svcmd_GameWeapon_f( char *cmd ) {
   int argc = trap_Argc( );
   char *fileName;
   fileHandle_t f;
+  gitem_t *item;
+  wpinfo_t *wpinfo;
+  animation_t *anim;
 
-
-  if(!g_cheats.integer){
+  if(!g_cheats.integer) {
     Com_Printf( "Svcmd_GameWeapon_f: Cheats off.\n" );
     return;
   }
@@ -584,8 +586,6 @@ void Svcmd_GameWeapon_f( char *cmd ) {
       config_GetInfos( PFT_GRAVITY );
   }
   else if( !Q_stricmp( args[1], "items" ) ) {
-    gitem_t *item;
-
     if( !Q_stricmp( args[2], "save" ) ) {
       for( i = 1; i < IT_NUM_ITEMS; i++ ) {
         fileName = Parse_FindFile( i, PFT_ITEMS );
@@ -623,9 +623,6 @@ void Svcmd_GameWeapon_f( char *cmd ) {
       trap_SendItemsChanges( args[3], args[4], args[5] );
     }
     else if( !Q_stricmp( args[1], "weapons" ) ) {
-      wpinfo_t *wpinfo;
-      animation_t *anim;
-
       if( !Q_stricmp( args[2], "save" ) ) {
         for(i=1; i < WP_NUM_WEAPONS; i++ )
         {
