@@ -73,8 +73,8 @@ static void parse_TokToDest( char *str, char *s )
   Com_sprintf( buf, sizeof(buf), parse_getChar(s) );
 
   if( !Q_stricmp( buf, "0" ) || !Q_stricmp( buf, "<NULL>" )
-      || !Q_stricmp( buf, "NULL" ) )
-    str = 0;
+	  || !Q_stricmp( buf, "NULL" ) )
+	Com_sprintf(str, sizeof(buf), "<NULL>");
   else
     memcpy( str, buf, MAX_QPATH );
 }
