@@ -740,7 +740,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 	item = &bg_itemlist[ itemNum ];
 
-	if( item->pickup_sound ) {
+	if (*item->pickup_sound) {
 		trap_S_RegisterSound( item->pickup_sound, qfalse );
 	}
 
