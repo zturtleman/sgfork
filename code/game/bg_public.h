@@ -850,7 +850,7 @@ typedef struct wpinfo_s {
 	char	v_barrel[MAX_QPATH];
 	char	snd_fire[MAX_QPATH];
 	char	snd_reload[MAX_QPATH];
-	char	name[100];
+	char	name[MAX_QPATH];
 	char	path[MAX_QPATH];
 	int		wp_sort;
 } wpinfo_t;
@@ -874,46 +874,25 @@ typedef enum {
 } wp_buy_type;
 
 typedef struct gitem_s {
-	char		classname[MAX_QPATH];	// spawning name
-	char		pickup_sound[MAX_QPATH];
-	char		world_model[MAX_ITEM_MODELS][MAX_QPATH];
+	char		classname[MAX_QPATH];					// Spawning name
+	char		pickup_sound[MAX_QPATH];				// Sound on Pickup
+	char		world_model[MAX_ITEM_MODELS][MAX_QPATH];// Item models
 
-	char		icon[MAX_QPATH];
-	float		xyrelation;		// for the icon
-	char		pickup_name[MAX_QPATH];	// for printing on pickup
+	char		icon[MAX_QPATH];		// Icon shader
+	float		xyrelation;				// Icon x/y relation
+	char		pickup_name[MAX_QPATH];	// Name to show on pickup
 
-	int			quantity;		// for ammo how much, or duration of powerup
-	itemType_t  giType;			// IT_* flags
+	int			quantity;				// How much ammo or duration of powerup
+	itemType_t  giType;					// IT_* flags (weapon, armor, powerup, etc)
 
-	int			giTag;
+	int			giTag;					// WP_*, PW_*
 
-	int			prize;
-	int			weapon_sort;	// used for sorted weapons in changeweapon-menu
+	int			prize;					// Price of the item
+	int			weapon_sort;			// Used for sorted weapons in changeweapon-menu
 
-	char		precaches[MAX_QPATH];		// string of all models and images this item will use
-	char		sounds[MAX_QPATH];		// string of all sounds this item will use
+	char		precaches[MAX_QPATH];	// All models and images this item will use
+	char		sounds[MAX_QPATH];		// All sounds this item will use
 } gitem_t;
-
-/*typedef struct gitem_s {
-	char		*classname;	// spawning name
-	char		*pickup_sound;
-	char		*world_model[MAX_ITEM_MODELS];
-
-	char		*icon;
-	float		xyrelation;		// for the icon
-	char		*pickup_name;	// for printing on pickup
-
-	int			quantity;		// for ammo how much, or duration of powerup
-	itemType_t  giType;			// IT_* flags
-
-	int			giTag;
-
-	int			prize;
-	int			weapon_sort;	// used for sorted weapons in changeweapon-menu
-
-	char		*precaches;		// string of all models and images this item will use
-	char		*sounds;		// string of all sounds this item will use
-} gitem_t;*/
 
 // included in both the game dll and the client
 extern	wpinfo_t bg_weaponlist[WP_NUM_WEAPONS];
@@ -1209,12 +1188,12 @@ extern const char *psf_weapon_buyType[];
 extern const psf_weapons_t psf_weapons_config[];
 
 extern void parse_config( int fileType, char *fileName, int num );
-extern char *Parse_FindFile( int num, int fileType );
+extern char *Parse_FindFile(char *filename_out, int filename_out_size, int num, int fileType);
 extern void config_GetInfos( int fileType );
 extern int BG_ItemNumByName( char *name );
 extern int BG_AnimNumByName( char *anim );
 extern int BG_WeaponNumByName( char *wp );
-extern int BG_WeaponListChange( char *weapon, char *an, char *dest, char *value );
+int BG_WeaponListChange( char *weapon, char *an, char *dest, char *value );
 extern int BG_ItemListChange( char *item, char *dest, char *value );
 int BG_WSNumByName( char *s );
 int BG_GitagNumByName( char *s );
