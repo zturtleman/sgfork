@@ -72,10 +72,10 @@ flipflop = 0
 
 spread = 1300.0f
 damage = 15.3f
-range = 1500
+range = 600
 addTime = 0
-count = 0
-clipAmmo = 1
+count = 14
+clipAmmo = 2
 clip = WP_CART_CLIP
 maxAmmo = 12
 v_model = "models/weapons2/sawedoff/v_sawedoff.md3"

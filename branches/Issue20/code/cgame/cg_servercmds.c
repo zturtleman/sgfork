@@ -520,6 +520,9 @@ static void CG_ServerCommand( void ) {
 	}
 
   if( !strcmp( cmd, "wpch" ) ) {
+    if( !cg_WeaponsListChangesEnable.integer )
+      return;
+
     Q_strncpyz( buf[0], CG_Argv(1), MAX_SAY_TEXT );
     Q_strncpyz( buf[1], CG_Argv(2), MAX_SAY_TEXT );
     Q_strncpyz( buf[2], CG_Argv(3), MAX_SAY_TEXT );
@@ -530,6 +533,9 @@ static void CG_ServerCommand( void ) {
   }
 
   if( !strcmp( cmd, "itch" ) ) {
+    if( !cg_ItemsListChangesEnable.integer )
+      return;
+
     Q_strncpyz( buf[0], CG_Argv(1), MAX_SAY_TEXT );
     Q_strncpyz( buf[1], CG_Argv(2), MAX_SAY_TEXT );
     Q_strncpyz( buf[2], CG_Argv(3), MAX_SAY_TEXT );

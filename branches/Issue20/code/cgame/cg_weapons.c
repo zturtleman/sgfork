@@ -181,7 +181,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 
 	// first person view weaponmodel
 	//right handed
-	if(bg_weaponlist[weaponNum].v_model){
+	if (*bg_weaponlist[weaponNum].v_model) {
 		strcpy( path, bg_weaponlist[weaponNum].v_model);
 		weaponInfo->r_weaponModel = trap_R_RegisterModel( path);
 
@@ -195,7 +195,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 #endif
 	}
 
-	if(bg_weaponlist[weaponNum].snd_fire && weaponNum >= WP_REM58
+	if (*bg_weaponlist[weaponNum].snd_fire && weaponNum >= WP_REM58
 		&& weaponNum < WP_GATLING){
 		for(i = 0; i < 3; i++){
 			char name[MAX_QPATH];
@@ -214,7 +214,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( bg_weaponlist[weaponNum].snd_fire, qfalse );
 	}
 
-	if(bg_weaponlist[weaponNum].snd_reload)
+	if (*bg_weaponlist[weaponNum].snd_reload)
 		weaponInfo->reloadSound = trap_S_RegisterSound( bg_weaponlist[weaponNum].snd_reload, qfalse );
 
 	switch ( weaponNum ) {
@@ -305,7 +305,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	//
 	if ( item->giType == IT_POWERUP || item->giType == IT_HEALTH ||
 		item->giType == IT_ARMOR || item->giType == IT_HOLDABLE ) {
-		if (!Q_stricmp(item->world_model[1],"<NULL>")) {
+		if (*item->world_model[1]) {
 			itemInfo->models[1] = trap_R_RegisterModel( item->world_model[1] );
 		}
 	}
@@ -597,7 +597,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		gun2.renderfx = parent->renderfx;
 	}
 
-	if(ps && bg_weaponlist[weaponNum].v_model){
+	if(ps && *bg_weaponlist[weaponNum].v_model){
 		clientInfo_t	*ci;
 
 		ci = &cgs.clientinfo[ cent->currentState.clientNum];
