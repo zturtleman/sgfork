@@ -16,3 +16,5 @@ Main section:
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfNGM3azZrc2c1&hl=en SGFork competitive security description]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMTloaHo0Y2RmNw&hl=en SGFork merge of ioQuake updates]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMjBmd2c5OTlmMg&hl=en SGFork weapon traces description]
+
+*Note*: Be aware that Google documents could not load images in Chrome browser if you are using non-English version of the browser.
