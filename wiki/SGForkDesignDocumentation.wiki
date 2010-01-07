@@ -17,4 +17,4 @@ Main section:
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMTloaHo0Y2RmNw&hl=en SGFork merge of ioQuake updates]
   * [http://docs.google.com/present/edit?id=0AdDYiCWRZI__ZGR0enhmejNfMjBmd2c5OTlmMg&hl=en SGFork weapon traces description]
 
-*Note*: Be aware that Google documents could not load images in Chrome browser if you are using non-English version of the browser.
+*Note*: Be aware that sometimes Google documents could not load documents images. The root cause of the trouble is unknown. You may use file->save as pdf - all images will be visible in that pdf.
