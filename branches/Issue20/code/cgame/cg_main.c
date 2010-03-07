@@ -159,7 +159,6 @@ vmCvar_t	cg_gun_frame;
 vmCvar_t	cg_gun_x;
 vmCvar_t	cg_gun_y;
 vmCvar_t	cg_gun_z;
-vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 vmCvar_t	cg_ignore;
@@ -186,6 +185,7 @@ vmCvar_t 	cg_enemyModel;
 vmCvar_t	cg_paused;
 vmCvar_t	cg_menu;
 vmCvar_t	cg_blood;
+vmCvar_t	cg_shakeOnHit;
 vmCvar_t	cg_predictItems;
 vmCvar_t	cg_deferPlayers;
 vmCvar_t	cg_drawTeamOverlay;
@@ -289,12 +289,6 @@ vmCvar_t		hit_model;
 
 vmCvar_t		cg_warmupmessage;
 
-vmCvar_t		cg_farclip;
-vmCvar_t		cg_farclipValue;
-vmCvar_t		cg_farclipZoomValue;
-
-vmCvar_t		cg_mapLOD;
-
 vmCvar_t    cg_WeaponsListChangesEnable;
 vmCvar_t    cg_ItemsListChangesEnable;
 
@@ -394,7 +388,6 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_noPlayerAnims, "cg_noplayeranims", "0", CVAR_CHEAT },
 	{ &cg_showmiss, "cg_showmiss", "0", 0 },
 	{ &cg_footsteps, "cg_footsteps", "1", CVAR_CHEAT },
-	{ &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT },
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
@@ -421,6 +414,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 	{ &cg_menu, "cl_menu", "0", CVAR_ROM },
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
+	{ &cg_shakeOnHit, "cg_shakeOnHit", "1", CVAR_ARCHIVE },
 	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
@@ -432,11 +426,6 @@ static cvarTable_t		cvarTable[] = {
 	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_USERINFO},
 	{ &cg_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE},
 	{ &cg_recordSPDemoName, "ui_recordSPDemoName", "", CVAR_ARCHIVE},
-	{ &cg_farclip, "cg_farclip", "1", CVAR_ARCHIVE},
-	{ &cg_farclipValue, "cg_farclipValue", "1", CVAR_ARCHIVE},
-	{ &cg_farclipZoomValue, "cg_farclipZoomValue", "3", CVAR_ARCHIVE},
-	
-	{ &cg_mapLOD, "cg_mapLOD", "2", CVAR_ARCHIVE},
 
   { &cg_WeaponsListChangesEnable, "cg_WeaponsListChangesEnable", "1", CVAR_ARCHIVE },
   { &cg_ItemsListChangesEnable, "cg_ItemsListChangesEnable", "1", CVAR_ARCHIVE },

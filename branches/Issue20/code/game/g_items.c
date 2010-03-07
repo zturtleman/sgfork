@@ -413,7 +413,7 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity, int droppe
 	if( droppedflags & FL_THROWN_ITEM) {
 		dropped->clipmask = MASK_SHOT;
 		dropped->s.pos.trTime = level.time - 50;	// move a bit on the very first frame
-		VectorScale( velocity, 200, dropped->s.pos.trDelta ); // 700
+		VectorScale( velocity, ITEM_DROP_SPEED, dropped->s.pos.trDelta ); // 700
 		SnapVector( dropped->s.pos.trDelta );		// save net bandwidth
 		dropped->physicsBounce= 0.2f;
 	}
@@ -468,31 +468,22 @@ Spawns an item and tosses it forward
 gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 	vec3_t	velocity;
 	vec3_t	angles;
-	int ammo;
 
-	if(item->giType == IT_WEAPON)
-		ammo = ent->client->ps.ammo[item->giTag];
-
-	VectorCopy( ent->s.apos.trBase, angles );
+	VectorCopy(ent->s.apos.trBase, angles);
 	angles[YAW] += angle;
 	angles[PITCH] = 0;	// always forward
 
-	AngleVectors( angles, velocity, NULL, NULL );
-	VectorScale( velocity, 100, velocity );
-	velocity[2] += 200 + crandom() * 50;
+	AngleVectors(angles, velocity, NULL, NULL);
+	VectorScale(velocity, ITEM_DROP_SPEED / 2, velocity);
+	velocity[2] += ITEM_DROP_SPEED + crandom() * ITEM_DROP_SPEED / 4;
 
-	// if player has no dynamite in his hands reset the mode to 0, otherwise
-	// the dynamite(unlit) would explode
-	if(ent->client->ps.weapon != WP_DYNAMITE && ent->client->ps.weapon != WP_MOLOTOV)
-		ent->client->ps.stats[STAT_WP_MODE] = 0;
-
-	if(item->giTag == WP_DYNAMITE && item->giType == IT_WEAPON){
-		return fire_dynamite( ent, ent->s.pos.trBase, velocity, 50);
-	} else if (item->giTag == WP_MOLOTOV && item->giType == IT_WEAPON
-		&& ent->client->ps.stats[STAT_WP_MODE] < 0){
-		return fire_molotov( ent, ent->s.pos.trBase, velocity, 50);
-	} else
-		return LaunchItem( item, ent->s.pos.trBase, velocity, FL_DROPPED_ITEM );
+	if (item->giTag == WP_DYNAMITE && item->giType == IT_WEAPON)
+		return FireThrowMissle(ent, ent->s.pos.trBase, velocity, WP_DYNAMITE, ITEM_DROP_SPEED);
+	else if (item->giTag == WP_MOLOTOV && item->giType == IT_WEAPON
+		&& ent->client->ps.stats[STAT_WP_MODE] < 0)
+		return FireThrowMissle(ent, ent->s.pos.trBase, velocity, WP_MOLOTOV, ITEM_DROP_SPEED);
+	else
+		return LaunchItem(item, ent->s.pos.trBase, velocity, FL_DROPPED_ITEM);
 }
 
 

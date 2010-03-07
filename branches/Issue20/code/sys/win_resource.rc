@@ -59,17 +59,6 @@ IDI_ICON1               ICON    DISCARDABLE     "../smokinguns.ico"
 IDI_ICON1               ICON    DISCARDABLE     "misc/smokinguns.ico"
 #endif
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_STRING1             "SG"
-END
-
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

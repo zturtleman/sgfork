@@ -365,8 +365,8 @@ float *CG_TeamColor( int team ) {
 CG_GetColorForHealth
 =================
 */
-void CG_GetColorForHealth( int health, vec4_t hcolor ) {
-	if ( health < HEALTH_USUAL) {
+void CG_GetColorForHealth(const int health, vec4_t hcolor) {
+	if (health < HEALTH_USUAL) {
 		if (health > HEALTH_INJURED) {
 			//Injuried
 			hcolor[0] = g_color_table[cg_healthInjuredColor.integer & Q_COLORS_COUNT][0];

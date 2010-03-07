@@ -87,7 +87,7 @@ qbool	PM_SlideMove( qbool gravity ) {
 	}
 
 	// never turn against original velocity
-	VectorNormalize2( pm->ps->velocity, planes[numplanes] );
+	VectorNormalizeClearOutOnZeroLength( pm->ps->velocity, planes[numplanes] );
 	numplanes++;
 
 	for ( bumpcount=0 ; bumpcount < numbumps ; bumpcount++ ) {

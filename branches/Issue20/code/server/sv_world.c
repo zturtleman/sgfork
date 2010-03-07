@@ -519,7 +519,7 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 
 	num = SV_AreaEntities( clip->boxmins, clip->boxmaxs, touchlist, MAX_GENTITIES);
 
-	if ( clip->passEntityNum != ENTITYNUM_NONE ) {
+	if (clip->passEntityNum != ENTITYNUM_NONE && !clip->passEntityNum & PASS_ONLY_THIS) {
 		passOwnerNum = ( SV_GentityNum( clip->passEntityNum ) )->r.ownerNum;
 		if ( passOwnerNum == ENTITYNUM_NONE ) {
 			passOwnerNum = -1;
@@ -535,15 +535,20 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		touch = SV_GentityNum( touchlist[i] );
 
 		// see if we should ignore this entity
-		if ( clip->passEntityNum != ENTITYNUM_NONE ) {
-			if ( touchlist[i] == clip->passEntityNum ) {
-				continue;	// don't clip against the pass entity
-			}
-			if ( touch->r.ownerNum == clip->passEntityNum ) {
-				continue;	// don't clip against own missiles
-			}
-			if ( touch->r.ownerNum == passOwnerNum ) {
-				continue;	// don't clip against other missiles from our owner
+		if (clip->passEntityNum != ENTITYNUM_NONE) {
+			if (clip->passEntityNum & PASS_ONLY_THIS) {
+				if (touchlist[i] == (clip->passEntityNum & ~PASS_ONLY_THIS))
+					continue;	// don't clip against the pass entity
+			} else {
+				if ( touchlist[i] == clip->passEntityNum ) {
+					continue;	// don't clip against the pass entity
+				}
+				if ( touch->r.ownerNum == clip->passEntityNum ) {
+					continue;	// don't clip against own missiles
+				}
+				if ( touch->r.ownerNum == passOwnerNum ) {
+					continue;	// don't clip against other missiles from our owner
+				}
 			}
 		}
 

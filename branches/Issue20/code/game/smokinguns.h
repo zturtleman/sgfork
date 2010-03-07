@@ -27,10 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 Weapon part
 =============================
 */
-
-#define DEFAULT_SHOTGUN_SPREAD	700
-#define DEFAULT_SHOTGUN_COUNT	11
-
 #define WINCH97_1_KSCALE 500
 #define WINCH97_2_KSCALE 300
 
@@ -53,23 +49,10 @@ Weapon part
 #define	GATLING_UP		23.0
 #define GATLING_SIDE	70.0
 
-#define DYNA_KSCALE 300
-#define DYNA_DAMAGE (900+(rand()%200))
-#define DYNA_SPLASHDAMAGE (600+(rand()%200))
-#define DYNA_SPLASHRADIUS (200+(rand()%50))
 #define DYNA_HEALTH 5
-#define DYNA_SPEED 700
-
-#define DYN_SPLASH_DAM			150
-#define DYN_SPLASH_RAD			200
-#define DYN_DAM					200
 
 #define BELT_MAXAMMO 1.25f
 
-#define MOLOTOV_DAMAGE 7
-#define MOLOTOV_SPLASHDAMAGE 0
-#define MOLOTOV_SPLASHRADIUS 0
-#define MOLOTOV_SPEED 700
 #define	MOLOTOV_BURNTIME		30000  // burning in hand
 #define	WHISKEY_BURNTIME		15000  // whiskey pool
 #define WHISKEY_SICKERTIME		60000  // time till whiskey sinks into the ground
@@ -77,20 +60,58 @@ Weapon part
 
 #define	SCOPE_TIME				400
 
+#define ITEM_DROP_SPEED					200 // Speed for dropped items
+
+#define KNIFE_MAX_DISTANCE_HIT_UNITS	32	// Length of knife's trace during close combat
+
+#define MAX_KNOCKBACKTIME				200
+#define MIN_KNOCKBACKTIME				50
+
+#define DAMAGE_LOSE_ON_PLAYER			0.5f // Part of damage to be lost when going through player
+
+#define UP_KNOCK_ADDENDUM				24; // Used to knock players a bit higher on radius damage
+
 /*
 =============================
 Player
 =============================
 */
-#define PLAYER_MIN_PITCH -14
-#define PLAYER_MIN_YAW -14
-#define PLAYER_MIN_HIT_PITCH -25
-#define PLAYER_MIN_HIT_YAW -25
+#define PLAYER_HEAD_Z		8
+#define PLAYER_BODY_Z		16
+#define PLAYER_MIN_PITCH	-14
+#define PLAYER_MIN_YAW		-14
+#define PLAYER_MAX_PITCH	14
+#define PLAYER_MAX_YAW		14
+#define	PLAYER_MINS_Z		-24
+#define PLAYER_MAXS_Z		8 + PLAYER_BODY_Z + PLAYER_HEAD_Z
 
-#define PLAYER_MAX_PITCH 14
-#define PLAYER_MAX_YAW 14
-#define PLAYER_MAX_HIT_PITCH 25
-#define PLAYER_MAX_HIT_YAW 25
+//Locational damage info
+#define HIT_LOCATION_NONE	0x00000000
+#define	HIT_LOCATION_HEAD	0x00000001
+#define HIT_LOCATION_FRONT	0x00000002
+#define HIT_LOCATION_BACK	0x00000004
+#define HIT_LOCATION_LEFT	0x00000008
+#define HIT_LOCATION_RIGHT	0x00000010
+#define HIT_LOCATION_LEGS	0x00000020
+
+#define HIT_LOCATION_NAME_NONE	"error!"
+#define	HIT_LOCATION_NAME_HEAD	"^1head"
+#define HIT_LOCATION_NAME_FRONT	"^4chest"
+#define HIT_LOCATION_NAME_BACK	"^4back"
+#define HIT_LOCATION_NAME_LEFT	"^4left arm"
+#define HIT_LOCATION_NAME_RIGHT	"^4right arm"
+#define HIT_LOCATION_NAME_LEGS	"^2leg"
+
+#define	HIT_LOCATION_MULTIPLIER_HEAD	1.5f
+#define HIT_LOCATION_MULTIPLIER_FRONT	1.0f
+#define HIT_LOCATION_MULTIPLIER_BACK	1.0f
+#define HIT_LOCATION_MULTIPLIER_LEFT	1.0f
+#define HIT_LOCATION_MULTIPLIER_RIGHT	1.0f
+#define HIT_LOCATION_MULTIPLIER_LEGS	1.0f
+
+//Health stages
+#define HEALTH_USUAL	80
+#define HEALTH_INJURED	49
 
 /*
 =============================
@@ -105,9 +126,6 @@ System
 #define DEFAULT_REDTEAM_NAME		"Lawmen"
 #define DEFAULT_BLUETEAM_NAME		"Outlaws"
 
-#define	MINS_Z				-24
-#define MAXS_Z_HIT			38
-#define MAXS_Z				28
 #define	DEFAULT_VIEWHEIGHT	26
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
@@ -130,6 +148,12 @@ System
 
 #define MAX_FREESPAWN_ZONE_DISTANCE_SQUARE	490000
 
+// damage flags
+#define DAMAGE_INSTANT_KILL			0x00000001
+
+// trace system flags
+#define PASS_ONLY_THIS				0x10000000 // Flag for trace functions to skip child/parent check. Have to be larger than MAX_ENTITIES
+
 /*
 =============================
 Money system
@@ -143,8 +167,11 @@ Money system
 #define MAX_POINT_ROBBER_REWARD			5
 #define MIN_POINT_ROBBER_REWARD			0
 
-// Squre of maximum distance from spawn point where player is allowed to buy
+// Square maximum distance to spawn point where player is allowed to buy
 #define MAX_BUY_DISTANCE_SQUARE			90000
+
+#define COINS 7
+#define	BILLS 15
 
 /*
 =============================
@@ -161,17 +188,16 @@ Misc
 
 #define	MAX_ITEMS			256
 #define	RANK_TIED_FLAG		0x4000
-#define	MAX_BULLET_DISTANCE		800
 
 /*
 =============================
 Duel stats
 =============================
 */
-#define DU_INTRO_CAM		7000.0f
-#define DU_INTRO_DRAW		3000.0f
-#define	DU_CROSSHAIR_START	1500.0f
-#define DU_CROSSHAIR_FADE	4500.0f
+#define DU_INTRO_CAM		7000
+#define DU_INTRO_DRAW		3000
+#define	DU_CROSSHAIR_START	1500
+#define DU_CROSSHAIR_FADE	4500
 #define DU_WP_STEP			2
 
 /*

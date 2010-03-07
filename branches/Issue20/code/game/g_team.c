@@ -64,7 +64,7 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 OnSameTeam
 ==============
 */
-qbool OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
+qbool OnSameTeam(const gentity_t *ent1, const gentity_t *ent2 ) {
 	if ( !ent1->client || !ent2->client ) {
 		return qfalse;
 	}

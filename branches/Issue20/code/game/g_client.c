@@ -174,7 +174,7 @@ static gentity_t *SelectRandomFurthestSpawnPoint(vec3_t avoidPoint, int ignoreTe
 		VectorSubtract(spot->s.origin, avoidPoint, delta);
 		dist = VectorLengthSquared(delta);
 		for (i = 0; i < numSpots; i++) {
-			if ( dist > list_dist[i] ) {
+			if (dist > list_dist[i]) {
 				if ( numSpots >= MAX_SPAWN_POINTS )
 					numSpots = MAX_SPAWN_POINTS-1;
 				for (j = numSpots; j > i; j--) {
@@ -197,7 +197,7 @@ static gentity_t *SelectRandomFurthestSpawnPoint(vec3_t avoidPoint, int ignoreTe
 	}
 
 	if (!numSpots)
-		return G_Find( NULL, FOFS(classname), "info_player_deathmatch");
+		return G_Find(NULL, FOFS(classname), "info_player_deathmatch");
 
 	// try find a spawn point that's not too close to another player
 	i = rnd = rand() % (numSpots / 2);
@@ -998,7 +998,6 @@ void ClientBegin( int clientNum ) {
 	}
 	G_InitGentity( ent );
 	ent->touch = 0;
-	ent->pain = 0;
 	ent->client = client;
 
 	client->pers.connected = CON_CONNECTED;
@@ -1120,7 +1119,6 @@ static void G_RestorePlayerStats(gentity_t *ent, qbool save){
 	client->ps.stats[STAT_MONEY] = savedMoney;
 	client->accuracy_hits = accuracy_hits;
 	client->accuracy_shots = accuracy_shots;
-	client->lastkilled_client = -1;
 	client->realspec = realspec;
 	client->won = won;
 	client->ps.stats[STAT_WINS] = wins;
@@ -1417,9 +1415,6 @@ void ClientSpawn(gentity_t *ent) {
 
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
-
-	G_ClearLerpFrame( &client->torso, TORSO_PISTOL_STAND);
-	G_ClearLerpFrame( &client->legs, LEGS_IDLE);
 
 	if(g_gametype.integer == GT_DUEL && client->sess.sessionTeam == TEAM_SPECTATOR)
 		client->specmappart = ent->mappart;

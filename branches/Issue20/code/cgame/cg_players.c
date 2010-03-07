@@ -38,42 +38,6 @@ char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 };
 
 /*
-=================
-CG_LoadHitFiles
-by: Spoon
-18.8.2001
-=================
-*/
-qbool CG_LoadHitFiles(const char *modelName, clientInfo_t *ci){
-#ifdef HIT_DATA
-	char filename[64];
-
-	//parse lower body
-	Com_sprintf(filename, sizeof(filename), "models/wq3_players/%s/lower.hit", modelName);
-	if(!CG_ParseHitFile(filename, &hit_data, ci, PART_LOWER)){
-		CG_Printf("%s could not be loaded\n", filename);
-		return qfalse;
-	}
-
-	//parse upper body
-	Com_sprintf(filename, sizeof(filename), "models/wq3_players/%s/upper.hit", modelName);
-	if(!CG_ParseHitFile(filename, &hit_data, ci, PART_UPPER)){
-		CG_Printf("%s could not be loaded\n", filename);
-		return qfalse;
-	}
-
-	//parse head
-	Com_sprintf(filename, sizeof(filename), "models/wq3_players/%s/head.hit", modelName);
-	if(!CG_ParseHitFile(filename, &hit_data, ci, PART_HEAD)){
-		CG_Printf("%s could not be loaded\n", filename);
-		return qfalse;
-	}
-#endif
-
-	return qtrue;
-}
-
-/*
 ================
 CG_CustomSound
 
@@ -2624,6 +2588,176 @@ void CG_Fly( centity_t *cent) {
 		trap_R_AddRefEntityToScene( &fly );
 }
 
+static void CG_DrawSimpleBoxHit (vec3_t corners[8], polyVert_t verts[4], qhandle_t bboxShader, qhandle_t bboxShader_nocull) {
+	// top
+	VectorCopy( corners[0], verts[0].xyz );
+	VectorCopy( corners[1], verts[1].xyz );
+	VectorCopy( corners[2], verts[2].xyz );
+	VectorCopy( corners[3], verts[3].xyz );
+	trap_R_AddPolyToScene( bboxShader, 4, verts );
+
+	// bottom
+	VectorCopy( corners[7], verts[0].xyz );
+	VectorCopy( corners[6], verts[1].xyz );
+	VectorCopy( corners[5], verts[2].xyz );
+	VectorCopy( corners[4], verts[3].xyz );
+	trap_R_AddPolyToScene( bboxShader, 4, verts );
+
+	// top side
+	VectorCopy( corners[3], verts[0].xyz );
+	VectorCopy( corners[2], verts[1].xyz );
+	VectorCopy( corners[6], verts[2].xyz );
+	VectorCopy( corners[7], verts[3].xyz );
+	trap_R_AddPolyToScene( bboxShader_nocull, 4, verts );
+
+	// left side
+	VectorCopy( corners[2], verts[0].xyz );
+	VectorCopy( corners[1], verts[1].xyz );
+	VectorCopy( corners[5], verts[2].xyz );
+	VectorCopy( corners[6], verts[3].xyz );
+	trap_R_AddPolyToScene( bboxShader_nocull, 4, verts );
+
+	// right side
+	VectorCopy( corners[0], verts[0].xyz );
+	VectorCopy( corners[3], verts[1].xyz );
+	VectorCopy( corners[7], verts[2].xyz );
+	VectorCopy( corners[4], verts[3].xyz );
+	trap_R_AddPolyToScene( bboxShader_nocull, 4, verts );
+
+	// bottom side
+	VectorCopy( corners[1], verts[0].xyz );
+	VectorCopy( corners[0], verts[1].xyz );
+	VectorCopy( corners[4], verts[2].xyz );
+	VectorCopy( corners[5], verts[3].xyz );
+	trap_R_AddPolyToScene( bboxShader_nocull, 4, verts );
+}
+
+static void CG_AddBoundingBoxHit( centity_t *cent ) {
+	polyVert_t verts[4];
+	clientInfo_t *ci;
+	int i;
+	vec3_t mins = {PLAYER_MIN_PITCH, PLAYER_MIN_YAW, PLAYER_MINS_Z};
+	vec3_t maxs = {PLAYER_MAX_PITCH, PLAYER_MAX_YAW, PLAYER_MAXS_Z};
+	float extx, exty, extz;
+	vec3_t corners[8];
+	qhandle_t bboxShader, bboxShader_nocull;
+
+	if ( !cg_drawBBox.integer ) {
+		return;
+	}
+
+	// don't draw it if it's us in first-person
+	if ( cent->currentState.number == cg.predictedPlayerState.clientNum &&
+			!cg.renderingThirdPerson ) {
+		return;
+	}
+
+	// don't draw it for dead players
+	if ( cent->currentState.eFlags & EF_DEAD ) {
+		return;
+	}
+
+	// get the shader handles
+	bboxShader = trap_R_RegisterShader( "bbox" );
+	bboxShader_nocull = trap_R_RegisterShader( "bbox_nocull" );
+
+	// if they don't exist, forget it
+	if ( !bboxShader || !bboxShader_nocull ) {
+		return;
+	}
+
+	// get the player's client info
+	ci = &cgs.clientinfo[cent->currentState.clientNum];
+
+	// if it's us
+	if ( cent->currentState.number == cg.predictedPlayerState.clientNum ) {
+		// use the view height
+		maxs[2] = cg.predictedPlayerState.viewheight + 6;
+	}
+	else {
+		int x, zd, zu;
+
+		// otherwise grab the encoded bounding box
+		x = (cent->currentState.solid & 255);
+		zd = ((cent->currentState.solid>>8) & 255);
+		zu = ((cent->currentState.solid>>16) & 255) - 32;
+
+		mins[0] = mins[1] = -x;
+		maxs[0] = maxs[1] = x;
+		mins[2] = -zd;
+		maxs[2] = zu;
+	}
+
+	// get the extents (size)
+	extx = maxs[0] - mins[0];
+	exty = maxs[1] - mins[1];
+	extz = maxs[2] - mins[2];
+
+	// set the polygon's texture coordinates
+	verts[0].st[0] = 0;
+	verts[0].st[1] = 0;
+	verts[1].st[0] = 0;
+	verts[1].st[1] = 1;
+	verts[2].st[0] = 1;
+	verts[2].st[1] = 1;
+	verts[3].st[0] = 1;
+	verts[3].st[1] = 0;
+
+	for ( i = 0; i < 4; i++ ) {
+		verts[i].modulate[0] = 160;
+		verts[i].modulate[1] = 0;
+		verts[i].modulate[2] = 0;
+		verts[i].modulate[3] = 255;
+	}
+
+	VectorAdd( cent->lerpOrigin, maxs, corners[3] );
+
+	VectorCopy( corners[3], corners[2] );
+	corners[2][0] -= extx;
+
+	VectorCopy( corners[2], corners[1] );
+	corners[1][1] -= exty;
+
+	VectorCopy( corners[1], corners[0] );
+	corners[0][0] += extx;
+
+	for ( i = 0; i < 4; i++ ) {
+		VectorCopy( corners[i], corners[i + 4] );
+		corners[i + 4][2] -= PLAYER_HEAD_Z;
+	}
+
+	CG_DrawSimpleBoxHit (corners, verts, bboxShader, bboxShader_nocull);
+
+	for ( i = 0; i < 4; i++ ) {
+		verts[i].modulate[0] = 0;
+		verts[i].modulate[1] = 0;
+		verts[i].modulate[2] = 192;
+		verts[i].modulate[3] = 255;
+	}
+
+	for ( i = 0; i < 4; i++ ) {
+		VectorCopy( corners[i + 4], corners[i] );
+		corners[i + 4][2] -= PLAYER_BODY_Z;
+	}
+
+	CG_DrawSimpleBoxHit (corners, verts, bboxShader, bboxShader_nocull);
+
+	for ( i = 0; i < 4; i++ ) {
+		verts[i].modulate[0] = 0;
+		verts[i].modulate[1] = 128;
+		verts[i].modulate[2] = 0;
+		verts[i].modulate[3] = 255;
+	}
+
+	for ( i = 0; i < 4; i++ ) {
+		VectorCopy( corners[i + 4], corners[i] );
+		corners[i + 4][2] -= extz - PLAYER_BODY_Z - PLAYER_HEAD_Z;
+	}
+
+	CG_DrawSimpleBoxHit (corners, verts, bboxShader, bboxShader_nocull);
+}
+
+
 /*
 ===============
 CG_Player
@@ -2670,7 +2804,6 @@ void CG_Player( centity_t *cent ) {
 		}
 	}
 
-
 	memset( &legs, 0, sizeof(legs) );
 	memset( &torso, 0, sizeof(torso) );
 	memset( &head, 0, sizeof(head) );
@@ -2682,25 +2815,6 @@ void CG_Player( centity_t *cent ) {
 	CG_PlayerAnimation( cent, &legs.oldframe, &legs.frame, &legs.backlerp,
 		 &torso.oldframe, &torso.frame, &torso.backlerp );
 
-
-#if defined HIT_DATA
-	if(hit_model.integer && cent->currentState.clientNum == cg.snap->ps.clientNum){
-		vec3_t			legsAngles, torsoAngles;
-
-		vectoangles(legs.axis[0], legsAngles);
-		vectoangles(torso.axis[0], torsoAngles);
-
-		CG_Printf("cg %f %f %f  %f %f %f\n", legsAngles[0],
-			legsAngles[1], legsAngles[2],
-			torsoAngles[0], torsoAngles[1],
-			torsoAngles[2]);
-
-		BuildHitModel(&hit_data, cent->lerpOrigin,
-			legsAngles, torsoAngles, cent->lerpAngles,
-			torso.frame, torso.oldframe, torso.backlerp,
-			legs.frame, legs.oldframe, legs.backlerp);
-	}
-#endif
 
 	// add the talk baloon or disconnect icon
 	CG_PlayerSprites( cent );
@@ -3186,7 +3300,7 @@ void CG_Player( centity_t *cent ) {
 
 //unlagged - client options
 	// add the bounding box (if cg_drawBBox is 1)
-	CG_AddBoundingBox( cent );
+	CG_AddBoundingBoxHit( cent );
 //unlagged - client options
 }
 

@@ -312,15 +312,30 @@ This is the spurt of blood when a character gets hit
 =================
 */
 void CG_Bleed( vec3_t origin, int entityNum ) {
+	localEntity_t	*ex;
+
+	if ( !cg_blood.integer ) {
+		return;
+	}
+
+	ex = CG_AllocLocalEntity();
+	ex->leType = LE_EXPLOSION;
+
+	ex->startTime = cg.time;
+	ex->endTime = ex->startTime + 500;
+	
+	VectorCopy ( origin, ex->refEntity.origin);
+	ex->refEntity.reType = RT_SPRITE;
+	ex->refEntity.rotation = rand() % 360;
+	ex->refEntity.radius = 24;
+
+	ex->refEntity.customShader = cgs.media.bloodExplosionShader;
+
 	// don't show player's own blood in view
 	if ( entityNum == cg.snap->ps.clientNum ) {
-		cg.landAngleChange = (rand()%30)-15;
-		cg.landTime = cg.time;
-		cg.landChange = 0;
+		ex->refEntity.renderfx |= RF_THIRD_PERSON;
 	}
 }
-
-
 
 /*
 ==================

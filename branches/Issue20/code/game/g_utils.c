@@ -448,7 +448,7 @@ The origin will be snapped to save net bandwidth, so care
 must be taken if the origin is right on a surface (snap towards start vector first)
 =================
 */
-gentity_t *G_TempEntity( vec3_t origin, int event ) {
+gentity_t *G_TempEntity( const vec3_t origin, int event ) {
 	gentity_t		*e;
 	vec3_t		snapped;
 
@@ -503,8 +503,8 @@ void G_KillBox (gentity_t *ent) {
 		}
 
 		// nail it
-		G_Damage ( hit, ent, ent, NULL, NULL,
-			100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+		G_Damage (hit, ent, ent, NULL, NULL,
+			0, DAMAGE_INSTANT_KILL, MOD_TELEFRAG);
 	}
 
 }
