@@ -856,13 +856,10 @@ static int IsUnacceptableError( playerState_t *ps, playerState_t *pps ) {
 			return 18;
 		}
 	}
-/*
-	if ( pps->generic1 != ps->generic1 ||
-			pps->loopSound != ps->loopSound ||
-			pps->jumppad_ent != ps->jumppad_ent ) {
+
+	if (pps->loopSound != ps->loopSound)
 		return 19;
-	}
-*/
+
 	return 0;
 }
 //unlagged - optimized prediction
@@ -1150,10 +1147,6 @@ void CG_PredictPlayerState( void ) {
 				}
 			}
 		}
-
-		// don't predict gauntlet firing, which is only supposed to happen
-		// when it actually inflicts damage
-		cg_pmove.gauntletHit = qfalse;
 
 		if ( cg_pmove.pmove_fixed ) {
 			cg_pmove.cmd.serverTime = ((cg_pmove.cmd.serverTime + pmove_msec.integer-1) / pmove_msec.integer) * pmove_msec.integer;

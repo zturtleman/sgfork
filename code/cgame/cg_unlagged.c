@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qbool flesh, int fleshEntityNum );
 
 // and this as well
-#define MACHINEGUN_SPREAD	200
+//#define MACHINEGUN_SPREAD	200
 
 /*
 =======================

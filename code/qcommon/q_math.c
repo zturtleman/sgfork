@@ -833,7 +833,7 @@ vec_t VectorNormalize( vec3_t v ) {
 	return length;
 }
 
-vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
+vec_t VectorNormalizeClearOutOnZeroLength( const vec3_t v, vec3_t out) {
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
@@ -1006,3 +1006,4 @@ int Q_isnan( float x )
 
 	return (int)( (unsigned int)fi.ui >> 31 );
 }
+

@@ -1187,7 +1187,7 @@ void PM_CheckStuck(void) {
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask);
 	if (trace.allsolid) {
-		//int shit = qtrue;
+		//qbool shit = qtrue;
 	}
 }
 */
@@ -1283,7 +1283,7 @@ void PM_FindGround( void ){
 	trace_t		trace;
 	vec3_t		mins, maxs;
 
-	VectorSet(mins, -2, -2, MINS_Z);
+	VectorSet(mins, -2, -2, PLAYER_MINS_Z);
 	VectorSet(maxs, 2, 2, 2);
 
 	point[0] = pm->ps->origin[0];
@@ -1420,20 +1420,20 @@ static void PM_SetWaterLevel( void ) {
 
 	point[0] = pm->ps->origin[0];
 	point[1] = pm->ps->origin[1];
-	point[2] = pm->ps->origin[2] + MINS_Z + 1;
+	point[2] = pm->ps->origin[2] + PLAYER_MINS_Z + 1;
 	cont = pm->pointcontents( point, pm->ps->clientNum );
 
 	if ( cont & MASK_WATER ) {
-		sample2 = pm->ps->viewheight - MINS_Z;
+		sample2 = pm->ps->viewheight - PLAYER_MINS_Z;
 		sample1 = sample2 / 2;
 
 		pm->watertype = cont;
 		pm->waterlevel = 1;
-		point[2] = pm->ps->origin[2] + MINS_Z + sample1;
+		point[2] = pm->ps->origin[2] + PLAYER_MINS_Z + sample1;
 		cont = pm->pointcontents (point, pm->ps->clientNum );
 		if ( cont & MASK_WATER ) {
 			pm->waterlevel = 2;
-			point[2] = pm->ps->origin[2] + MINS_Z + sample2;
+			point[2] = pm->ps->origin[2] + PLAYER_MINS_Z + sample2;
 			cont = pm->pointcontents (point, pm->ps->clientNum );
 			if ( cont & MASK_WATER ){
 				pm->waterlevel = 3;
@@ -1460,7 +1460,7 @@ static void PM_CheckDuck (void)
 	VectorCopy(playerMins, pm->mins);
 	VectorCopy(playerMaxs, pm->maxs);
 
-	pm->mins[2] = MINS_Z;
+	pm->mins[2] = PLAYER_MINS_Z;
 
 	if (pm->ps->pm_type == PM_DEAD)
 	{
@@ -1478,7 +1478,7 @@ static void PM_CheckDuck (void)
 		if (pm->ps->pm_flags & PMF_DUCKED)
 		{
 			// try to stand up
-			pm->maxs[2] = MAXS_Z;
+			pm->maxs[2] = PLAYER_MAXS_Z;
 			pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask );
 			if (!trace.allsolid)
 				pm->ps->pm_flags &= ~PMF_DUCKED;
@@ -1487,12 +1487,12 @@ static void PM_CheckDuck (void)
 
 	if (pm->ps->pm_flags & PMF_DUCKED)
 	{
-		pm->maxs[2] = MAXS_Z - 16;
+		pm->maxs[2] = PLAYER_MAXS_Z - 16;
 		pm->ps->viewheight = CROUCH_VIEWHEIGHT;
 	}
 	else
 	{
-		pm->maxs[2] = MAXS_Z;
+		pm->maxs[2] = PLAYER_MAXS_Z;
 		pm->ps->viewheight = DEFAULT_VIEWHEIGHT;
 	}
 }
@@ -1694,19 +1694,11 @@ static void PM_BeginWeaponChange( int weapon ) {
 			return;
 	}
 
-	// don't change weapon if dynamite is burning
-	if(pm->ps->weapon == WP_DYNAMITE && pm->ps->stats[STAT_WP_MODE] < 0){
-		pm->cmd.weapon = pm->ps->weapon = WP_DYNAMITE;
-
-		PM_ChangeWeapon(WP_DYNAMITE);
-		return;
-	}
-	// same with molotov
-	// don't change weapon if molotov is burning
-	if(pm->ps->weapon == WP_MOLOTOV && pm->ps->stats[STAT_WP_MODE] < 0){
-		pm->cmd.weapon = pm->ps->weapon = WP_MOLOTOV;
-
-		PM_ChangeWeapon(WP_MOLOTOV);
+	// don't change weapon if dynamite or molotov is burning
+	if ((pm->ps->weapon == WP_DYNAMITE || pm->ps->weapon == WP_MOLOTOV)
+		&& pm->ps->stats[STAT_WP_MODE] < 0) {
+		pm->cmd.weapon = pm->ps->weapon;
+		PM_ChangeWeapon(pm->ps->weapon);
 		return;
 	}
 
@@ -2266,7 +2258,7 @@ static qbool PM_PlanarCheck ( void ){
 		return qfalse;
 	}
 
-	if(fabs(pml.groundTrace.endpos[2] + MINS_Z - trace.endpos[2]) > 13){
+	if(fabs(pml.groundTrace.endpos[2] + PLAYER_MINS_Z - trace.endpos[2]) > 13){
 		PM_AddEvent(EV_GATLING_NOTPLANAR);
 		return qfalse;
 	}
@@ -2768,7 +2760,7 @@ static void PM_Weapon( void ) {
 			if(pm->ps->ammo[pm->ps->weapon] == 1)
 				break;
 
-			pm->ps->stats[STAT_WP_MODE] = -(pm->ps->stats[STAT_WP_MODE]-1);
+			pm->ps->stats[STAT_WP_MODE] = 1 - pm->ps->stats[STAT_WP_MODE];
 			pm->ps->stats[IDLE_TIMER] = 0;
 			PM_AddEvent(EV_ALT_WEAPON_MODE);
 

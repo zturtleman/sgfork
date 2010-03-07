@@ -34,16 +34,12 @@ typedef struct {
 	int			cvarFlags;
 	int			modificationCount;  // for tracking changes
 	qbool	trackChange;	    // track this variable, and announce if changed
-  qbool teamShader;        // track and if changed, update shader state
 } cvarTable_t;
 
 gentity_t		g_entities[MAX_GENTITIES];
 gclient_t		g_clients[MAX_CLIENTS];
 
 vmCvar_t	g_gametype;
-
-//hitdata
-hit_data_t	hit_data;
 
 //Spoon
 int			g_round;
@@ -80,9 +76,6 @@ vmCvar_t	g_robberReward;
 vmCvar_t	g_redteamcount;
 vmCvar_t	g_blueteamcount;
 
-vmCvar_t	g_redteamscore;
-vmCvar_t	g_blueteamscore;
-
 vmCvar_t	g_chaseonly;
 vmCvar_t	sg_rtppoints;
 vmCvar_t	g_deathcam;
@@ -111,12 +104,10 @@ vmCvar_t	g_dedicated;
 vmCvar_t	g_speed;
 vmCvar_t	g_gravity;
 vmCvar_t	g_cheats;
-vmCvar_t	g_knockback;
 vmCvar_t	g_quadfactor;
 vmCvar_t	g_forcerespawn;
 vmCvar_t	g_inactivity;
 vmCvar_t	g_debugMove;
-vmCvar_t	g_debugDamage;
 vmCvar_t	g_debugAlloc;
 vmCvar_t	g_weaponRespawn;
 vmCvar_t	g_weaponTeamRespawn;
@@ -157,8 +148,6 @@ vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
 vmCvar_t	g_rankings;
 vmCvar_t	g_listEntity;
-vmCvar_t	g_version;
-vmCvar_t	g_url;
 vmCvar_t	g_breakspawndelay;
 vmCvar_t	g_forcebreakrespawn;
 vmCvar_t  g_tourney;
@@ -220,22 +209,22 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &du_forcetrio, "du_forcetrio", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
 	{ &br_teamrole, "br_teamrole", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-	{&rtp_teamrole, "rtp_teamrole", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue},
+	{ &rtp_teamrole, "rtp_teamrole", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	
 	{ &g_moneyRespawnMode, "g_moneyRespawnMode", "0", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
-	{ &g_countSocialHelp, "g_countSocialHelp", "3", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_countSocialHelp, "g_countSocialHelp", "3", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
 	//Money system
-	{ &g_moneyMax, "g_moneyMax", "200", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneyDUMin, "g_moneyDUMin", "20", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneyMin, "g_moneyMin", "20", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneySocialHelp, "g_moneySocialHelp", "28", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneyLose, "g_moneyLose", "7", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneyForRobber, "g_moneyForRobber", "10", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyMax, "g_moneyMax", "200", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyDUMin, "g_moneyDUMin", "20", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyMin, "g_moneyMin", "20", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneySocialHelp, "g_moneySocialHelp", "28", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyLose, "g_moneyLose", "7", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyForRobber, "g_moneyForRobber", "10", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
-	{ &g_moneyMaxReward, "g_moneyMaxReward", "20", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneyTeamWin, "g_moneyTeamWin", "16", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
-	{ &g_moneyTeamLose, "g_moneyTeamLose", "10", CVAR_ARCHIVE | CVAR_NORESTART, 1, qtrue },
+	{ &g_moneyMaxReward, "g_moneyMaxReward", "20", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyTeamWin, "g_moneyTeamWin", "16", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+	{ &g_moneyTeamLose, "g_moneyTeamLose", "10", CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	//Money system END
   	
 	{ &g_newShotgunPattern, "g_newShotgunPattern", "0", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
@@ -268,14 +257,12 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_speed, "g_speed", G_SPEED_DEF, 0, 0, qtrue  },
 	{ &g_gravity, "g_gravity", G_GRAVITY_DEF, 0, 0, qtrue  },
-	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue  },
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
 	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, 0, qtrue  },
 	{ &g_weaponTeamRespawn, "g_weaponTeamRespawn", "30", 0, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "20", 0, 0, qtrue },
 	{ &g_inactivity, "g_inactivity", "0", 0, 0, qtrue },
 	{ &g_debugMove, "g_debugMove", "0", 0, 0, qfalse },
-	{ &g_debugDamage, "g_debugDamage", "0", 0, 0, qfalse },
 	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, qfalse },
 	{ &g_motd, "g_motd", "", 0, 0, qfalse },
 	{ &g_blood, "com_blood", "1", 0, 0, qfalse },
@@ -301,8 +288,8 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
-	{ &g_redteam, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
+	{ &g_redteam, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue },
+	{ &g_blueteam, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue },
 
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -327,12 +314,6 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_robberReward, "g_robberReward", "1", CVAR_ARCHIVE|CVAR_SERVERINFO, 0, qfalse  },
 	
-	{ &g_redteamscore, "g_redteamscore", "0", CVAR_SERVERINFO, 0, qfalse  },
-	{ &g_blueteamscore, "g_blueteamscore", "0", CVAR_SERVERINFO, 0, qfalse  },
-
-	{ &g_version, "sg_version", XSTRING(PRODUCT_VERSION) " " XSTRING(SG_RELEASE), CVAR_ROM | CVAR_SERVERINFO , 0, qtrue },
-	{ &g_url, "MOD_URL", "www.smokin-guns.net", CVAR_ROM | CVAR_SERVERINFO, 0, qtrue },
-
 	// If g_breakspawndelay == 0, use BREAK_RESPAWN_TIME instead in g_mover.c
 	{ &g_breakspawndelay, "g_breakspawndelay", "0", 0, 0, qtrue },
 	{ &g_forcebreakrespawn, "g_forcebreakrespawn", "0", 0, 0, qtrue },
@@ -606,12 +587,81 @@ qbool G_ParseTexFile(const char *filename){
 }
 
 /*
+====================
+G_OpenFileAiNode
+
+by spoon
+====================
+*/
+extern	vec3_t	ai_nodes[MAX_AINODES];
+extern	int		ai_nodecount;
+#define MAX_AINODEFILE 10000
+static qbool G_OpenFileAiNode(const char *filename){
+	int				i;
+	fileHandle_t	file;
+	char			header[] = "AI-NODES";
+	int				len;
+	char			headercheck[10];
+	char			buf[MAX_AINODEFILE];
+
+	int				pos = 0;
+
+	G_Printf("AiNode-File: %s:\n", filename);
+
+	len = trap_FS_FOpenFile( filename, &file, FS_READ );
+	if ( !file ) {
+		trap_FS_FCloseFile( file );
+		return qfalse;
+	}
+	if ( len >= MAX_AINODEFILE ) {
+		G_Printf("ai file too big: %s!\n", filename);
+		trap_FS_FCloseFile( file );
+		return qfalse;
+	}
+	trap_FS_Read( buf, len, file );
+	buf[len] = 0;
+	trap_FS_FCloseFile( file );
+
+	// read the header
+	BG_StringRead(headercheck, (char*)buf, sizeof(header));
+	pos += sizeof(header);
+	headercheck[8] = '\0';
+
+	//check
+	if(Q_stricmp(headercheck, header)){
+		G_Printf("no valid ai-file: %s\n", filename);
+		return qfalse;
+	}
+
+	// now read the waypoints into the memory
+	for(i=0; i<MAX_AINODES; i++){
+		//trace_t trace;
+		if(len <= pos){
+			break;
+		}
+		BG_StringRead((char*)ai_nodes[i], (char*)(buf+pos), sizeof(vec3_t));
+		pos += sizeof(vec3_t);
+		//G_Printf("%i. %f %f %f\n", i+1, ai_nodes[i][0], ai_nodes[i][1], ai_nodes[i][2]);
+
+		// check if they're in solid
+		/*trap_Trace(&trace, ai_nodes[i], NULL, NULL, ai_nodes[i], -1, CONTENTS_SOLID);
+		if(trace.allsolid || trace.startsolid)
+			G_Printf("node %i is in solid\n", i);
+		else
+			G_Printf("node %i is ok\n", i);*/
+	}
+
+	ai_nodecount = i;
+	G_Printf("%i nodes parsed\n", ai_nodecount);
+	return qtrue;
+}
+
+/*
 ============
 G_InitGame
 
 ============
 */
-qbool G_OpenFileAiNode(const char *filename);
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
 	char				map[64];
@@ -706,10 +756,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	InitBodyQue();
 
 	ClearRegisteredItems();
-
-	// parse hit files for models
-	if(!G_LoadHitFiles(&hit_data))
-		G_Error("Couldn't load hitfiles\n");
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();

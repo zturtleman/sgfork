@@ -27,6 +27,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 
 
+qbool LogAccuracyHit(const gentity_t *target, const gentity_t *attacker) {
+	if (!target->takedamage || target == attacker || !target->client
+		|| !attacker->client || target->client->ps.stats[STAT_HEALTH] <= 0
+		|| OnSameTeam(target, attacker))
+		return qfalse;
+
+	return qtrue;
+}
+
 /*
 ============
 ScorePlum
@@ -207,7 +216,7 @@ void TossClientItems( gentity_t *self ) {
 LookAtKiller
 ==================
 */
-void LookAtKiller( gentity_t *self, gentity_t *attacker ) {
+void LookAtKiller( gentity_t *self, const gentity_t *attacker ) {
 	vec3_t		dir;
 	vec3_t		angles;
 
@@ -361,8 +370,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->client->ps.persistant[PERS_KILLED]++;
 
 	if (attacker && attacker->client) {
-		attacker->client->lastkilled_client = self->s.number;
-
 		if ( attacker == self || OnSameTeam (self, attacker ) )
 			AddScore( attacker, self->r.currentOrigin, -1 );
 		else
@@ -570,670 +577,20 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	//  inflictor->client->ps.stats[STAT_MONEY]);
 }
 
-#define	L_PRINT	0
-
-/*
-============
-G_LocationDamage
-============
-*/
-float G_LocationDamage(vec3_t point, gentity_t* targ, gentity_t* attacker, float take, int *mod) {
-	vec3_t bulletPath;
-	vec3_t bulletAngle;
-	int clientRotation;
-	int bulletRotation;	// Degrees rotation around client.
-				// used to check Back of head vs. Face
-	int impactRotation;
-	//safe location from hit-detection
-	int location = targ->client->lasthurt_location;
-	int direction = 0;
-	// sharps rifle can shoot thru boiler plate
-	qbool sharps = (attacker->client->ps.weapon == WP_SHARPS);
-	// knife doesnt make the dynamite explode
-	qbool isknife  = (attacker->client->ps.weapon == WP_KNIFE);
-	// be sure, the target has dynamit in his hand
-	qbool isdyn    = (targ->client->ps.weapon == WP_DYNAMITE);
-	vec3_t dynorigin;
-	gentity_t *tent;
-
-	// First things first.  If we're not damaging them, why are we here?
-	if (!take)
-		return 0.0f;
-
-	// Get a vector aiming from the client to the bullet hit
-	VectorSubtract(targ->r.currentOrigin, point, bulletPath);
-	// Convert it into PITCH, ROLL, YAW
-	vectoangles(bulletPath, bulletAngle);
-
-	clientRotation = targ->client->ps.viewangles[YAW];
-	bulletRotation = bulletAngle[YAW];
-
-	impactRotation = abs(clientRotation-bulletRotation);
-
-	impactRotation = impactRotation % 360; // Keep it in the 0-359 range
-	impactRotation = AngleNormalize180(impactRotation);
-
-	if (fabs(impactRotation) > 70)
-		direction = LOCATION_FRONT;
-	else
-		direction = LOCATION_BACK;
-
-	attacker->client->lasthurt_direction = direction;
-
-	// Check the location ignoring the rotation info
-	switch ( location )
-	{
-	case HIT_HEAD:
-		take *= 5.0f;
-		break;
-	case HIT_NECK:
-		take *= 2.8f;
-		break;
-	case HIT_SHOULDER_R:
-	case HIT_SHOULDER_L:
-		take *= 2.0f;
-		break;
-	case HIT_HAND_R:
-		//blow up the dynamite, the gun doesnt cause damage
-		if (isdyn && !isknife){
-			VectorCopy(point, dynorigin);
-			G_InstantExplode(dynorigin, attacker);
-		    return 0.0f;
-		} else {
-		  //don't blow up the dynamite, normal gun damage
-		  take *= 1.0f;
-		}
-		break;
-	case HIT_HAND_L:
-	case HIT_LOWER_ARM_R:
-	case HIT_LOWER_ARM_L:
-	case HIT_UPPER_ARM_L:
-	case HIT_UPPER_ARM_R:
-		take *= 1.0f;
-		break;
-	case HIT_CHEST:
-		if(targ->client->ps.stats[STAT_ARMOR] && !sharps){
-			targ->client->ps.stats[STAT_ARMOR] -= take*4;
-
-			if(targ->client->ps.stats[STAT_ARMOR] < 0)
-				targ->client->ps.stats[STAT_ARMOR] = 0;
-
-			// Tequila comment: Log protection got from boiler plate
-			if ( g_debugDamage.integer ) {
-				G_Printf( "%i: client:%i health:%i damage:%.1f where:chest_boiler_plate(%i) from:%s by:%i\n", level.time,
-					targ->s.number,	targ->health, take, targ->client->ps.stats[STAT_ARMOR],
-					modNames[*mod], attacker->s.number );
-			}
-
-			// Tequila comment: reset take after it could has been logged
-			take = 0;
-
-			*mod = MOD_BOILER;
-		} else
-			take *= 2.6f; // Belly or back
-		break;
-	case HIT_STOMACH:
-		if(targ->client->ps.stats[STAT_ARMOR] && !sharps){
-			targ->client->ps.stats[STAT_ARMOR] -= take*4;
-
-			if(targ->client->ps.stats[STAT_ARMOR] < 0)
-				targ->client->ps.stats[STAT_ARMOR] = 0;
-
-			// Tequila comment: Log protection got from boiler plate
-			if ( g_debugDamage.integer ) {
-				G_Printf( "%i: client:%i health:%i damage:%.1f where:stomack_boiler_plate(%i) from:%s by:%i\n", level.time,
-					targ->s.number,	targ->health, take, targ->client->ps.stats[STAT_ARMOR],
-					modNames[*mod], attacker->s.number );
-			}
-
-			// Tequila comment: reset take after it could has been logged
-			take = 0;
-
-			*mod = MOD_BOILER;
-		} else
-			take *= 2.0f;
-		break;
-	case HIT_PELVIS:
-		take *= 2.0f; // Groin shot
-		break;
-	case HIT_LOWER_LEG_L:
-	case HIT_LOWER_LEG_R:
-	case HIT_UPPER_LEG_L:
-	case HIT_UPPER_LEG_R:
-		take *= 1.8f;
-		if(targ->client->ps.speed == g_speed.integer){
-			targ->client->ps.speed *= 0.75f;
-			//trap_SendServerCommand( targ-g_entities, va("print \"You were hit in the leg!\n\""));
-		}
-		break;
-	case HIT_FOOT_L:
-	case HIT_FOOT_R:
-		take *= 1.2f;
-		if(targ->client->ps.speed == g_speed.integer) {
-			targ->client->ps.speed *= 0.75f;
-			//trap_SendServerCommand( targ-g_entities, va("print \"You were hit in the leg!\n\""));
-		}
-		break;
-	}
-
-	// death animations
-	switch ( location ){
-	case HIT_HEAD:
-		targ->client->lasthurt_anim = BOTH_DEATH_HEAD;
-		break;
-	case HIT_CHEST:
-		if(direction != LOCATION_BACK)
-			targ->client->lasthurt_anim = BOTH_DEATH_CHEST;
-		else
-			targ->client->lasthurt_anim = BOTH_DEATH_DEFAULT;
-		break;
-	case HIT_STOMACH:
-		if(direction != LOCATION_BACK)
-			targ->client->lasthurt_anim = BOTH_DEATH_STOMACH;
-		else
-			targ->client->lasthurt_anim = BOTH_DEATH_DEFAULT;
-		break;
-	case HIT_UPPER_ARM_L:
-	case HIT_LOWER_ARM_L:
-	case HIT_HAND_L:
-		targ->client->lasthurt_anim = BOTH_DEATH_ARM_L;
-		break;
-	case HIT_UPPER_ARM_R:
-	case HIT_LOWER_ARM_R:
-	case HIT_HAND_R:
-		targ->client->lasthurt_anim = BOTH_DEATH_ARM_R;
-		break;
-	case HIT_UPPER_LEG_L:
-	case HIT_LOWER_LEG_L:
-	case HIT_FOOT_L:
-		targ->client->lasthurt_anim = BOTH_DEATH_LEG_L;
-		break;
-	case HIT_UPPER_LEG_R:
-	case HIT_LOWER_LEG_R:
-	case HIT_FOOT_R:
-		targ->client->lasthurt_anim = BOTH_DEATH_LEG_R;
-		break;
-	default:
-		targ->client->lasthurt_anim = BOTH_DEATH_DEFAULT;
-		break;
-	}
-
-	//damage skins
-	switch ( hit_info[location].hit_part ){
-	case PART_HEAD:
-		targ->client->ps.powerups[DM_HEAD_1]++;
-		break;
-	case PART_UPPER:
-		targ->client->ps.powerups[DM_TORSO_1]++;
-		break;
-	default:
-		targ->client->ps.powerups[DM_LEGS_1]++;
-		break;
-	}
-
-	//reduce damage
-	take *= 0.8f;
-
-	// print a message
-	// broadcast the death event to everyone
-	if(!(attacker->s.eFlags & EF_HIT_MESSAGE)){
-		tent = G_TempEntity( vec3_origin, EV_HIT_MESSAGE );
-
-		if(direction == LOCATION_BACK)
-			tent->s.weapon = 0;
-		else
-			tent->s.weapon = 1;
-
-		tent->s.frame = location;
-		tent->s.otherEntityNum = targ->s.number;
-		tent->s.otherEntityNum2 = attacker->s.number;
-		tent->r.svFlags |= SVF_BROADCAST;
-		tent->s.angles2[0] = -1;
-		tent->s.angles2[1] = -1;
-		tent->s.angles2[2] = -1;
-	}
-
-	return take;
-}
-
-/*
-============
-CheckTeamKills
-By Tequila, TeamKill management inspired by Conq patch
-Return false when TK supported limit is not hit
-============
-*/
-static qbool CheckTeamKills( gentity_t *attacker, gentity_t *targ, int mod ) {
-	if ( !g_maxteamkills.integer )
-		return qfalse;
-
-	// g_teamkillschecktime can be set to only activate the check at the round beginning
-	if ( g_teamkillschecktime.integer && g_roundstarttime && level.time > g_roundstarttime + g_teamkillschecktime.integer * 1000 )
-		return qfalse;
-
-	// Some weapons should not have to be checked for TK
-	switch(mod){
-	case MOD_GATLING:
-	case MOD_DYNAMITE:
-	case MOD_MOLOTOV:
-	case MOD_TELEFRAG:
-		return qfalse;
-	default:
-		break;
-	}
-
-	if ( !attacker || !targ )
-		return qfalse;
-
-	if ( !attacker->client )
-		return qfalse;
-
-	if ( attacker == targ || !OnSameTeam (targ,attacker) )
-		return qfalse;
-
-	// Check if we should reset TK count before
-	if ( attacker->client->pers.lastTeamKillTime && level.time > attacker->client->pers.lastTeamKillTime + g_teamkillsforgettime.integer * 1000 ) {
-#ifndef NDEBUG
-		G_Printf(S_COLOR_MAGENTA "CheckTeamKills: Forget TeamKillsCount (%i) from %s\n", attacker->client->pers.TeamKillsCount, attacker->client->pers.netname);
-#endif
-		attacker->client->pers.TeamKillsCount=0;
-	}
-
-	attacker->client->pers.TeamKillsCount ++;
-#ifndef NDEBUG
-	if (attacker->client->pers.lastTeamKillTime)
-		G_Printf(S_COLOR_MAGENTA "CheckTeamKills: Last TeamKills for %s was %.2f seconds ago\n", attacker->client->pers.netname,(float)(level.time-attacker->client->pers.lastTeamKillTime)/1000.0f);
-#endif
-	attacker->client->pers.lastTeamKillTime = level.time;
-
-	// Kick the attacker if TK limit is hit and return true
-	if ( attacker->client->pers.TeamKillsCount >= g_maxteamkills.integer )
-	{
-		trap_DropClient( attacker-g_entities, "Reached the limit of supported teammate kills." );
-		return qtrue;
-	} else if ( attacker->client->pers.TeamKillsCount == g_maxteamkills.integer -1 )
-		trap_SendServerCommand( attacker-g_entities,
-			va("print \"%s" S_COLOR_YELLOW "... Be careful teammate !!! Next teammate kill could kick you from that server.\n\"",
-			attacker->client->pers.netname));
-#ifndef NDEBUG
-	G_Printf(S_COLOR_MAGENTA "CheckTeamKills: TeamKillsCount is %i for %s\n", attacker->client->pers.TeamKillsCount, attacker->client->pers.netname);
-#endif
-	return qfalse;
-}
-
-/*
-============
-G_Damage
-
-targ		entity that is being damaged
-inflictor	entity that is causing the damage
-attacker	entity that caused the inflictor to damage targ
-	example: targ=monster, inflictor=rocket, attacker=player
-
-dir			direction of the attack for knockback
-point		point at which the damage is being inflicted, used for headshots
-damage		amount of damage being inflicted
-knockback	force to be applied against targ as a result of the damage
-
-inflictor, attacker, dir, and point can be NULL for environmental effects
-
-dflags		these flags are used to control how T_Damage works
-	DAMAGE_RADIUS			damage was indirect (from a nearby explosion)
-	DAMAGE_NO_ARMOR			armor does not protect from this damage
-	DAMAGE_NO_KNOCKBACK		do not affect velocity, just view angles
-	DAMAGE_NO_PROTECTION	kills godmode, armor, everything
-============
-*/
-
-void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
-			   vec3_t dir, vec3_t point, float damage, int dflags, int mod) {
-	gclient_t	*client;
-	float		take;
-	int			hsave=0;
-	int			knockback;
-	int			max;
-
-	if( !targ->takedamage 
-      || level.intermissionQueued)
-		return;
-
-	if ( !inflictor )
-		inflictor = &g_entities[ENTITYNUM_WORLD];
-
-	if ( !attacker )
-		attacker = &g_entities[ENTITYNUM_WORLD];
-
-	// shootable doors / buttons don't actually have any health
-	if ( targ->s.eType == ET_MOVER ) {
-		if ( targ->use && targ->moverState == MOVER_POS1 ) {
-			targ->use( targ, inflictor, attacker );
-      G_LogPrintf( "G_Damage: %s (%s) shoots on a shootable object (%s)\n",
-          attacker->client->pers.netname, vtos(attacker->s.origin), vtos(targ->s.origin) );
-		}
-		return;
-	}
-	//if the breakable only accepts damage of specific weapon(s)
-	if( targ->s.eType == ET_BREAKABLE) {
-		if(targ->s.weapon && mod != targ->s.weapon)
-			return;
-	}
-	// reduce damage by the attacker's handicap value
-	// unless they are rocket jumping
-	if ( attacker->client && attacker != targ ) {
-		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
-		damage = damage * max / 100;
-	}
-
-	client = targ->client;
-
-	if ( client ) {
-		if ( client->noclip ) {
-      G_LogPrintf( "G_Damage: %s (%s) couldn't be shoot at because he used /noclip.\n",
-          client->pers.netname, vtos(targ->s.origin) );
-			return;
-		}
-	}
-
-	if ( !dir )
-		dflags |= DAMAGE_NO_KNOCKBACK;
-	else
-		VectorNormalize(dir);
-
-	knockback = damage/1.5;
-	if(attacker->client){
-		if(attacker->client->ps.weapon == WP_SAWEDOFF ||
-			attacker->client->ps.weapon == WP_REMINGTON_GAUGE ||
-			attacker->client->ps.weapon == WP_WINCH97)
-			knockback *= 6;
-	}
-	//allow full knockback if it's a dynamite
-	if ( knockback > 200 && mod != MOD_DYNAMITE)
-		knockback = 200;
-	if ( targ->flags & FL_NO_KNOCKBACK )
-		knockback = 0;
-	if ( dflags & DAMAGE_NO_KNOCKBACK )
-		knockback = 0;
-
-	// check for completely getting out of the damage
-	if ( !(dflags & DAMAGE_NO_PROTECTION) ) {
-		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
-		// if the attacker was on the same team
-		if ( targ != attacker && OnSameTeam (targ, attacker)  ) {
-			if ( !g_friendlyFire.integer )
-				return;
-			// Can be used later in case of TK limit reached to protect the last victim
-			hsave = targ->health;
-		}
-
-		// check for godmode
-		if ( targ->flags & FL_GODMODE ) {
-      G_LogPrintf( "%s couldn't be shoot because he used godmode\n", targ->client->pers.netname );
-			return;
-		}
-	}
-
-	if ( damage < 1 ) {
-		damage = 1;
-	}
-	take = damage;
-
-	// add to the damage inflicted on a player this frame
-	// the total will be turned into screen blends and view angle kicks
-	// at the end of the frame
-	if ( client && inflictor) {
-		if ( attacker )
-			client->ps.persistant[PERS_ATTACKER] = attacker->s.number;
-		else
-			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
-
-		client->damage_blood += take;
-		client->damage_knockback += knockback;
-		if ( dir ) {
-			VectorCopy ( dir, client->damage_from );
-			client->damage_fromWorld = qfalse;
-		} else {
-			VectorCopy ( targ->r.currentOrigin, client->damage_from );
-			client->damage_fromWorld = qtrue;
-		}
-	}
-
-	if (targ->client && inflictor->client && attacker->client) {
-		// Modify the damage for location damage
-		if (point && targ && targ->health > 0 && attacker && take){
-			if(targ->client){
-				if(targ->client->lasthurt_part == PART_LOWER){
-					targ->client->ps.stats[STAT_KNOCKTIME] = -1;
-					VectorClear(targ->client->ps.velocity);
-				} else {
-					targ->client->ps.stats[STAT_KNOCKTIME] = 1;
-					VectorScale(targ->client->ps.velocity, 0.6, targ->client->ps.velocity);
-				}
-			}
-
-			// only modify for bullet weapons
-			if(attacker->client->ps.weapon != WP_DYNAMITE &&
-				attacker->client->ps.weapon != WP_MOLOTOV &&
-				attacker->client->ps.weapon != WP_KNIFE){
-				take = G_LocationDamage(point, targ, attacker, take, &mod);
-			}
-		} else
-			targ->client->lasthurt_part = PART_NONE;
-
-		// set the last client who damaged the target
-		targ->client->lasthurt_client = attacker->s.number;
-		targ->client->lasthurt_mod = mod;
-
-		attacker->client->lasthurt_victim = targ->s.number;
-	}
-
-	// figure momentum add, even if the damage won't be taken
-	if ( knockback && targ->client ) {
-		float knockbackvalue = g_knockback.value;
-		vec3_t	kvel;
-		float	mass;
-
-		mass = 200;
-
-		switch(mod){
-		case MOD_REMINGTON_GAUGE:
-		case MOD_SAWEDOFF:
-		case MOD_WINCH97:
-			if(targ->health-take <= 0)
-				knockbackvalue = WINCH97_1_KSCALE;
-			else
-				knockbackvalue = WINCH97_2_KSCALE;
-			break;
-		case MOD_DYNAMITE:
-			knockbackvalue = DYNA_KSCALE;
-			break;
-		}
-
-		VectorScale (dir, knockbackvalue * (float)knockback / mass, kvel);
-		VectorAdd (targ->client->ps.velocity, kvel, targ->client->ps.velocity);
-
-		// set the timer so that the other client can't cancel
-		// out the movement immediately
-		if ( !targ->client->ps.pm_time ) {
-			int		t;
-
-			t = knockback * 2;
-			if ( t < 50 ) {
-				t = 50;
-			}
-			if ( t > 200 ) {
-				t = 200;
-			}
-			targ->client->ps.pm_time = t;
-			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
-		}
-	}
-
-	// do the damage
-	if (take) {
-		// Tequila comment: only report debug damage when it is taken
-		if ( g_debugDamage.integer ) {
-			if (client) {
-				G_LogPrintf( "%i: client:%i health:%i damage:%.1f where:%s from:%s by:%i\n", level.time,
-					targ->s.number,	targ->health, take, client->ps.weapon ?
-						hit_info[client->lasthurt_location].forename
-						: hit_info[client->lasthurt_location].backname,
-					modNames[mod], attacker->s.number );
-			} else {
-				G_LogPrintf( "%i: world:%i health:%i damage:%.1f from:%s by:%i\n", level.time,
-					targ->s.number, targ->health, take, modNames[mod] , attacker->s.number );
-			}
-		}
-
-		// Tequila fix: take is a float in SG so round it with a cast to got a real damage
-		targ->health = targ->health - (int)(take+.5);
-		if ( targ->client ) {
-			targ->client->ps.stats[STAT_HEALTH] = targ->health;
-		}
-
-		if ( targ->health <= 0 ) {
-			if ( client )
-				targ->flags |= FL_NO_KNOCKBACK;
-
-			if (targ->health < 0)
-				targ->health = 0;
-
-			targ->enemy = attacker;
-
-			// Target is not killed if TK limit is hit
-			if ( g_friendlyFire.integer && CheckTeamKills(attacker,targ,mod) ) {
-				targ->client->ps.stats[STAT_HEALTH] = targ->health = hsave;
-				if ( g_debugDamage.integer )
-					G_LogPrintf( "%i: client:%i health:%i saved from TK by:%i\n", level.time,
-							targ->s.number,	targ->health, attacker->s.number );
-				return;
-			}
-
-			// do the hit-message before the death-message
-			if(attacker->s.angles2[0] != -1 &&
-				(attacker->s.eFlags & EF_HIT_MESSAGE)){
-				gentity_t *tent;
-
-				// send the hit message
-				tent = G_TempEntity( attacker->r.currentOrigin, EV_HIT_MESSAGE );
-
-				if(attacker->client->lasthurt_direction == LOCATION_BACK)
-					tent->s.weapon = 0;
-				else
-					tent->s.weapon = 1;
-
-				tent->s.frame = -1;
-				tent->s.otherEntityNum = attacker->client->lasthurt_victim;
-				tent->s.otherEntityNum2 = attacker->s.number;
-				tent->r.svFlags = SVF_BROADCAST;
-				tent->s.angles2[0] = attacker->s.angles2[0];
-				tent->s.angles2[1] = attacker->s.angles2[1];
-				tent->s.angles2[2] = attacker->s.angles2[2];
-
-				attacker->s.eFlags &= ~EF_HIT_MESSAGE;
-				attacker->s.angles2[0] =  attacker->s.angles2[1] = attacker->s.angles2[2] = -1;
-			}
-			// Tequila comment: ->die can be NULL
-			if (targ->die)
-			targ->die (targ, inflictor, attacker, take, mod);
-			return;
-		} else if ( targ->pain ) {
-			targ->pain (targ, attacker, take);
-		}
-	}
-
-}
-
-#define SMALL 2
-void G_LookForBreakableType(gentity_t *ent){
-	vec3_t	origin, origin2;
-	vec3_t	mins, maxs;
-	int		j, shaderNum;
-	trace_t tr;
-
-	if( ent->flags & FL_BREAKABLE_INIT)
-		return;
-
-	VectorAdd (ent->r.absmin, ent->r.absmax, origin);
-	VectorScale (origin, 0.5f, origin);
-	VectorSubtract(ent->r.absmin, origin, mins);
-	VectorSubtract(ent->r.absmax, origin, maxs);
-
-	ent->r.contents |= CONTENTS_JUMPPAD;
-	trap_LinkEntity(ent);
-
-	// from the mins
-	for(j=0;j<6;j++){
-		VectorCopy(origin, origin2);
-
-		if(j < 3){
-			origin2[j] += mins[j];
-			origin2[j] += -SMALL;
-		} else {
-			origin2[j-3] += maxs[j-3];
-			origin2[j-3] += SMALL;
-		}
-
-		shaderNum = trap_Trace_New2 ( &tr, origin2, NULL, NULL, origin, -1, MASK_SHOT|CONTENTS_JUMPPAD);
-
-		if(tr.entityNum == ent->s.number)
-			break;
-
-		// test has failed
-		shaderNum  = -1;
-	}
-
-	ent->r.contents &= ~CONTENTS_JUMPPAD;
-	trap_LinkEntity(ent);
-
-	if(shaderNum != -1)
-		ent->flags |= FL_BREAKABLE_INIT;
-
-	G_BreakablePrepare(ent, shaderNum);
-}
-
-
-/*
-============
-CanDamage
-
-Returns qtrue if the inflictor can directly damage the target.  Used for
-explosions and melee attacks.
-============
-*/
-qbool CanDamage (gentity_t *targ, vec3_t origin) {
+static qbool CanDirectlyDamage(const gentity_t *targ, const vec3_t origin) {
 	vec3_t	dest;
 	trace_t	tr;
 	vec3_t	midpoint;
-	int shaderNum;
 
 	// use the midpoint of the bounds instead of the origin, because
-	// bmodels may have their origin is 0,0,0
+	// bmodels may have their origin as 0,0,0
 	VectorAdd (targ->r.absmin, targ->r.absmax, midpoint);
 	VectorScale (midpoint, 0.5, midpoint);
 
 	VectorCopy (midpoint, dest);
-	//prepare breakable by Spoon
-	if(targ->s.eType == ET_BREAKABLE){
-
-		G_LookForBreakableType(targ);
-
-		// try a direct trace
-		if(targ->count == -1){
-			//ignore other breakables, so temporally change contents-type
-			targ->r.contents = CONTENTS_JUMPPAD;
-			trap_LinkEntity(targ);
-			shaderNum = trap_Trace_New2 ( &tr, origin, NULL, NULL, dest, targ->s.clientNum, CONTENTS_SOLID|CONTENTS_JUMPPAD);
-			targ->r.contents = (CONTENTS_MOVER|CONTENTS_BODY);
-			trap_LinkEntity(targ);
-
-			G_BreakablePrepare(targ, shaderNum);
-		}
-	}
-
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number){
+	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
-	}
 
 	// this should probably check in the plane of projection,
 	// rather than in world coordinate, and also include Z
@@ -1241,98 +598,264 @@ qbool CanDamage (gentity_t *targ, vec3_t origin) {
 	dest[0] += 15.0;
 	dest[1] += 15.0;
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
 
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
 	trap_Trace_New ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
-
 
 	return qfalse;
 }
 
 
-/*
-============
-G_RadiusDamage
-============
-*/
-qbool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
-					 gentity_t *ignore, int mod) {
-	float		points, dist;
-	gentity_t	*ent;
+qbool G_RadiusDamage(vec3_t origin, gentity_t *attacker, const float initialDamage, const float radius,
+					 gentity_t *ignore, const meansOfDeath_t mod) {
+	float		damage;
 	int			entityList[MAX_GENTITIES];
 	int			numListedEntities;
 	vec3_t		mins, maxs;
-	vec3_t		v;
-	vec3_t		dir;
 	int			i, e;
-	qbool	hitClient = qfalse;
+	qbool		hitClient = qfalse;
 
-	if ( radius < 1 )
-		radius = 1;
-
-	for ( i = 0 ; i < 3 ; i++ ) {
+	for (i = 0; i < 3; i++) {
 		mins[i] = origin[i] - radius;
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = trap_EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
 
-	for ( e = 0 ; e < numListedEntities ; e++ ) {
-		ent = &g_entities[entityList[ e ]];
-
-		if (ent == ignore)
-			continue;
-		if (!ent->takedamage)
+	for (e = 0; e < numListedEntities; e++) {
+		if (&g_entities[entityList[e]] == ignore || !g_entities[entityList[e]].takedamage)
 			continue;
 
-		// find the distance from the edge of the bounding box
-		for ( i = 0 ; i < 3 ; i++ ) {
-			if ( origin[i] < ent->r.absmin[i] ) {
-				v[i] = ent->r.absmin[i] - origin[i];
-			} else if ( origin[i] > ent->r.absmax[i] ) {
-				v[i] = origin[i] - ent->r.absmax[i];
-			} else {
-				v[i] = 0;
-			}
-		}
+		if (CanDirectlyDamage(&g_entities[entityList[e]], origin)) {
+			vec3_t		dir;
 
-		dist = VectorLength( v );
-		if ( dist >= radius )
-			continue;
+			if (!hitClient)
+				hitClient = LogAccuracyHit(&g_entities[entityList[e]], attacker);
 
-		points = damage * ( 1.0 - dist / radius );
+			// Find the distance from the edge of the bounding box
+			// Can't use entity's origin because bmodels for most of entities (especially breakables)
+			// have their origin as 0,0,0
+			// And most of them are really wide or tall which makes distance too long comparing to radius
+			for (i = 0; i < 3; i++)
+				if (origin[i] < g_entities[entityList[e]].r.absmin[i])
+					dir[i] = g_entities[entityList[e]].r.absmin[i] - origin[i];
+				else if (origin[i] > g_entities[entityList[e]].r.absmax[i])
+					dir[i] = origin[i] - g_entities[entityList[e]].r.absmax[i];
+				else
+					dir[i] = 0;
+/*DEBUG_MOD
+	{
+		gentity_t	*tEnt = G_TempEntity(g_entities[entityList[e]].r.currentOrigin, EV_RAILTRAIL);
+		tEnt->s.torsoAnim = rand() % Q_COLORS_COUNT;
+		VectorCopy(origin, tEnt->s.origin2);
+	}
+*/
+			damage = initialDamage * (1.0f - VectorLength(dir) / radius);
+			if (damage < 1)
+				continue;
 
-		if( CanDamage (ent, origin) ) {
-			if( LogAccuracyHit( ent, attacker ) )
-				hitClient = qtrue;
-
-			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
-			dir[2] += 24;
-			G_Damage (ent, NULL, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod);
+			VectorSubtract(g_entities[entityList[e]].r.currentOrigin, origin, dir);
+			dir[2] += UP_KNOCK_ADDENDUM;
+			G_Damage(&g_entities[entityList[e]], NULL, attacker, dir, origin, damage, 0, mod);
 		}
 	}
 
 	return hitClient;
+}
+
+static int G_GetHitLocation(const gentity_t *targ, const vec3_t point) {
+	int	unitsBelowPlayerTop = targ->r.currentOrigin[2] + targ->r.maxs[2] - point[2];	
+
+	if (unitsBelowPlayerTop < PLAYER_HEAD_Z)
+		return HIT_LOCATION_HEAD;
+	else if (unitsBelowPlayerTop < PLAYER_BODY_Z + PLAYER_HEAD_Z) {
+		vec3_t	bulletAngle;
+		int		impactRotation;
+
+		VectorSubtract(targ->r.currentOrigin, point, bulletAngle);
+		vectoangles(bulletAngle, bulletAngle);
+
+		impactRotation = abs(360 + 45 + targ->client->ps.viewangles[YAW] - bulletAngle[YAW]) % 360;
+
+		if (impactRotation < 90)
+			return HIT_LOCATION_BACK;
+		else if (impactRotation < 180)
+			return HIT_LOCATION_LEFT;
+		else if (impactRotation < 270)
+			return HIT_LOCATION_FRONT;
+		else
+			return HIT_LOCATION_RIGHT;
+	} else
+		return HIT_LOCATION_LEGS;
+}
+
+static float G_DamageProjectileHitPlayer(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
+			  const vec3_t dir, const vec3_t point, float damage, const meansOfDeath_t mod) {
+	int		hitLocation = HIT_LOCATION_NONE;
+
+	if ((attacker->client && !g_friendlyFire.integer
+		&& OnSameTeam(targ, attacker))
+		|| targ->flags & FL_GODMODE)
+		return damage;
+
+	if (point) {
+		hitLocation = G_GetHitLocation(targ, point);
+
+		if (hitLocation == HIT_LOCATION_RIGHT
+			&& targ->client->ps.weapon == WP_DYNAMITE) {
+			G_InstantExplode(point, attacker);
+			return damage;
+		}
+	}
+
+	if (attacker->client) {
+		targ->client->lasthurt_client = targ->client->ps.persistant[PERS_ATTACKER] = attacker->s.number;
+		targ->client->damage_fromWorld = qfalse;
+		targ->client->lasthurt_mod = mod;
+
+		// reduce damage by the attacker's handicap value
+		if ((targ->client->damage_blood = damage * attacker->client->ps.stats[STAT_MAX_HEALTH] / 100.0f) < 1)
+			targ->client->damage_blood = 1;
+	} else {
+		targ->client->damage_fromWorld = qtrue;
+		targ->client->lasthurt_mod = mod;
+		targ->client->damage_blood = damage;
+	}
+
+	if (point) {
+		if (targ->client->ps.stats[STAT_ARMOR] && mod != WP_SHARPS
+			&& (hitLocation & (HIT_LOCATION_BACK | HIT_LOCATION_FRONT))) {
+			targ->client->damage_armor = targ->client->damage_blood;
+			damage = targ->client->damage_blood = 0;
+			if ((targ->client->ps.stats[STAT_ARMOR] -= targ->client->damage_armor) < 0)
+				targ->client->ps.stats[STAT_ARMOR] = 0;	
+		}
+
+		if (hitLocation == HIT_LOCATION_HEAD) {
+			targ->client->lasthurt_anim = BOTH_DEATH_HEAD;
+			targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood * HIT_LOCATION_MULTIPLIER_HEAD;
+			targ->client->ps.powerups[DM_HEAD_2] = (targ->health < HEALTH_INJURED) ? 1 : 0;
+			targ->client->ps.powerups[DM_HEAD_1] = (targ->health < HEALTH_USUAL) ? 1 : 0;
+		} else if (hitLocation == HIT_LOCATION_LEGS) {
+			targ->client->ps.stats[STAT_KNOCKTIME] = -1;
+			VectorClear(targ->client->ps.velocity);
+			targ->client->lasthurt_anim = (rand() % 2)? BOTH_DEATH_LEG_L : BOTH_DEATH_LEG_R;
+			targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood * HIT_LOCATION_MULTIPLIER_LEGS;
+			targ->client->ps.powerups[DM_LEGS_2] = (targ->health < HEALTH_INJURED) ? 1 : 0;
+			targ->client->ps.powerups[DM_LEGS_1] = (targ->health < HEALTH_USUAL) ? 1 : 0;
+		} else {
+			if (hitLocation == HIT_LOCATION_LEFT) {
+				targ->client->lasthurt_anim = BOTH_DEATH_ARM_L;
+				targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood * HIT_LOCATION_MULTIPLIER_LEFT;
+			} else if (hitLocation == HIT_LOCATION_RIGHT) {
+				targ->client->lasthurt_anim = BOTH_DEATH_ARM_R;
+				targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood * HIT_LOCATION_MULTIPLIER_RIGHT;
+			} else if (hitLocation == HIT_LOCATION_FRONT) {
+				targ->client->lasthurt_anim = (rand() % 2)? BOTH_DEATH_CHEST : BOTH_DEATH_STOMACH;
+				targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood * HIT_LOCATION_MULTIPLIER_FRONT;
+			} else if (hitLocation == HIT_LOCATION_BACK) {
+				targ->client->lasthurt_anim = BOTH_DEATH_DEFAULT;
+				targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood * HIT_LOCATION_MULTIPLIER_BACK;
+			}
+			targ->client->ps.powerups[DM_TORSO_2] = (targ->health < HEALTH_INJURED) ? 1 : 0;
+			targ->client->ps.powerups[DM_TORSO_1] = (targ->health < HEALTH_USUAL) ? 1 : 0;
+		}
+	} else {
+		targ->client->ps.stats[STAT_HEALTH] = targ->health -= targ->client->damage_blood;
+	}
+
+	if (attacker->client && !targ->client->tEntFireWeapon) {
+		vec3_t	normal;
+		targ->client->tEntFireWeapon = G_TempEntity(point, EV_PLAYER_HIT);
+		targ->client->tEntFireWeapon->r.svFlags |= SVF_BROADCAST;
+		targ->client->tEntFireWeapon->s.clientNum = targ->s.number;
+		VectorCopy(dir, normal);
+		VectorScale(normal, -1, normal);
+		targ->client->tEntFireWeapon->s.torsoAnim = DirToByte(normal);
+		targ->client->tEntFireWeapon->s.otherEntityNum = attacker->s.number;
+	}
+	targ->client->tEntFireWeapon->s.eventParm |= hitLocation;
+
+	if (dir && mod < WP_NUM_WEAPONS) {
+		vec3_t	knockbackVelocity;
+		float	damageRatio = damage / bg_weaponlist[mod].damage;
+
+		VectorCopy(dir, targ->client->damage_from);
+		VectorNormalize(targ->client->damage_from);
+		VectorScale(targ->client->damage_from, bg_weaponlist[mod].knockback * damageRatio, knockbackVelocity);
+		VectorAdd(targ->client->ps.velocity, knockbackVelocity, targ->client->ps.velocity);
+		
+		damageRatio *= MAX_KNOCKBACKTIME;
+		if (damageRatio > targ->client->ps.pm_time) {
+			targ->client->ps.pm_time = (damageRatio < MIN_KNOCKBACKTIME) ? MIN_KNOCKBACKTIME : damageRatio;
+			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+		}
+	}
+
+	if (targ->health <= 0) {
+		targ->health = 0;
+		targ->enemy = attacker;
+		targ->die(targ, inflictor, attacker, targ->client->damage_armor + targ->client->damage_blood, mod);
+	}
+
+	return damage * DAMAGE_LOSE_ON_PLAYER;
+}
+
+
+float G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
+			   const vec3_t dir, const vec3_t point, const float damage, const int dflags, const meansOfDeath_t mod) {
+	if (!targ->takedamage || level.intermissionQueued || targ->health <= 0)
+		return damage;
+
+	if (targ->client && attacker && !(dflags & DAMAGE_INSTANT_KILL))
+		return G_DamageProjectileHitPlayer(targ, inflictor, attacker, dir, point, damage, mod);
+
+	// shootable doors / buttons don't actually have any health
+	if (targ->s.eType == ET_MOVER) {
+		if (targ->use && targ->moverState == MOVER_POS1)
+			targ->use(targ, inflictor, attacker);
+		return damage;
+	}
+
+	//if the breakable only accepts damage of specific weapon(s)
+	if (targ->s.eType == ET_BREAKABLE
+		&& targ->s.weapon && mod != targ->s.weapon)
+			return damage;
+
+	if (dflags & DAMAGE_INSTANT_KILL) {
+		targ->health = 0;
+		if (targ->client)
+			targ->client->ps.stats[STAT_HEALTH] = 0;
+	} else
+		targ->health -= damage;
+
+	if (targ->health <= 0) {
+		targ->health = 0;
+		targ->enemy = attacker;
+		targ->die(targ, inflictor, attacker, damage, mod);
+	}
+
+	return damage;
 }

@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // cg_weapons.c -- events and effects dealing with weapons
 #include "cg_local.h"
+#include "../game/bg_weapon.h"
 
 /*
 ==========================
@@ -228,6 +229,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 		MAKERGB( weaponInfo->flashDlightColor, 1, 0.8f, 0.6f );
 		cgs.media.bulletExplosionShader = trap_R_RegisterShader( "waterExplosion" );
 		cgs.media.bulletPuffShader = trap_R_RegisterShader("smokePuff");
+		cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
 		break;
 
 	case WP_LIGHTNING:
@@ -304,7 +306,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	// powerups have an accompanying ring or sphere
 	//
 	if ( item->giType == IT_POWERUP || item->giType == IT_HEALTH ||
-		item->giType == IT_ARMOR || item->giType == IT_HOLDABLE ) {
+		item->giType == IT_ARMOR ) {
 		if (*item->world_model[1]) {
 			itemInfo->models[1] = trap_R_RegisterModel( item->world_model[1] );
 		}
@@ -2181,323 +2183,6 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	}
 }
 
-
-
-/*
-============================================================================
-
-SHOTGUN TRACING
-
-============================================================================
-*/
-
-static void CG_ShotgunPellet( vec3_t start, vec3_t origin2, vec3_t end, int skipNum, int playerhit,
-							 vec3_t player, float r, float u, int weapon) {
-	trace_t		tr;
-	int sourceContentType, destContentType;
-	int	shaderNum;
-	float		damage = bg_weaponlist[weapon].damage;
-	qbool	shootthru;
-	vec3_t		tr_start;
-	int shootcount = 0;
-
-	VectorCopy(start, tr_start);
-
-cg_shotgunfire:
-	shootthru = qfalse;
-
-	if(playerhit != -1){
-
-		shaderNum = CG_Trace_New( &tr, tr_start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT );
-
-		//player is already dead
-		if(tr.entityNum >= MAX_CLIENTS){
-			VectorCopy(player, tr.endpos);
-			tr.entityNum = playerhit;
-		}
-
-	} else {
-		vec3_t dir;
-
-		VectorSubtract(end, tr_start, dir);
-		VectorNormalize(dir);
-
-		shaderNum = CG_Trace_New( &tr, tr_start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SHOT );
-
-		while(tr.entityNum < MAX_CLIENTS){
-			VectorMA( tr.endpos, 8192 * 16, dir, end);
-
-			shaderNum = CG_Trace_New( &tr, tr.endpos, NULL, NULL, end, tr.entityNum, MASK_SHOT );
-		}
-	}
-
-	sourceContentType = trap_CM_PointContents( tr_start, 0 );
-	destContentType = trap_CM_PointContents( tr.endpos, 0 );
-
-	// FIXME: should probably move this cruft into CG_BubbleTrail
-	if ( sourceContentType == destContentType ) {
-		if ( sourceContentType & CONTENTS_WATER ) {
-			CG_BubbleTrail( tr_start, tr.endpos, 32 );
-		}
-	} else if ( sourceContentType & CONTENTS_WATER ) {
-		trace_t trace;
-
-		trap_CM_BoxTrace_New( &trace, end, tr_start, NULL, NULL, 0, CONTENTS_WATER );
-		CG_BubbleTrail( tr_start, trace.endpos, 32 );
-	} else if ( destContentType & CONTENTS_WATER ) {
-		trace_t trace;
-
-		shaderNum = trap_CM_BoxTrace_New( &trace, tr_start, end, NULL, NULL, 0, CONTENTS_WATER );
-		CG_BubbleTrail( tr.endpos, trace.endpos, 32 );
-
-		//water particles
-		CG_LaunchImpactParticle( trace.endpos, trace.plane.normal, SURF_WATER, shaderNum, WP_SAWEDOFF, qfalse);
-	}
-
-	if (  tr.surfaceFlags & SURF_NOIMPACT ) {
-		return;
-	}
-
-	if ( cg_entities[tr.entityNum].currentState.eType == ET_PLAYER) {
-		vec3_t dir;
-
-		VectorAdd(cg_entities[tr.entityNum].currentState.pos.trDelta, tr.plane.normal, dir);
-		VectorNormalize(dir);
-
-		CG_LaunchImpactParticle(tr.endpos, dir, -1, -1, -1, qtrue);
-		//CG_MissileHitPlayer( WP_REMINGTON_GAUGE, tr.endpos, tr.plane.normal, tr.entityNum );
-		if(tr.entityNum == cg.snap->ps.clientNum){
-			//"shake" the view
-			cg.landAngleChange = (rand()%30)-15;
-			cg.landTime = cg.time;
-			cg.landChange = 0;
-		}
-	} else {
-		vec3_t	endpos;
-		vec3_t		forward, right, up;
-
-		if ( tr.surfaceFlags & SURF_NOIMPACT ) {
-			// SURF_NOIMPACT will not make a flame puff or a mark
-			return;
-		}
-
-		if(cg_entities[tr.entityNum].currentState.eType == ET_BREAKABLE)
-			tr.surfaceFlags |= SURF_BREAKABLE;
-
-		if ( tr.surfaceFlags & SURF_METAL ) {
-			CG_MissileHitWall( WP_REMINGTON_GAUGE, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_METAL, tr.surfaceFlags, shaderNum, qfalse, NULL, tr.entityNum );
-		} else {
-			CG_MissileHitWall( WP_REMINGTON_GAUGE, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_DEFAULT, tr.surfaceFlags, shaderNum, qfalse, NULL, tr.entityNum );
-		}
-
-		// check if bullets are gone thru
-#define DAM_FACTOR 0.5f
-		// modify damage for a short time, cause shotguns have particles with low damage
-		damage *= DAM_FACTOR;
-
-		// look if the weapon is able to shoot through the wall
-		shootthru = BG_ShootThruWall(&damage, tr.endpos, tr_start, tr.surfaceFlags, endpos,
-			CG_Trace);
-
-		damage /= DAM_FACTOR;
-
-		// derive the right and up vectors from the forward vector, because
-		// the client won't have any other information
-		VectorNormalize2( origin2, forward );
-		PerpendicularVector( right, forward );
-		CrossProduct( forward, right, up );
-
-		if(shootthru){
-
-			shootcount++;
-			if(shootcount >= 10)
-				return;
-
-			// first make a hole on the other side of the wall
-			shaderNum = CG_Trace_New( &tr, endpos, NULL, NULL, tr_start, ENTITYNUM_NONE, (MASK_SOLID|CONTENTS_BODY) );
-
-			if(cg_entities[tr.entityNum].currentState.eType == ET_BREAKABLE)
-				tr.surfaceFlags |= SURF_BREAKABLE;
-
-			if ( tr.surfaceFlags & SURF_METAL ) {
-				CG_MissileHitWall( WP_REMINGTON_GAUGE, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_METAL, tr.surfaceFlags, shaderNum, qfalse, NULL, tr.entityNum );
-			} else {
-				CG_MissileHitWall( WP_REMINGTON_GAUGE, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_DEFAULT, tr.surfaceFlags, shaderNum, qfalse, NULL,tr.entityNum );
-			}
-
-			VectorCopy(endpos, tr_start);
-			VectorMA( tr_start, 8192 * 16, forward, end);
-			VectorMA (end, r, right, end);
-			VectorMA (end, u, up, end);
-			goto cg_shotgunfire;
-		}
-
-	}
-}
-
-/*
-================
-CG_ShotgunPattern
-
-Perform the same traces the server did to locate the
-hit splashes
-================
-*/
-static void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int otherEntNum, entityState_t *es ) {
-	int		i;
-	float		r, u;
-	float           spread_dist , spread_angle , angle_shift , current_angle_shift ;
-	float           max_spread_circle , current_spread_circle , extra_circle ;
-	int             current_spread_cell , pellet_per_circle , extra_center_pellet , current_pellet_per_circle ;
-	vec3_t		end;
-	vec3_t		forward, right, up;
-	int count = bg_weaponlist[es->weapon].count;
-	int			seed = es->eventParm;
-
-	if(es->angles[0])
-		count *=2;
-
-	// derive the right and up vectors from the forward vector, because
-	// the client won't have any other information
-	VectorNormalize2( origin2, forward );
-	PerpendicularVector( right, forward );
-	CrossProduct( forward, right, up );
-	
-	if ( cgs.newShotgunPattern ) {
-			
-		// Joe Kari: new experimental shotgun pattern //
-
-		// generate the "random" spread pattern
-
-		switch ( count )  {
-			case 14 :
-			case 28 :
-				pellet_per_circle = 7 ;
-				extra_center_pellet = 0 ;
-				break ;
-			case 6 :
-				pellet_per_circle = 5 ;
-				extra_center_pellet = 1 ;
-				break ;
-			default :
-				pellet_per_circle = 6 ;
-				extra_center_pellet = 0 ;
-		}
-		max_spread_circle = count / pellet_per_circle ;
-		if ( max_spread_circle < 1 )  max_spread_circle = 1 ;
-		angle_shift = Q_random( &seed ) * M_PI * 2.0f ;
-		if ( extra_center_pellet > 0 )  {
-			extra_circle = (float)extra_center_pellet / (float)pellet_per_circle ;
-			max_spread_circle += extra_circle ;
-		}
-
-		for ( i = - extra_center_pellet ; i < count - extra_center_pellet ; i++ ) {
-
-			if ( extra_center_pellet > 0 )  {
-				if ( i < 0 )  {
-					current_spread_circle = 0 ;
-					current_pellet_per_circle = extra_center_pellet ;
-				}
-				else  {
-					current_spread_circle = extra_circle + i / pellet_per_circle ;
-					current_pellet_per_circle = pellet_per_circle ;
-				}
-				current_spread_cell = i - current_spread_circle * current_pellet_per_circle ;
-			}
-			else  {
-				current_spread_circle = i / pellet_per_circle ;
-				current_pellet_per_circle = pellet_per_circle ;
-				current_spread_cell = i - current_spread_circle * current_pellet_per_circle ;
-			}
-			current_angle_shift = angle_shift + current_spread_circle * M_PI / (float)current_pellet_per_circle ;
-
-			spread_dist = ( current_spread_circle + Q_random( &seed ) ) / max_spread_circle * bg_weaponlist[es->weapon].spread * 16 ;
-			// spread adjustement to keep the same spread feeling:
-			spread_dist *= 1.4f;
-			
-			spread_angle = current_angle_shift + ( (float)current_spread_cell + Q_random( &seed ) ) * M_PI * 2.0f / (float)current_pellet_per_circle ;
-
-			r = sin( spread_angle ) * spread_dist ;
-			u = cos( spread_angle ) * spread_dist ;
-
-			VectorMA( origin, 8192 * 16, forward, end);
-			VectorMA (end, r, right, end);
-			VectorMA (end, u, up, end);
-
-			if((i+1) < 16 && ((int)es->angles[1] & (1 << (i+1)))){
-				vec3_t player;
-
-				VectorCopy(cg_entities[es->clientNum].lerpOrigin, player);
-
-				CG_ShotgunPellet( origin, origin2, end, otherEntNum, es->clientNum, player, r, u, es->weapon );
-			} else {
-				CG_ShotgunPellet( origin, origin2, end, otherEntNum, -1, origin, r, u, es->weapon );
-			}
-		
-		}
-
-		// End (Joe Kari) //
-
-			
-	} else {
-		
-		// generate the "random" spread pattern
-		for ( i = 0 ; i < count ; i++ ) {
-			r = Q_crandom( &seed ) * bg_weaponlist[es->weapon].spread * 16;
-			u = Q_crandom( &seed ) * bg_weaponlist[es->weapon].spread * 16;
-			VectorMA( origin, 8192 * 16, forward, end);
-			VectorMA (end, r, right, end);
-			VectorMA (end, u, up, end);
-
-			if((i+1) < 16 && ((int)es->angles[1] & (1 << (i+1)))){
-				vec3_t player;
-
-				VectorCopy(cg_entities[es->clientNum].lerpOrigin, player);
-
-				CG_ShotgunPellet( origin, origin2, end, otherEntNum, es->clientNum, player, r, u, es->weapon );
-			} else {
-				CG_ShotgunPellet( origin, origin2, end, otherEntNum, -1, origin, r, u, es->weapon );
-			}
-		}
-	}
-}
-
-/*
-==============
-CG_ShotgunFire
-==============
-*/
-void CG_ShotgunFire( entityState_t *es ) {
-	vec3_t	v;
-	int		contents;
-
-	VectorSubtract( es->origin2, es->pos.trBase, v );
-	VectorNormalize( v );
-	VectorScale( v, 32, v );
-	VectorAdd( es->pos.trBase, v, v );
-	if ( cgs.glconfig.hardwareType != GLHW_RAGEPRO ) {
-		// ragepro can't alpha fade, so don't even bother with smoke
-		vec3_t			up;
-
-		contents = trap_CM_PointContents( es->pos.trBase, 0 );
-		if ( !( contents & CONTENTS_WATER ) && (cg.snap->ps.clientNum != es->otherEntityNum ||
-			cg.renderingThirdPerson || !cg_gunsmoke.integer)) {
-			VectorSet( up, 0, 0, 8 );
-			CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
-		}
-	}
-	CG_ShotgunPattern( es->pos.trBase, es->origin2, es->otherEntityNum, es );
-}
-
-/*
-============================================================================
-
-BULLETS
-
-============================================================================
-*/
-
-
 /*
 ===============
 CG_Tracer
@@ -2510,7 +2195,6 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 	float		len, begin, end;
 	vec3_t		start, finish;
 	vec3_t		midpoint;
-	int			tracerWidth = 7, tracerLength = 500;
 
 	// tracer
 	VectorSubtract( dest, source, forward );
@@ -2521,7 +2205,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 		return;
 	}
 	begin = 50 + random() * (len - 60);
-	end = begin + tracerLength;
+	end = begin + cg_tracerLength.value;
 	if ( end > len ) {
 		end = len;
 	}
@@ -2535,7 +2219,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 	VectorMA( right, -line[0], cg.refdef.viewaxis[2], right );
 	VectorNormalize( right );
 
-	VectorMA( finish, tracerWidth, right, verts[0].xyz );
+	VectorMA( finish, cg_tracerWidth.value, right, verts[0].xyz );
 	verts[0].st[0] = 0;
 	verts[0].st[1] = 1;
 	verts[0].modulate[0] = 255;
@@ -2543,7 +2227,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 	verts[0].modulate[2] = 255;
 	verts[0].modulate[3] = 255;
 
-	VectorMA( finish, -tracerWidth, right, verts[1].xyz );
+	VectorMA( finish, -cg_tracerWidth.value, right, verts[1].xyz );
 	verts[1].st[0] = 1;
 	verts[1].st[1] = 0;
 	verts[1].modulate[0] = 255;
@@ -2551,7 +2235,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 	verts[1].modulate[2] = 255;
 	verts[1].modulate[3] = 255;
 
-	VectorMA( start, -tracerWidth, right, verts[2].xyz );
+	VectorMA( start, -cg_tracerWidth.value, right, verts[2].xyz );
 	verts[2].st[0] = 1;
 	verts[2].st[1] = 1;
 	verts[2].modulate[0] = 255;
@@ -2559,7 +2243,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 	verts[2].modulate[2] = 255;
 	verts[2].modulate[3] = 255;
 
-	VectorMA( start, tracerWidth, right, verts[3].xyz );
+	VectorMA( start, cg_tracerWidth.value, right, verts[3].xyz );
 	verts[3].st[0] = 0;
 	verts[3].st[1] = 0;
 	verts[3].modulate[0] = 255;
@@ -2574,8 +2258,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 	midpoint[2] = ( start[2] + finish[2] ) * 0.5;
 
 	// add the tracer sound
-	if ( random() < cg_tracerChance.value )
-		trap_S_StartSound( midpoint, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.tracerSound );
+	trap_S_StartSound( midpoint, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.tracerSound );
 
 }
 
@@ -2585,7 +2268,7 @@ void CG_Tracer( vec3_t source, vec3_t dest ) {
 CG_CalcMuzzlePoint
 ======================
 */
-static qbool	CG_CalcMuzzlePoint( int entityNum, vec3_t muzzle ) {
+qbool	CG_CalcMuzzlePoint( int entityNum, vec3_t muzzle ) {
 	vec3_t		forward;
 	centity_t	*cent;
 	int			anim;
@@ -2619,82 +2302,157 @@ static qbool	CG_CalcMuzzlePoint( int entityNum, vec3_t muzzle ) {
 
 }
 
-/*
-======================
-CG_Bullet
 
-Renders bullet effects.
-======================
-*/
-void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qbool flesh, int fleshEntityNum,
-			   int weapon, int surfaceFlags, int shaderNum, int entityNum ) {
-	trace_t trace;
-	int sourceContentType, destContentType;
-	vec3_t		start;
+void CG_RailTrail (const vec3_t start, const vec3_t end, int color) {
+	localEntity_t *le;
+	refEntity_t   *re;
+ 
+	le = CG_AllocLocalEntity();
+	re = &le->refEntity;
+ 
+	le->leType = LE_FADE_RGB;
+	le->startTime = cg.time;
+	le->endTime = cg.time + cg_railTrailTime.value;
+	le->lifeRate = 1.0 / (le->endTime - le->startTime);
+ 
+	re->shaderTime = cg.time / 1000.0f;
+	re->reType = RT_RAIL_CORE;
+	re->customShader = cgs.media.railCoreShader;
+ 
+	VectorCopy(start, re->origin);
+	VectorCopy(end, re->oldorigin);
+ 
+	re->shaderRGBA[0] = g_color_table[color][0] * 255;
+    re->shaderRGBA[1] = g_color_table[color][1] * 255;
+    re->shaderRGBA[2] = g_color_table[color][2] * 255;
+    re->shaderRGBA[3] = 255;
 
-	// if the shooter is currently valid, calc a source point and possibly
-	// do trail effects
-	if ( sourceEntityNum >= 0 ) {
-		if ( CG_CalcMuzzlePoint( sourceEntityNum, start ) ) {
-			int shaderNum;
-			sourceContentType = trap_CM_PointContents( start, 0 );
-			destContentType = trap_CM_PointContents( end, 0 );
-
-			// do a complete bubble trail if necessary
-			if ( ( sourceContentType == destContentType ) && ( sourceContentType & CONTENTS_WATER ) ) {
-				CG_BubbleTrail( start, end, 32 );
-			}
-			// bubble trail from water into air
-			else if ( ( sourceContentType & CONTENTS_WATER ) ) {
-				shaderNum = trap_CM_BoxTrace_New( &trace, end, start, NULL, NULL, 0, CONTENTS_WATER );
-				CG_BubbleTrail( start, trace.endpos, 32 );
-			}
-			// bubble trail from air into water
-			else if ( ( destContentType & CONTENTS_WATER ) ) {
-				shaderNum = trap_CM_BoxTrace_New( &trace, start, end, NULL, NULL, 0, CONTENTS_WATER );
-				CG_BubbleTrail( trace.endpos, end, 32 );
-				//water particles
-				CG_LaunchImpactParticle( trace.endpos, trace.plane.normal, SURF_WATER, shaderNum, weapon, qfalse);
-			}
-
-			// draw a tracer
-				CG_Tracer( start, end );
-		}
-	}
-
-	// impact splash and mark
-	if ( flesh ) {
-		if ( !cg_blood.integer ) {
-			return;
-		}
-		CG_Bleed( end, fleshEntityNum );
-		CG_LaunchImpactParticle(end, normal, -1, -1, -1, qtrue);
-	} else {
-		if(weapon)
-			CG_MissileHitWall( weapon, 0, end, normal, IMPACTSOUND_DEFAULT, surfaceFlags, shaderNum, qfalse, NULL, entityNum );
-		else
-			CG_MissileHitWall( WP_PEACEMAKER, 0, end, normal, IMPACTSOUND_DEFAULT, surfaceFlags , shaderNum, qfalse, NULL, entityNum);
-	}
-
+	le->color[0] = g_color_table[color][0] * 0.75;
+	le->color[1] = g_color_table[color][1] * 0.75;
+	le->color[2] = g_color_table[color][2] * 0.75;
+	le->color[3] = 1.0f;
 }
 
-void CG_MakeSmokePuff(entityState_t *ent){
-	vec3_t	v;
-	int		contents;
-
-	//make smoke puff
-	VectorSubtract( ent->origin2, ent->pos.trBase, v );
-	VectorNormalize( v );
-	VectorScale( v, 32, v );
-	VectorAdd( ent->pos.trBase, v, v );
-	if ( cgs.glconfig.hardwareType != GLHW_RAGEPRO ) {
+void CG_MakeSmokePuff(entityState_t *es){
+	if (cgs.glconfig.hardwareType != GLHW_RAGEPRO) {
 		// ragepro can't alpha fade, so don't even bother with smoke
-		vec3_t			up;
+		int		contents;
+		vec3_t	up;
 
-		contents = trap_CM_PointContents( ent->pos.trBase, 0 );
-		if ( !( contents & CONTENTS_WATER ) ) {
-			VectorSet( up, 0, 0, 8 );
-			CG_SmokePuff( v, up, 24, 1, 1, 0.8f, 0.40f, 400, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
+		contents = trap_CM_PointContents(es->pos.trBase, 0);
+		if (!(contents & CONTENTS_WATER) && (cg.snap->ps.clientNum != es->otherEntityNum ||
+			cg.renderingThirdPerson || !cg_gunsmoke.integer)) {
+			vec3_t	v;
+
+			VectorSubtract(es->origin2, es->pos.trBase, v);
+			VectorNormalize(v);
+			VectorScale(v, 32, v);
+			VectorAdd(es->pos.trBase, v, v);
+			VectorSet(up, 0, 0, 8);
+			CG_SmokePuff(v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader);
 		}
 	}
+}
+
+void CG_Do_Bubbles(const vec3_t muzzle, const vec3_t end, const vec3_t smallStep, int weapon) {
+	trace_t	tr;					//Trace object
+	vec3_t	currentOrigin;		//Muzzle origin for current trace
+	int		tracesCount;		//Number of passed traces
+	qbool	lastTrace;			//Break on that trace
+
+	VectorCopy(muzzle,currentOrigin);
+
+	for (tracesCount = 0; tracesCount < MAX_TRACES_COUNT; tracesCount++) {
+		int shaderNum = trap_CM_BoxTrace_New(&tr, currentOrigin, end, NULL, NULL, 0, CONTENTS_WATER);
+
+		lastTrace = (tr.fraction == 1.0f || tr.allsolid);
+
+		if (trap_CM_PointContents(currentOrigin, 0) & CONTENTS_WATER) {
+			vec3_t	shootBackOrigin;
+			int		internalShaderNum;
+			trace_t	internalTrace;
+
+			if (lastTrace)
+				VectorCopy(end, shootBackOrigin);
+			else
+				VectorCopy(tr.endpos, shootBackOrigin);
+
+			internalShaderNum = trap_CM_BoxTrace_New(&internalTrace, shootBackOrigin, currentOrigin, NULL, NULL, 0, CONTENTS_WATER);
+			if (internalTrace.fraction != 1.0f && !internalTrace.allsolid) {
+				CG_LaunchImpactParticle(internalTrace.endpos, internalTrace.plane.normal, SURF_WATER, internalShaderNum, weapon, qfalse);
+				CG_BubbleTrail(currentOrigin, internalTrace.endpos, 32);
+			} else {
+				CG_BubbleTrail(currentOrigin, shootBackOrigin, 32);
+			}
+		}
+
+		if (lastTrace)
+			break;
+
+		CG_LaunchImpactParticle(tr.endpos, tr.plane.normal, SURF_WATER, shaderNum, weapon, qfalse);
+
+		VectorAdd(tr.endpos, smallStep, currentOrigin);
+	}
+}
+
+void CG_BulletFire(entityState_t *es) {
+	int			seed = es->eventParm;	//Seed for spread pattern
+	vec3_t		smallStep;				//Small step (~1 unit) in the fire direction
+	vec3_t		traceEnd;				//Trace end point at the maximum allowed distance
+	vec3_t		end;					//Trace end point with spread taken into account
+	vec3_t		right, up;
+
+	CG_MakeSmokePuff(es);
+
+	BG_GetProjectileTraceEnd(es->pos.trBase, es->origin2, right, up, traceEnd);
+	BG_GetProjectileEndAndSmallStep(es->angles[0], &seed, es->pos.trBase, traceEnd, right, up, end, smallStep);
+	BG_DoProjectile(es->weapon, es->angles[1], es->pos.trBase, smallStep, end, es->otherEntityNum);
+	CG_Tracer(es->pos.trBase, end);
+/*DEBUG_MOD
+	CG_RailTrail(es->pos.trBase, end, 1);
+*/
+}
+
+void CG_ShotgunFire(entityState_t *es) {
+	int			i;
+	int			seed = es->eventParm;	//Seed for spread pattern
+	vec3_t		smallStep;				//Small step (~1 unit) in the fire direction
+	vec3_t		traceEnd;				//Trace end point at the maximum allowed distance
+	vec3_t		end;					//Trace end point with spread taken into account
+	vec3_t		right, up;
+
+	CG_MakeSmokePuff(es);
+
+	BG_GetProjectileTraceEnd(es->pos.trBase, es->origin2, right, up, traceEnd);
+
+	for (i = 0; i < es->otherEntityNum2; i++) {
+		BG_GetProjectileEndAndSmallStep(es->angles[0], &seed, es->pos.trBase, traceEnd, right, up, end, smallStep);
+		BG_DoProjectile(es->weapon, es->angles[1], es->pos.trBase, smallStep, end, es->otherEntityNum);
+/*DEBUG_MOD
+		CG_RailTrail(es->pos.trBase, end, (i+1)%Q_COLORS_COUNT);
+*/
+	}
+}
+
+void CG_ProjectileHitWall(int weapon, vec3_t origin, vec3_t dir,
+					   int surfaceFlags, int shaderNum,
+					   int entityNum) {
+	int	i;
+
+	if (cg_entities[entityNum].currentState.eType == ET_BREAKABLE)
+		surfaceFlags |= SURF_BREAKABLE;
+
+	if (surfaceFlags == -1)
+		return;
+
+	for (i=0; i<NUM_PREFIXINFO; i++)
+		if ((surfaceFlags & prefixInfo[i].surfaceFlags) || !prefixInfo[i].surfaceFlags) {
+			if (surfaceFlags & SURF_BREAKABLE)
+				CG_CreateBulletHole(origin, dir, surfaceFlags, entityNum);
+			else
+				CG_ImpactMark(cgs.media.marks[i][rand()%2], origin, dir, random()*360, shaderInfo[shaderNum].color[0], shaderInfo[shaderNum].color[1], shaderInfo[shaderNum].color[2], 1.0f, qtrue, 3, qfalse, -1);
+			break;
+		}
+
+	CG_LaunchImpactParticle(origin, dir, surfaceFlags, shaderNum, weapon, qfalse);
 }

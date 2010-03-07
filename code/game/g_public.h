@@ -446,9 +446,6 @@ extern	shaderInfo_t shaderInfo[MAX_BRUSHSIDES];
 extern	int	shaderInfoNum;
 
 qbool CG_ParseTexFile(const char *filename);
-extern	hit_data_t	hit_data;
-
-qbool G_LoadHitFiles(hit_data_t *hit_data);
 
 #endif
 

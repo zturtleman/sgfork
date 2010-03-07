@@ -183,7 +183,7 @@ static	int	neighbors[8][2] = {
 						break;					// edge of patch
 					}
 					VectorSubtract( ctrl[y][x].xyz, base, temp );
-					if ( VectorNormalize2( temp, temp ) == 0 ) {
+					if ( VectorNormalizeClearOutOnZeroLength( temp, temp ) == 0 ) {
 						continue;				// degenerate edge, get more dist
 					} else {
 						good[k] = qtrue;
@@ -199,7 +199,7 @@ static	int	neighbors[8][2] = {
 					continue;	// didn't get two points
 				}
 				CrossProduct( around[(k+1)&7], around[k], normal );
-				if ( VectorNormalize2( normal, normal ) == 0 ) {
+				if ( VectorNormalizeClearOutOnZeroLength( normal, normal ) == 0 ) {
 					continue;
 				}
 				VectorAdd( normal, sum, sum );
@@ -209,7 +209,7 @@ static	int	neighbors[8][2] = {
 //printf("bad normal\n");
 				count = 1;
 			}
-			VectorNormalize2( sum, dv->normal );
+			VectorNormalizeClearOutOnZeroLength( sum, dv->normal );
 		}
 	}
 }

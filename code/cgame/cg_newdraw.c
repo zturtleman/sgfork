@@ -1440,7 +1440,6 @@ static void CG_DrawDeathMessages(rectDef_t *rect, vec4_t textColor) {
 }
 
 static void CG_DrawAttacker(rectDef_t *rect, vec4_t textColor) {
-	int			t;
 	float		size;
 	vec3_t		angles;
 	const char	*info;
@@ -1460,8 +1459,7 @@ static void CG_DrawAttacker(rectDef_t *rect, vec4_t textColor) {
 	if (clientNum < 0 || clientNum >= MAX_CLIENTS || clientNum == cg.snap->ps.clientNum)
 		return;
 
-	t = cg.time - cg.attackerTime;
-	if ( t > ATTACKER_HEAD_TIME ) {
+	if ( cg.time - cg.attackerTime > ATTACKER_HEAD_TIME ) {
 		cg.attackerTime = 0;
 		return;
 	}

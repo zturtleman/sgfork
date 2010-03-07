@@ -70,9 +70,9 @@ initialLerp = 0
 reversed = 0
 flipflop = 0
 
-spread = 0
-damage = 0
-range = 250
+spread = 700
+damage = 7
+range = 0
 addTime = 0
 count = 405
 clipAmmo = -1

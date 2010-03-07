@@ -50,9 +50,9 @@ endif
 # Based on ioQuake3 revision
 IOQ3_REVISION = 1735
 
-SDK_GAME          = Smokin' Guns
-SDK_GAMENAME      = smokinguns
-SDK_GAMENAME_DED  = smokinguns_dedicated
+SDK_GAME          = SGFork
+SDK_GAMENAME      = sgfork
+SDK_GAMENAME_DED  = sgfork_dedicated
 
 # Here some convenient defaults
 ifndef COPYDIR
@@ -65,14 +65,9 @@ endif
 # Packagers can uncomment and change DEFAULT_BASEDIR to define a system
 # installation path for the game. Otherwise, you can start the game with
 # a script setting SG_BASEPATH environment to the path you would prefer
-#DEFAULT_BASEDIR = /usr/share/games/smokinguns
-
-# Use -DFS_FOPENI if you are MODing under Unix (content out of PK3)
-#STANDALONE_CFLAGS += -DFS_FOPENI
-#STANDALONE_CFLAGS += -DFS_MISSING -DFS_FOPENI
-
+#DEFAULT_BASEDIR = /usr/share/games/sgfork
 #############################################################################
-#EO SG/SGFork specified variables
+#EO SG/SGFork specific variables
 #############################################################################
 
 ifndef PLATFORM
@@ -756,7 +751,7 @@ ifeq ($(PLATFORM),sunos)
   CC=gcc
   INSTALL=ginstall
   MKDIR=gmkdir
-  COPYDIR="/usr/local/share/games/smokinguns"
+  COPYDIR="/usr/local/share/games/sgfork"
 
   ifneq (,$(findstring i86pc,$(shell uname -m)))
     ARCH=i386
@@ -1673,6 +1668,7 @@ Q3CGOBJ_ = \
   $(B)/$(SDK_GAMENAME)/cgame/bg_slidemove.o \
   $(B)/$(SDK_GAMENAME)/cgame/bg_lib.o \
   $(B)/$(SDK_GAMENAME)/cgame/bg_parse.o \
+  $(B)/$(SDK_GAMENAME)/cgame/bg_weapon.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_consolecmds.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_newdraw.o \
   $(B)/$(SDK_GAMENAME)/cgame/cg_draw.o \
@@ -1725,6 +1721,7 @@ Q3GOBJ_ = \
   $(B)/$(SDK_GAMENAME)/game/bg_misc.o \
   $(B)/$(SDK_GAMENAME)/game/bg_pmove.o \
   $(B)/$(SDK_GAMENAME)/game/bg_parse.o \
+  $(B)/$(SDK_GAMENAME)/game/bg_weapon.o \
   $(B)/$(SDK_GAMENAME)/game/bg_slidemove.o \
   $(B)/$(SDK_GAMENAME)/game/bg_lib.o \
   $(B)/$(SDK_GAMENAME)/game/g_active.o \
@@ -1751,7 +1748,6 @@ Q3GOBJ_ = \
   $(B)/$(SDK_GAMENAME)/qcommon/q_shared.o \
   \
   $(B)/$(SDK_GAMENAME)/game/g_sg_utils.o \
-  $(B)/$(SDK_GAMENAME)/game/g_hit.o \
   $(B)/$(SDK_GAMENAME)/game/g_unlagged.o
 
 Q3GOBJ = $(Q3GOBJ_) $(B)/$(SDK_GAMENAME)/game/g_syscalls.o
