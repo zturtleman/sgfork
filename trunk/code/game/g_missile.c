@@ -91,7 +91,7 @@ G_ExplodeMissile
 Explode a missile without an impact
 ================
 */
-void G_ExplodeMissile( gentity_t *ent ) {
+static void G_ExplodeMissile( gentity_t *ent ) {
 	vec3_t		dir;
 	vec3_t		origin;
 
@@ -112,6 +112,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	if ( ent->splashDamage ) {
 		if( G_RadiusDamage( ent->r.currentOrigin, ent->parent, ent->splashDamage, ent->splashRadius, ent
 			, ent->splashMethodOfDeath ) ) {
+				g_entities[ent->r.ownerNum].client->accuracy_hits++;
 		}
 	}
 
@@ -125,7 +126,7 @@ Makes a dynamite explode in the given position.
 Needs an attacker, to know who caused the explosion.
 ================
 */
-void G_InstantExplode(vec3_t orig, gentity_t *attacker) {
+void G_InstantExplode(const vec3_t orig, gentity_t *attacker) {
 	gentity_t *dynamite;
 
 	//spawn a new entity
@@ -144,9 +145,11 @@ void G_InstantExplode(vec3_t orig, gentity_t *attacker) {
 	dynamite->r.ownerNum = attacker->s.number;
 	dynamite->parent = attacker;
 	//dynamite damage
-	dynamite->damage = DYNA_DAMAGE;
-	dynamite->splashDamage = DYNA_SPLASHDAMAGE;
-	dynamite->splashRadius = DYNA_SPLASHRADIUS;
+	dynamite->damage = bg_weaponlist[WP_DYNAMITE].damage;
+	if (bg_weaponlist[WP_DYNAMITE].range) {
+		dynamite->splashDamage = dynamite->damage;
+		dynamite->splashRadius = bg_weaponlist[WP_DYNAMITE].range;
+	}
 	dynamite->methodOfDeath = MOD_DYNAMITE;
 	dynamite->splashMethodOfDeath = MOD_DYNAMITE;
 	dynamite->clipmask = MASK_SHOT;
@@ -560,54 +563,6 @@ think:
 
 //=============================================================================
 
-void G_Temp(gentity_t *self){
-	self->nextthink = level.time + 100;
-}
-
-/*
-=================
-fire_knife
-=================
-*/
-gentity_t *fire_knife (gentity_t *self, vec3_t start, vec3_t dir, int speed) {
-	gentity_t	*bolt;
-
-	VectorNormalize (dir);
-
-	bolt = G_Spawn();
-	bolt->classname = "knife";
-	bolt->nextthink = level.time + 100;
-	bolt->think = G_Temp;
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weapon = WP_KNIFE;
-	bolt->r.ownerNum = self->s.number;
-//unlagged - projectile nudge
-	// we'll need this for nudging projectiles later
-	bolt->s.otherEntityNum = self->s.number;
-//unlagged - projectile nudge
-	bolt->parent = self;
-	bolt->damage = 65 + rand()%30;
-	bolt->splashDamage = 0;
-	bolt->splashRadius = 0;
-	bolt->methodOfDeath = MOD_KNIFE;
-	bolt->splashMethodOfDeath = MOD_KNIFE;
-	bolt->clipmask = MASK_SHOT;
-
-	if(self->client)
-		VectorCopy(self->client->ps.viewangles, bolt->s.angles2);
-
-	bolt->s.pos.trType = TR_GRAVITY;//_LOW;
-	bolt->s.pos.trTime = level.time + MISSILE_PRESTEP_TIME; //- MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, speed, bolt->s.pos.trDelta );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
-
-	return bolt;
-}
-
-
 /*
 ==========================================================================================
 DYNAMITE
@@ -690,121 +645,84 @@ void G_DynamiteDie( gentity_t *self, gentity_t *inflictor,
 	self->parent = attacker;
 }
 
-/*
-=================
-fire_dynamite
-=================
-*/
+gentity_t *FireThrowMissle(gentity_t *self, const vec3_t start, const vec3_t dir, const weapon_t weapon, const float speed) {
+	gentity_t	*bolt = G_Spawn();
 
-gentity_t *fire_dynamite (gentity_t *self, vec3_t start, vec3_t dir, int speed) {
-	gentity_t	*bolt;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weapon = weapon;
+	bolt->damage = bg_weaponlist[weapon].damage;
+	if (bg_weaponlist[weapon].range) {
+		bolt->splashDamage = bolt->damage;
+		bolt->splashRadius = bg_weaponlist[weapon].range;
+	}
+	bolt->r.ownerNum = self->s.number;
+//unlagged - projectile nudge
+	// we'll need this for nudging projectiles later
+	bolt->s.otherEntityNum = self->s.number;
+//unlagged - projectile nudge
+	bolt->parent = self;
+	bolt->methodOfDeath = weapon; // Assume each weapon is equal to MOD
+	bolt->splashMethodOfDeath = weapon; // Assume each weapon is equal to MOD
+	bolt->clipmask = MASK_SHOT;
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;	// move a bit on the very first frame
+	VectorCopy(start, bolt->s.pos.trBase);
+	VectorCopy(dir, bolt->s.pos.trDelta);
+	VectorNormalize(bolt->s.pos.trDelta);
+	VectorScale(bolt->s.pos.trDelta, speed, bolt->s.pos.trDelta);
+	SnapVector(bolt->s.pos.trDelta);			// save net bandwidth
+	VectorCopy(start, bolt->r.currentOrigin);
 
-	VectorNormalize (dir);
+	if (weapon == WP_KNIFE)
+		bolt->classname = "knife";
+	else if (weapon == WP_MOLOTOV) {
+		bolt->classname = "molotov";
 
-	bolt = G_Spawn();
-	bolt->classname = "grenade";
+		if (self->client) {
+			if (self->client->ps.stats[STAT_WP_MODE] < 0)
+				bolt->s.apos.trDelta[0] = self->client->ps.stats[STAT_WP_MODE];
+			else
+				bolt->s.apos.trDelta[0] = 0;
 
-	bolt->nextthink = level.time + 100; // call G_Suck in 1/10 second
-	bolt->think = G_Suck;
+			self->client->ps.stats[STAT_WP_MODE] = 0;
+		}
+	} else if (weapon == WP_DYNAMITE) {
+		bolt->classname = "grenade";
+		bolt->think = G_Suck;
+		bolt->nextthink = level.time + 100;
+		bolt->s.eFlags = EF_BOUNCE_HALF;
+		if (self->client) {
+			// dynamite(variable) lifetime
+			if (self->client->ps.stats[STAT_WP_MODE]) {
+				bolt->nextthink = level.time + G_AnimLength(WP_ANIM_ALT_FIRE, WP_DYNAMITE)
+					+ G_AnimLength(WP_ANIM_SPECIAL, WP_DYNAMITE) +
+					self->client->ps.stats[STAT_WP_MODE];
+				bolt->think = G_ExplodeMissile;
+			}
 
-	if (self->client ) {
-		// dynamite(variable) lifetime
-		if(self->client->ps.stats[STAT_WP_MODE]){
-			bolt->nextthink = level.time + G_AnimLength(WP_ANIM_ALT_FIRE, WP_DYNAMITE)
-				+ G_AnimLength(WP_ANIM_SPECIAL, WP_DYNAMITE) +
-				self->client->ps.stats[STAT_WP_MODE];
+			// Spoon
+			bolt->health = DYNA_HEALTH;
+			bolt->takedamage = qtrue;
+			bolt->die = G_DynamiteDie;
+			bolt->r.contents = CONTENTS_CORPSE;
+			VectorSet(bolt->r.mins, -8, -8, -1);
+			VectorCopy(bolt->r.mins, bolt->r.absmin);
+			VectorSet(bolt->r.maxs, 8, 8, 8);
+			VectorCopy(bolt->r.maxs, bolt->r.absmax);
+
+			if (self->client->ps.stats[STAT_WP_MODE] >= 0) {
+				bolt->classname = "grenadeno";
+				bolt->s.apos.trDelta[0] = 0;
+			} else //needed to check the missilesound on or off
+				bolt->s.apos.trDelta[0] = bolt->nextthink;//it's burning down the house
+
+			self->client->ps.stats[STAT_WP_MODE] = 0;
+		} else {
+			bolt->nextthink = level.time + 2500;
 			bolt->think = G_ExplodeMissile;
 		}
-
-		// Spoon
-		bolt->health = DYNA_HEALTH;
-		bolt->takedamage = qtrue;
-        bolt->die = G_DynamiteDie;
-		bolt->r.contents = CONTENTS_CORPSE;
-        VectorSet(bolt->r.mins, -8, -8, -1);
-        VectorCopy(bolt->r.mins, bolt->r.absmin);
-        VectorSet(bolt->r.maxs, 8, 8, 8);
-        VectorCopy(bolt->r.maxs, bolt->r.absmax);
-
-		if (self->client->ps.stats[STAT_WP_MODE] >= 0){
-			bolt->classname = "grenadeno";
-			bolt->s.apos.trDelta[0] = 0;
-		} else //needed to check the missilesound on or off
-			bolt->s.apos.trDelta[0] = bolt->nextthink;//it's burning down the house
-	} else {
-		bolt->nextthink = level.time + 2500;
-		bolt->think = G_ExplodeMissile;
-	}
-
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->r.svFlags |= SVF_BROADCAST;
-	bolt->s.weapon = WP_DYNAMITE;
-	bolt->s.eFlags = EF_BOUNCE_HALF;
-	bolt->r.ownerNum = self->s.number;
-//unlagged - projectile nudge
-	// we'll need this for nudging projectiles later
-	bolt->s.otherEntityNum = self->s.number;
-//unlagged - projectile nudge
-	bolt->parent = self;
-	bolt->damage = DYNA_DAMAGE;
-	bolt->splashDamage = DYNA_SPLASHDAMAGE;
-	bolt->splashRadius = DYNA_SPLASHRADIUS;
-	bolt->methodOfDeath = MOD_DYNAMITE;
-	bolt->splashMethodOfDeath = MOD_DYNAMITE;
-	bolt->clipmask = MASK_SHOT;
-
-	bolt->s.pos.trType = TR_GRAVITY;
-	bolt->s.pos.trTime = level.time + MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, speed, bolt->s.pos.trDelta );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-
-	VectorCopy (start, bolt->r.currentOrigin);
-
-	return bolt;
-}
-
-gentity_t *fire_molotov (gentity_t *self, vec3_t start, vec3_t dir, int speed) {
-	gentity_t	*bolt;
-
-	VectorNormalize (dir);
-
-	bolt = G_Spawn();
-	bolt->classname = "molotov";
-
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->r.svFlags |= SVF_BROADCAST;
-	bolt->s.weapon = WP_MOLOTOV;
-	bolt->r.ownerNum = self->s.number;
-//unlagged - projectile nudge
-	// we'll need this for nudging projectiles later
-	bolt->s.otherEntityNum = self->s.number;
-//unlagged - projectile nudge
-	bolt->parent = self;
-	bolt->damage = MOLOTOV_DAMAGE;
-	bolt->splashDamage = MOLOTOV_SPLASHDAMAGE;
-	bolt->splashRadius = MOLOTOV_SPLASHRADIUS;
-	bolt->methodOfDeath = MOD_MOLOTOV;
-	bolt->splashMethodOfDeath = MOD_MOLOTOV;
-	bolt->clipmask = MASK_SHOT;
-
-	bolt->s.pos.trType = TR_GRAVITY;
-	bolt->s.pos.trTime = level.time + MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, speed, bolt->s.pos.trDelta );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-
-	VectorCopy (start, bolt->r.currentOrigin);
-
-	if(self->client){
-		if(self->client->ps.stats[STAT_WP_MODE] < 0)
-			bolt->s.apos.trDelta[0] = self->client->ps.stats[STAT_WP_MODE];
-		else
-			bolt->s.apos.trDelta[0] = 0;
 	}
 
 	return bolt;
 }
-

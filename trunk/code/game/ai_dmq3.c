@@ -3022,8 +3022,8 @@ Before the bot ends in this part of the AI it should predict which doors to
 open, which buttons to activate etc.
 ==================
 */
-extern vec3_t	playerMins;
-extern vec3_t	playerMaxs;
+extern const vec3_t	playerMins;
+extern const vec3_t	playerMaxs;
 void BotAIBlocked(bot_state_t *bs, bot_moveresult_t *moveresult, int activate) {
 	int movetype, bspent;
 	vec3_t hordir, start, end, mins, maxs, sideward, angles, up = {0, 0, 1};

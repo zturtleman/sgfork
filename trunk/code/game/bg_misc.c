@@ -27,11 +27,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_public.h"
 
-vec3_t playerMins = {PLAYER_MIN_PITCH, PLAYER_MIN_YAW, MINS_Z};
-vec3_t playerMaxs = {PLAYER_MAX_PITCH, PLAYER_MAX_YAW, MAXS_Z};
-
-vec3_t playerMins_hit = {PLAYER_MIN_HIT_PITCH, PLAYER_MIN_HIT_YAW, MINS_Z};
-vec3_t playerMaxs_hit = {PLAYER_MAX_HIT_PITCH, PLAYER_MAX_HIT_YAW, MAXS_Z_HIT};
+const vec3_t playerMins = {PLAYER_MIN_PITCH, PLAYER_MIN_YAW, PLAYER_MINS_Z};
+const vec3_t playerMaxs = {PLAYER_MAX_PITCH, PLAYER_MAX_YAW, PLAYER_MAXS_Z};
 
 vec3_t gatling_mins = {GATLING_MINS_PITCH, GATLING_MINS_YAW, GATLING_MINS_ROLL};
 vec3_t gatling_maxs = {GATLING_MAXS_PITCH, GATLING_MAXS_YAW, GATLING_MAXS_ROLL};
@@ -65,26 +62,6 @@ gitem_t	*BG_ItemForPowerup( powerup_t pw ) {
 	return NULL;
 }
 
-
-/*
-==============
-BG_ItemForHoldable
-==============
-*/
-gitem_t	*BG_ItemForHoldable( holdable_t pw ) {
-	int		i;
-
-	for ( i = 0 ; i < IT_NUM_ITEMS ; i++ ) {
-		if ( bg_itemlist[i].giType == IT_HOLDABLE && bg_itemlist[i].giTag == pw ) {
-			return &bg_itemlist[i];
-		}
-	}
-
-	Com_Error( ERR_DROP, "HoldableItem not found" );
-
-	return NULL;
-}
-
 /*
 ===============
 BG_ItemForWeapon
@@ -113,11 +90,9 @@ BG_ItemForAmmo
 gitem_t	*BG_ItemForAmmo( weapon_t ammo ) {
 	gitem_t	*it;
 
-	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
-		if ( it->giType == IT_AMMO && it->giTag == ammo ) {
+	for (it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++)
+		if (it->giType == IT_AMMO && it->giTag == ammo)
 			return it;
-		}
-	}
 
 	Com_Printf( "Couldn't find item for ammo %i\nPlease report on http://www.smokin-guns.net forum or http://sourceforge.net/projects/smokinguns\n", ammo);
 	return NULL;
@@ -128,14 +103,12 @@ gitem_t	*BG_ItemForAmmo( weapon_t ammo ) {
 BG_PlayerWeapon
 ===========================
 */
-int	BG_PlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps){
+int	BG_PlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps) {
 	int i;
 
-	for(i=firstweapon;i<lastweapon;i++){
-		if(ps->stats[STAT_WEAPONS] & (1<<i)){
+	for (i=firstweapon; i<lastweapon; i++)
+		if (ps->stats[STAT_WEAPONS] & (1<<i))
 			return i;
-		}
-	}
 	return 0;
 }
 
@@ -148,10 +121,9 @@ by Spoon
 gitem_t	*BG_ItemByClassname( const char *classname ) {
 	gitem_t	*it;
 
-	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
-		if ( !Q_stricmp( it->classname, classname ) )
+	for (it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++)
+		if (!Q_stricmp(it->classname, classname))
 			return it;
-	}
 
 	return NULL;
 }
@@ -165,10 +137,9 @@ BG_Item
 gitem_t	*BG_Item( const char *pickupName ) {
 	gitem_t	*it;
 
-	for(it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++){
-		if ( !Q_stricmp( it->pickup_name, pickupName ) )
+	for (it=&bg_itemlist[1]; ITEM_INDEX(it) < IT_NUM_ITEMS; it++)
+		if (!Q_stricmp( it->pickup_name, pickupName))
 			return it;
-	}
 
 	return NULL;
 }
@@ -350,13 +321,6 @@ qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerS
 
 	case IT_TEAM: // team items, such as flags
 		return qfalse;
-
-	case IT_HOLDABLE:
-		// can only hold one item at a time
-		if ( ps->stats[STAT_HOLDABLE_ITEM] ) {
-			return qfalse;
-		}
-		return qtrue;
 
 	case IT_BAD:
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
@@ -672,19 +636,10 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qbool sna
 	s->groundEntityNum = ps->groundEntityNum;
 
 	s->powerups = 0;
-	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
-		if ( ps->powerups[ i ] ) {
-			if(i == PW_SCOPE && ps->powerups[i] != 2)
+	for (i = 0; i < MAX_POWERUPS; i++) {
+		if (ps->powerups[i]) {
+			if (i == PW_SCOPE && ps->powerups[i] != 2)
 				continue;
-
-			if(i == DM_TORSO_1 || i == DM_LEGS_1|| i == DM_HEAD_1){
-				if(ps->powerups[i] >= 2)
-					s->powerups |= 1 << (i+1);
-				else
-					s->powerups |= 1 << i;
-				i++;
-				continue;
-			}
 			s->powerups |= 1 << i;
 		}
 	}
@@ -693,7 +648,6 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qbool sna
 	s->frame = ps->weapon2;
 
 	s->loopSound = ps->loopSound;
-	s->generic1 = ps->generic1;
 
 	if((ps->weapon == WP_MOLOTOV || ps->weapon == WP_DYNAMITE) &&
 		ps->stats[STAT_WP_MODE] < 0){
@@ -780,20 +734,10 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	s->groundEntityNum = ps->groundEntityNum;
 
 	s->powerups = 0;
-	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
-		if ( ps->powerups[ i ] ) {
-			if(i == PW_SCOPE && ps->powerups[i] != 2)
+	for (i = 0; i < MAX_POWERUPS; i++) {
+		if (ps->powerups[i]) {
+			if (i == PW_SCOPE && ps->powerups[i] != 2)
 				continue;
-
-			if(i == DM_TORSO_1 || i == DM_LEGS_1|| i == DM_HEAD_1){
-				if(ps->powerups[i] >= 2)
-					s->powerups |= 1 << (i+1);
-				else
-					s->powerups |= 1 << i;
-
-				i++;
-				continue;
-			}
 			s->powerups |= 1 << i;
 		}
 	}
@@ -802,7 +746,6 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	s->frame = ps->weapon2;
 
 	s->loopSound = ps->loopSound;
-	s->generic1 = ps->generic1;
 
 	if((ps->weapon == WP_MOLOTOV || ps->weapon == WP_DYNAMITE) &&
 		ps->stats[STAT_WP_MODE] < 0){
@@ -853,112 +796,6 @@ prefixInfo_t prefixInfo[NUM_PREFIXINFO] = {
 	{ "grass", SURF_GRASS,		7.0f,	0.9f,	7,	1,	2.0f},
 	{ "other", 0,				0.8f,	1.0f,	10, 1,	0.5f}
 };
-
-// shoot-thru-walls code( STW wuahahahaha, damn shit)
-qbool BG_ShootThruWall( float *damage,
-						  vec3_t start, vec3_t muzzle, int surfaceFlags, vec3_t end,
-						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask )){
-	trace_t			tr;
-	int	i;
-	float	factor = 0.0f, distance;
-	vec3_t dir;
-
-	// find surface
-	for(i = 0; i < NUM_PREFIXINFO; i++){
-		if(surfaceFlags & prefixInfo[i].surfaceFlags){
-			factor = prefixInfo[i].thickness;
-			break;
-		}
-	}
-
-	// no surface found
-	if(factor == 0.0f){
-		return qfalse;
-	}
-
-	// calculate direction
-	VectorSubtract(start, muzzle, dir);
-	distance = VectorNormalize(dir);
-
-	// set strength of bullet
-	factor *= 2.5f;//(1.1f + (*damage/25.0f));
-
-#define CHECK 2.0f
-#define MAX_DISTANCE 300
-	for(i = 1; i < 10; i++){
-		vec3_t temp, tempend;
-		vec3_t	mins, maxs;
-
-		VectorSet(mins, -CHECK, -CHECK, -CHECK);
-		VectorSet(maxs, CHECK, CHECK, CHECK);
-
-		VectorMA(start, i*factor, dir, temp);
-		VectorMA(start, (i+1)*factor, dir, tempend);
-
-		trace( &tr, temp, NULL, NULL, tempend, -1, MASK_SHOT);
-
-		// shoot thru!
-		if(!tr.allsolid && !tr.startsolid){
-			vec3_t dist, trend;
-			float distance;
-
-			// trace into the direction and look if the level has ended after that wall
-			VectorMA(start, 10000, dir, trend);
-			trace( &tr, tempend, mins, maxs, trend, -1, MASK_SOLID);
-			if(tr.fraction == 1.0 || tr.allsolid || tr.startsolid)
-				return qfalse;
-
-			// get exact endpoint (shoot into the other direction)
-			VectorMA(start, -100, dir, trend);
-			trace( &tr, tempend, mins, maxs, trend, -1, MASK_SOLID);
-			VectorCopy(tr.endpos, end);
-
-			// if the surface doesn't have a right normal vector don't shoouthru(curves)
-			/*if(tr.plane.normal[0] == 0 &&
-				tr.plane.normal[0] == 0 &&
-				tr.plane.normal[0] == 0)
-				return qfalse;*/
-
-			// now see if we could trace a direct line between the two sides
-			//trace( &tr, tempend, NULL, NULL, start, -1, MASK_SOLID);
-
-			//Com_Printf("%f %i %i\n", tr.fraction, tr.startsolid, tr.allsolid, tr.entityNum);
-
-			// nothing solid in between
-			//if(tr.fraction == 1.0 && !tr.allsolid){
-			//	return qfalse;
-			//}
-
-			// calculate distance
-			VectorSubtract(end, start, dist);
-			distance = VectorNormalize(dist);
-
-			if(distance > *damage*6.0f)
-				break;
-
-			// decrease damage
-			if(distance > MAX_DISTANCE)
-				break;
-
-			// change the endpos a bit
-			//VectorMA(end, -1, dist, end);
-			*damage *= 0.5f*sqrt((MAX_DISTANCE-distance)/MAX_DISTANCE);
-			return qtrue;
-		}
-	}
-	return qfalse;
-}
-
-void BG_SurfaceFlags2Prefix(int surfaceFlags, char	*prefix){
-	int i;
-
-	for(i=0;i<NUM_PREFIXINFO;i++){
-		if(surfaceFlags & prefixInfo[i].surfaceFlags){
-			strcpy(prefix, prefixInfo[i].name);
-			break;
-		}
-	}
-}
 
 void BG_StringRead(char *destination, char *source, int size) {
 	int i;
@@ -1083,15 +920,6 @@ qbool CheckPistols(playerState_t *ps, int *weapon){
 	return qfalse;
 }
 
-// I often want to check the vectors ingame, so i need this, works faster
-void Com_PrintfVector(vec3_t vec){
-	Com_Printf("%f, %f, %f\n", vec[0], vec[1], vec[2]);
-}
-
-void Com_PrintfVectorInt(int vec[3]){
-	Com_Printf("%i, %i, %i\n", vec[0], vec[1], vec[2]);
-}
-
 void BG_SetWhiskeyDrop(trajectory_t *tr, vec3_t org, vec3_t normal, vec3_t dir){
 	vec3_t origin;
 
@@ -1156,27 +984,3 @@ int BG_MapPrefix(char *map, int gametype){
 
 	return gametype;
 }
-
-hit_info_t	hit_info[NUM_HIT_LOCATIONS] = {
-	{"hit_h_head",			"head",		"head",		HIT_HEAD,			PART_HEAD	},
-
-	{"hit_u_neck",			"neck",		"neck",		HIT_NECK,			PART_UPPER	},
-	{"hit_u_shoulder_r",	"shoulder",	"shoulder",	HIT_SHOULDER_R,		PART_UPPER	},
-	{"hit_u_upper_arm_r",	"arm",		"arm",		HIT_UPPER_ARM_R,	PART_UPPER	},
-	{"hit_u_lower_arm_r",	"arm",		"arm",		HIT_LOWER_ARM_R,	PART_UPPER	},
-	{"hit_u_hand_r",		"hand",		"hand",		HIT_HAND_R,			PART_UPPER	},
-	{"hit_u_shoulder_l",	"shoulder",	"shoulder",	HIT_SHOULDER_L,		PART_UPPER	},
-	{"hit_u_upper_arm_l",	"arm",		"arm",		HIT_UPPER_ARM_L,	PART_UPPER	},
-	{"hit_u_lower_arm_l",	"arm",		"arm",		HIT_LOWER_ARM_L,	PART_UPPER	},
-	{"hit_u_hand_l",		"hand",		"hand",		HIT_HAND_L,			PART_UPPER	},
-	{"hit_u_chest",			"chest",	"back",		HIT_CHEST,			PART_UPPER	},
-	{"hit_u_stomach",		"stomach",	"back",		HIT_STOMACH,		PART_UPPER	},
-
-	{"hit_l_upper_leg_r",	"leg",		"leg",		HIT_UPPER_LEG_R,	PART_LOWER	},
-	{"hit_l_lower_leg_r",	"leg",		"leg",		HIT_LOWER_LEG_R,	PART_LOWER	},
-	{"hit_l_foot_r",		"foot",		"foot",		HIT_FOOT_R,			PART_LOWER	},
-	{"hit_l_upper_leg_l",	"leg",		"leg",		HIT_UPPER_LEG_L,	PART_LOWER	},
-	{"hit_l_lower_leg_l",	"leg",		"leg",		HIT_LOWER_LEG_L,	PART_LOWER	},
-	{"hit_l_foot_l",		"foot",		"foot",		HIT_FOOT_L,			PART_LOWER	},
-	{"hit_l_pelvis",		"groin",	"butt",		HIT_PELVIS,			PART_LOWER	}
-};

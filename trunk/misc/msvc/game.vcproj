@@ -507,6 +507,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\game\bg_weapon.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\game\g_active.c"
 				>
 			</File>
@@ -528,10 +532,6 @@
 			</File>
 			<File
 				RelativePath="..\..\code\game\g_combat.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\code\game\g_hit.c"
 				>
 			</File>
 			<File
@@ -689,6 +689,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\game\bg_public.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\game\bg_weapon.h"
 				>
 			</File>
 			<File

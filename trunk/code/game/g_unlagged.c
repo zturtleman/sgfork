@@ -41,11 +41,7 @@ void G_ResetHistory( gentity_t *ent ) {
 
 		// locational damage
 		VectorCopy( ent->r.currentAngles, ent->client->history[i].currentAngles);
-		VectorCopy( ent->client->legs_angles, ent->client->history[i].legs_angles);
-		VectorCopy( ent->client->torso_angles, ent->client->history[i].torso_angles);
 		VectorCopy( ent->client->ps.viewangles, ent->client->history[i].viewangles);
-		BG_CopyLerpFrame( &ent->client->legs, &ent->client->history[i].legs);
-		BG_CopyLerpFrame( &ent->client->torso, &ent->client->history[i].torso);
 
 		ent->client->history[i].leveltime = time;
 	}
@@ -79,11 +75,7 @@ void G_StoreHistory( gentity_t *ent ) {
 
 	// locational damage
 	VectorCopy( ent->r.currentAngles, ent->client->history[head].currentAngles);
-	VectorCopy( ent->client->legs_angles, ent->client->history[head].legs_angles);
-	VectorCopy( ent->client->torso_angles, ent->client->history[head].torso_angles);
 	VectorCopy( ent->client->ps.viewangles, ent->client->history[head].viewangles);
-	BG_CopyLerpFrame( &ent->client->legs, &ent->client->history[head].legs);
-	BG_CopyLerpFrame( &ent->client->torso, &ent->client->history[head].torso);
 
 	ent->client->history[head].leveltime = level.time;
 }
@@ -191,11 +183,7 @@ void G_TimeShiftClient( gentity_t *ent, int time, qbool debug, gentity_t *debugg
 
 			// locational damage
 			VectorCopy( ent->r.currentAngles, ent->client->saved.currentAngles);
-			VectorCopy( ent->client->legs_angles, ent->client->saved.legs_angles);
-			VectorCopy( ent->client->torso_angles, ent->client->saved.torso_angles);
 			VectorCopy( ent->client->ps.viewangles, ent->client->saved.viewangles);
-			BG_CopyLerpFrame( &ent->client->legs, &ent->client->saved.legs);
-			BG_CopyLerpFrame( &ent->client->torso, &ent->client->saved.torso);
 
 			ent->client->saved.leveltime = level.time;
 		}
@@ -226,19 +214,8 @@ void G_TimeShiftClient( gentity_t *ent, int time, qbool debug, gentity_t *debugg
 				ent->r.currentAngles);
 
 			TimeShiftAnglesLerp( frac,
-				ent->client->history[k].legs_angles, ent->client->history[j].legs_angles,
-				ent->client->legs_angles);
-
-			TimeShiftAnglesLerp( frac,
-				ent->client->history[k].torso_angles, ent->client->history[j].torso_angles,
-				ent->client->torso_angles);
-
-			TimeShiftAnglesLerp( frac,
 				ent->client->history[k].viewangles, ent->client->history[j].viewangles,
 				ent->client->ps.viewangles);
-
-			BG_CopyLerpFrame( &ent->client->history[k].legs, &ent->client->legs);
-			BG_CopyLerpFrame( &ent->client->history[k].torso, &ent->client->torso);
 
 			if ( debug && debugger != NULL ) {
 				// print some debugging stuff exactly like what the client does
@@ -273,11 +250,7 @@ void G_TimeShiftClient( gentity_t *ent, int time, qbool debug, gentity_t *debugg
 
 			// locational damage
 			VectorCopy( ent->client->history[k].currentAngles, ent->r.currentAngles);
-			VectorCopy( ent->client->history[k].legs_angles, ent->client->legs_angles);
-			VectorCopy( ent->client->history[k].torso_angles, ent->client->torso_angles);
 			VectorCopy( ent->client->history[k].viewangles, ent->client->ps.viewangles);
-			BG_CopyLerpFrame( &ent->client->history[k].legs, &ent->client->legs);
-			BG_CopyLerpFrame( &ent->client->history[k].torso, &ent->client->torso);
 
 			// this will recalculate absmin and absmax
 			trap_LinkEntity( ent );
@@ -382,11 +355,7 @@ void G_UnTimeShiftClient( gentity_t *ent ) {
 
 		// locational damage
 		VectorCopy( ent->client->saved.currentAngles, ent->r.currentAngles);
-		VectorCopy( ent->client->saved.legs_angles, ent->client->legs_angles);
-		VectorCopy( ent->client->saved.torso_angles, ent->client->torso_angles);
 		VectorCopy( ent->client->saved.viewangles, ent->client->ps.viewangles);
-		BG_CopyLerpFrame( &ent->client->saved.legs, &ent->client->legs);
-		BG_CopyLerpFrame( &ent->client->saved.torso, &ent->client->torso);
 
 		// this will recalculate absmin and absmax
 		trap_LinkEntity( ent );

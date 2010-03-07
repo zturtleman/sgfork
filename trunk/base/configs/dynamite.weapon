@@ -70,8 +70,8 @@ initialLerp = 0
 reversed = 0
 flipflop = 0
 
-spread = 0
-damage = 0
+spread = 700
+damage = 900
 range = 250
 addTime = 0
 count = 460

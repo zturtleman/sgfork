@@ -74,127 +74,65 @@ const char	*CG_PlaceString( int rank ) {
 	return str;
 }
 
-static void CG_Hit_Message( entityState_t *ent ){
+static char *CG_FetchHitPartName(int *hitLocation) {
+	if (*hitLocation & HIT_LOCATION_HEAD) {
+		*hitLocation &= ~HIT_LOCATION_HEAD;
+		return HIT_LOCATION_NAME_HEAD;
+	} else if (*hitLocation & HIT_LOCATION_FRONT) {
+		*hitLocation &= ~HIT_LOCATION_FRONT;
+		return HIT_LOCATION_NAME_FRONT;
+	} else if (*hitLocation & HIT_LOCATION_BACK) {
+		*hitLocation &= ~HIT_LOCATION_BACK;
+		return HIT_LOCATION_NAME_BACK;
+	} else if (*hitLocation & HIT_LOCATION_LEFT) {
+		*hitLocation &= ~HIT_LOCATION_LEFT;
+		return HIT_LOCATION_NAME_LEFT;
+	} else if (*hitLocation & HIT_LOCATION_RIGHT) {
+		*hitLocation &= ~HIT_LOCATION_RIGHT;
+		return HIT_LOCATION_NAME_RIGHT;
+	} else if (*hitLocation & HIT_LOCATION_LEGS) {
+		*hitLocation &= ~HIT_LOCATION_LEGS;
+		return HIT_LOCATION_NAME_LEGS;
+	} else {
+		*hitLocation = 0;
+		return HIT_LOCATION_NAME_NONE;
+	}
+}
+
+static void CG_HitMessageTarget(entityState_t *ent) {
 	const char		*info;
 	char			name[32];
-	clientInfo_t	*ci;
-	int				target = ent->otherEntityNum, shooter = ent->otherEntityNum2;
-	int				nameNum;
-	int				count = 0;
-	int				i;
 
-	if(!cg_hitmsg.integer && shooter == cg.snap->ps.clientNum)
+	if (!(info = CG_ConfigString(CS_PLAYERS + ent->clientNum)))
 		return;
+	Q_strncpyz(name, Info_ValueForKey(info, "n"), sizeof(name) - 2);
 
-	if(!cg_ownhitmsg.integer && target == cg.snap->ps.clientNum)
-		return;
+	CG_Printf("^3You hit ^7%s^3's ", name);
 
-	// is this client affected by the shoot?
-	if(shooter != cg.snap->ps.clientNum &&
-		target != cg.snap->ps.clientNum)
-		return;
+	if (ent->eventParm)
+		CG_Printf(CG_FetchHitPartName(&ent->eventParm));
+	
+	while (ent->eventParm)
+		CG_Printf(", %s", CG_FetchHitPartName(&ent->eventParm));
 
-	// name must be the other player
-	if(target == cg.snap->ps.clientNum)
-		nameNum = shooter;
-	else
-		nameNum = target;
+	CG_Printf("\n");
+}
 
-	if ( nameNum < 0 || nameNum >= MAX_CLIENTS ) {
-		return;
-	}
-	ci = &cgs.clientinfo[nameNum];
+static void CG_HitMessageOwn(entityState_t *ent) {
+	CG_Printf("^6Your ");
 
-	info = CG_ConfigString( CS_PLAYERS + nameNum );
-	if ( !info ) {
+	if (ent->eventParm)
+		CG_Printf(CG_FetchHitPartName(&ent->eventParm));
+
+	if (!ent->eventParm) {
+		CG_Printf(" was hit\n");
 		return;
 	}
-	Q_strncpyz( name, Info_ValueForKey( info, "n" ), sizeof(name) - 2);
-	strcat( name, S_COLOR_WHITE );
 
-	// if we have to print several locations
-	for(i=0; i<3; i++){
-		int j;
+	while (ent->eventParm)
+		CG_Printf(", %s", CG_FetchHitPartName(&ent->eventParm));
 
-		if(ent->angles2[i] != -1) {
-			qbool del = qfalse;
-
-			// check if this location is already stored
-			for(j = 0; j < i; j++){
-				if(ent->angles2[i] == ent->angles2[j]){
-
-					// front
-					if(ent->weapon){
-						if( !Q_stricmp(hit_info[(int)ent->angles2[i]].forename,
-							hit_info[(int)ent->angles2[j]].forename)){
-							del = qtrue;
-						}
-					} else if( !Q_stricmp(hit_info[(int)ent->angles2[i]].backname,
-						hit_info[(int)ent->angles2[j]].backname)){
-						del = qtrue;
-					}
-				}
-			}
-
-			// delete this location if nessecary
-			if(del){
-				for(j=i; j<2; j++){
-					ent->angles2[j] = ent->angles2[j+1];
-				}
-				ent->angles2[2] = -1;
-				continue;
-			}
-
-			count++;
-		}
-	}
-
-	if(count){
-		char part[3][10];
-
-		for(i=0;i<count;i++){
-
-			if((int)ent->angles2[i] < 0 || (int)ent->angles2[i] > NUM_HIT_LOCATIONS)
-				return;
-
-			if(ent->weapon)
-				strcpy(part[i], hit_info[(int)ent->angles2[i]].forename);
-			else
-				strcpy(part[i], hit_info[(int)ent->angles2[i]].backname);
-		}
-
-		if(target == cg.snap->ps.clientNum){
-			if(count == 3)
-				CG_Printf("^1Your %s, your %s and your %s are hit.\n", part[0], part[1], part[2]);
-			else if(count == 2)
-				CG_Printf("^1Your %s and your %s are hit.\n", part[0], part[1]);
-			else
-				CG_Printf("^1Your %s is hit.\n", part[0]);
-		} else {
-			if(count == 3)
-				CG_Printf("^2You hit ^7%s^2's %s, %s and %s.\n", name, part[0], part[1], part[2]);
-			else if(count == 2)
-				CG_Printf("^2You hit ^7%s^2's %s and %s.\n", name, part[0], part[1]);
-			else
-				CG_Printf("^2You hit ^7%s^2's %s.\n", name, part[0]);
-		}
-	} else {
-
-		if(ent->frame < 0 || ent->frame > NUM_HIT_LOCATIONS)
-			return;
-
-		if(target == cg.snap->ps.clientNum){
-			if(ent->weapon)
-				CG_Printf("^1Your %s is hit.\n", hit_info[ent->frame].forename);
-			else
-				CG_Printf("^1Your %s is hit.\n", hit_info[ent->frame].backname);
-		} else {
-			if(ent->weapon)
-				CG_Printf("^2You hit ^7%s^2's %s.\n", name, hit_info[ent->frame].forename);
-			else
-				CG_Printf("^2You hit ^7%s^2's %s.\n", name, hit_info[ent->frame].backname);
-		}
-	}
+	CG_Printf(" were hit\n");
 }
 
 /*
@@ -1004,13 +942,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT, -1, -1, qtrue, dirs, -1);
 		break;
 
-	// not used anymore
-	case EV_MISSILE_ALCOHOL:
-		//DEBUGNAME("EV_MISSILE_ALCOHOL");
-		//ByteToDir( es->eventParm, dir);
-		//CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT, -1, -1, qtrue, NULL);
-		break;
-
 	case EV_MISSILE_HIT:
 		DEBUGNAME("EV_MISSILE_HIT");
 		ByteToDir( es->eventParm, dir );
@@ -1035,87 +966,23 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_LaunchFuncBreakable(cent);
 		break;
 
-	case EV_BULLET:
-		break;
-
-	case EV_BULLET_HIT_BOILER:
-		DEBUGNAME("EV_BULLET_HIT_BOILER");
-		ByteToDir( es->eventParm, dir );
-		trap_S_StartSound ( NULL, es->number, CHAN_AUTO, cgs.media.boilerhit);
-		trap_S_StartSound ( NULL, es->number, CHAN_AUTO, cgs.media.boilerhit);
-		trap_S_StartSound ( NULL, es->number, CHAN_AUTO, cgs.media.boilerhit);
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD, es->time, SURF_METAL, -1, -1 );
-		//CG_Printf("Your Boiler Plate was hit (debugging)\n");
-		if(es->eventParm == cg.snap->ps.clientNum){
-			//"shake" the view
-			cg.landAngleChange = (rand()%40)-20;
-			cg.landTime = cg.time;
-			cg.landChange = 0;
-		}
-		break;
-
 	case EV_KNIFEHIT:
 		DEBUGNAME("EV_KNIFEHIT");
-		trap_S_StartSound(es->pos.trBase, es->number, CHAN_WEAPON, cgs.media.knifehit );
+		ByteToDir(es->eventParm, dir);
+		CG_ProjectileHitWall(WP_KNIFE, es->pos.trBase, dir, es->torsoAnim, es->weapon, es->otherEntityNum);
 
-		// wall was hit
-		if( es->torsoAnim != -1){
-			CG_LaunchImpactParticle( es->pos.trBase, dir, es->time2,
-				es->torsoAnim, WP_KNIFE, qfalse);
-			break;
-		}
+//		trap_S_StartSound(es->pos.trBase, es->number, CHAN_WEAPON, cgs.media.knifehit );
 
-		if(es->weapon < MAX_CLIENTS && es->weapon >= 0){
-			CG_LaunchImpactParticle(es->pos.trBase, dir, -1, -1, -1, qtrue);
-		}
-
-		if(es->eventParm == cg.snap->ps.clientNum){
-			//"shake" the view
-			cg.landAngleChange = (rand()%30)-15;
-			cg.landTime = cg.time;
-			cg.landChange = 0;
-		}
 		break;
-
-	case EV_BOILER_HIT:
-		DEBUGNAME("EV_BOILER_HIT"); //only sound
-		trap_S_StartSound ( NULL, es->number, CHAN_AUTO, cgs.media.boilerhit);
-		if(es->eventParm == cg.snap->ps.clientNum){
-			//"shake" the view
-			cg.landAngleChange = (rand()%40)-20;
-			cg.landTime = cg.time;
-			cg.landChange = 0;
-		}
-		break;
-
-	case EV_BULLET_HIT_WALL:
-		DEBUGNAME("EV_BULLET_HIT_WALL");
-		ByteToDir( es->eventParm, dir );
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD, es->time, es->time2, es->torsoAnim, es->otherEntityNum2 );
-		break;
-
-	case EV_BULLET_HIT_FLESH:
-		DEBUGNAME("EV_BULLET_HIT_FLESH");
-		ByteToDir( es->eventParm, dir );
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm, es->time, -1, -1, -1);
-		if(es->eventParm == cg.snap->ps.clientNum){
-			//"shake" the view
-			cg.landAngleChange = (rand()%30)-15;
-			cg.landTime = cg.time;
-			cg.landChange = 0;
-		}
-	break;
 
 	case EV_SHOTGUN:
 		DEBUGNAME("EV_SHOTGUN");
-		CG_ShotgunFire( es );
+		CG_ShotgunFire(es);
 		break;
 
-	case EV_SMOKE:
-		DEBUGNAME("EV_SMOKE");
-		if(es->frame != cg.snap->ps.clientNum || cg.renderingThirdPerson ||
-			!cg_gunsmoke.integer)
-			CG_MakeSmokePuff(es);
+	case EV_BULLET:
+		DEBUGNAME("EV_BULLET");
+		CG_BulletFire(es);
 		break;
 
 	case EV_GENERAL_SOUND:
@@ -1140,15 +1007,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.roundendtime = es->time2;
 		//if(es->time)
 			cg.roundstarttime = es->time;
-		break;
-
-	case EV_HIT_CHECK:
-		/*if(ai_nodepointer >= MAX_AINODES)
-			break;
-
-		VectorCopy(es->pos.trBase, ai_nodes[ai_nodepointer]);
-		VectorCopy(es->angles, ai_angles[ai_nodepointer]);
-		ai_nodepointer++;*/
 		break;
 
 	case EV_DUEL_WON:
@@ -1212,9 +1070,16 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cgs.media.snd_death[event-EV_DEATH_DEFAULT] );
 		break;
 
-	case EV_HIT_MESSAGE:
-		DEBUGNAME("EV_HIT_MESSAGE");
-		CG_Hit_Message( es);
+	case EV_PLAYER_HIT:
+		DEBUGNAME("EV_PLAYER_HIT");
+		ByteToDir(es->torsoAnim, dir);
+		if (es->otherEntityNum == cg.snap->ps.clientNum && cg_hitmsg.integer)
+			CG_HitMessageTarget(es);
+		else if (es->clientNum == cg.snap->ps.clientNum && cg_ownhitmsg.integer)
+			CG_HitMessageOwn(es);
+
+		if (cg_blood.integer)
+			CG_LaunchImpactParticle(es->pos.trBase, dir, -1, -1, -1, qtrue);
 		break;
 
 	case EV_OBITUARY:
@@ -1254,9 +1119,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_Beam( cent );
 		break;
 
-	case EV_NOTHING:
-		DEBUGNAME("EV_NOTHING");
-		CG_Printf("who called that event 77?\n");
+	case EV_RAILTRAIL:
+		DEBUGNAME("EV_RAILTRAIL");
+		CG_RailTrail(es->origin2, es->pos.trBase, es->torsoAnim);
 		break;
 
 	default:

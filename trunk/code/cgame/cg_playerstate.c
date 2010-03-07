@@ -122,7 +122,6 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 		kick = 10;
 	}
 	cg.damageValue = kick;
-	cg.v_dmg_time = cg.time + DAMAGE_TIME;
 	cg.damageTime = cg.snap->serverTime;
 }
 
@@ -189,8 +188,6 @@ void CG_Respawn( void ) {
 
 	VectorCopy(cent->lerpOrigin, cg.anim_vieworigin);
 }
-
-extern char *eventnames[];
 
 /*
 ==============

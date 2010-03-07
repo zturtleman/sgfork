@@ -244,17 +244,6 @@ void ByteToDir( int b, vec3_t dir ) {
 	VectorCopy (bytedirs[b], dir);
 }
 
-
-unsigned ColorBytes3 (float r, float g, float b) {
-	unsigned	i;
-
-	( (byte *)&i )[0] = r * 255;
-	( (byte *)&i )[1] = g * 255;
-	( (byte *)&i )[2] = b * 255;
-
-	return i;
-}
-
 unsigned ColorBytes4 (float r, float g, float b, float a) {
 	unsigned	i;
 
@@ -265,28 +254,6 @@ unsigned ColorBytes4 (float r, float g, float b, float a) {
 
 	return i;
 }
-
-float NormalizeColor( const vec3_t in, vec3_t out ) {
-	float	max;
-
-	max = in[0];
-	if ( in[1] > max ) {
-		max = in[1];
-	}
-	if ( in[2] > max ) {
-		max = in[2];
-	}
-
-	if ( !max ) {
-		VectorClear( out );
-	} else {
-		out[0] = in[0] / max;
-		out[1] = in[1] / max;
-		out[2] = in[2] / max;
-	}
-	return max;
-}
-
 
 /*
 =====================
@@ -555,23 +522,17 @@ void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out )
 //============================================================================
 
 #if !idppc
-/*
-** float q_rsqrt( float number )
-*/
-float Q_rsqrt( float number )
-{
+
+//Improved original Quake3 version from "Fast Inverse Square Root" by Chris Lomont
+float Q_rsqrt(float x) {
+	float xhalf = 0.5f*x;
 	floatint_t t;
-	float x2, y;
-	const float threehalfs = 1.5F;
-
-	x2 = number * 0.5F;
-	t.f  = number;
-	t.i  = 0x5f3759df - ( t.i >> 1 );               // what the fuck?
-	y  = t.f;
-	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
-//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
-
-	return y;
+	t.f = x;
+	t.i = 0x5f375a86 - (t.i>>1); // hidden initial guess, fast - LOMONT
+	x = t.f;
+	x = x*(1.5f-xhalf*x*x);
+//	x = x*(1.5f-xhalf*x*x); // add this in for added precision, or many more...
+	return x;
 }
 
 float Q_fabs( float f ) {
@@ -872,7 +833,7 @@ vec_t VectorNormalize( vec3_t v ) {
 	return length;
 }
 
-vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
+vec_t VectorNormalizeClearOutOnZeroLength( const vec3_t v, vec3_t out) {
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
@@ -890,41 +851,6 @@ vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
 
 	return length;
 
-}
-
-void _VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc) {
-	vecc[0] = veca[0] + scale*vecb[0];
-	vecc[1] = veca[1] + scale*vecb[1];
-	vecc[2] = veca[2] + scale*vecb[2];
-}
-
-
-vec_t _DotProduct( const vec3_t v1, const vec3_t v2 ) {
-	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
-}
-
-void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
-	out[0] = veca[0]-vecb[0];
-	out[1] = veca[1]-vecb[1];
-	out[2] = veca[2]-vecb[2];
-}
-
-void _VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
-	out[0] = veca[0]+vecb[0];
-	out[1] = veca[1]+vecb[1];
-	out[2] = veca[2]+vecb[2];
-}
-
-void _VectorCopy( const vec3_t in, vec3_t out ) {
-	out[0] = in[0];
-	out[1] = in[1];
-	out[2] = in[2];
-}
-
-void _VectorScale( const vec3_t in, vec_t scale, vec3_t out ) {
-	out[0] = in[0]*scale;
-	out[1] = in[1]*scale;
-	out[2] = in[2]*scale;
 }
 
 void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out ) {
@@ -1080,3 +1006,4 @@ int Q_isnan( float x )
 
 	return (int)( (unsigned int)fi.ui >> 31 );
 }
+
