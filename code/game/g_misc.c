@@ -273,7 +273,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 
 	switch ( ent->s.weapon ) {
 	case WP_DYNAMITE:
-		fire_dynamite( ent, ent->s.origin, dir, 700 );
+		FireThrowMissle(ent, ent->s.origin, dir, WP_DYNAMITE, bg_weaponlist[WP_DYNAMITE].spread);
 		break;
 	}
 

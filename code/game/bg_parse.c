@@ -131,6 +131,8 @@ void parse_config( int fileType, char *fileName, int num )
           anim->flipflop = parse_getInt( s );
         else if( !Q_stricmp( t, "spread" ) )
           wpinfo->spread = parse_getFloat( s );
+        else if( !Q_stricmp( t, "knockback" ) )
+          wpinfo->knockback = parse_getFloat( s );
         else if( !Q_stricmp( t, "damage" ) )
           wpinfo->damage = parse_getFloat( s );
         else if( !Q_stricmp( t, "range" ) )
@@ -438,6 +440,8 @@ int BG_WeaponListChange(char *weapon, char *an, char *dest, char *value) {
     anim->flipflop = atoi(value);
   else if (!Q_stricmp("spread", dest))
     wp->spread = atof(value);
+  else if (!Q_stricmp("knockback", dest))
+    wp->knockback = atof(value);
   else if (!Q_stricmp("damage", dest))
     wp->damage = atof(value);
   else if (!Q_stricmp("range", dest))
@@ -541,7 +545,7 @@ int BG_ItemListChange( char *item, char *dest, char *value )
     if (!Q_stricmp(value, "0"))
       it->weapon_sort = 0;
 	else {
-      for (i=WPS_NONE; i < WPS_NUM_ITEMS; i++)
+      for (i = WPS_NONE; i < WPS_NUM_ITEMS; i++)
         if (!Q_stricmp(psf_weapon_sortNames[i], value)) {
           it->weapon_sort = i;
           break;

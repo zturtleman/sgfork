@@ -49,7 +49,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	FL_GODMODE				0x00000010
 #define	FL_NOTARGET				0x00000020
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
-#define FL_NO_KNOCKBACK			0x00000800
 #define FL_DROPPED_ITEM			0x00001000
 #define FL_NO_BOTS				0x00002000	// spawn point not for bot use
 #define FL_NO_HUMANS			0x00004000	// spawn point just for bots
@@ -167,7 +166,6 @@ struct gentity_s {
 	void		(*blocked)(gentity_t *self, gentity_t *other);
 	void		(*touch)(gentity_t *self, gentity_t *other, trace_t *trace);
 	void		(*use)(gentity_t *self, gentity_t *other, gentity_t *activator);
-	void		(*pain)(gentity_t *self, gentity_t *attacker, int damage);
 	void		(*die)(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
 
 	int			pain_debounce_time;
@@ -187,7 +185,7 @@ struct gentity_s {
 	int			count;
 
 	gentity_t	*chain;
-	gentity_t	*enemy;
+	const gentity_t	*enemy;
 	gentity_t	*activator;
 	gentity_t	*teamchain;		// next entity in team
 	gentity_t	*teammaster;	// master of the team
@@ -337,9 +335,7 @@ typedef struct {
 	int			leveltime;
 
 	// locational damage
-	vec3_t		currentAngles;
-	vec3_t		legs_angles, torso_angles, viewangles;
-	lerpFrame_t torso, legs;
+	vec3_t		currentAngles, viewangles;
 } clientHistory_t;
 //unlagged - backward reconciliation #1
 
@@ -371,7 +367,6 @@ struct gclient_s {
 	// shotgun blasts give a single big kick
 	int			damage_armor;		// damage absorbed by armor
 	int			damage_blood;		// damage taken out of health
-	int			damage_knockback;	// impact damage
 	vec3_t		damage_from;		// origin for vector calculation
 	qbool	damage_fromWorld;	// if true, don't use the damage_from vector
 
@@ -381,16 +376,12 @@ struct gclient_s {
 	int			accuracy_hits;		// total number of hits
 
 	//
-	int			lastkilled_client;	// last client that this client killed
 	int			lasthurt_client;	// last client that damaged this client
 	int			lasthurt_mod;		// type of damage the client did
 
-	int			lasthurt_location;	// Where the client was hit.
-	int			lasthurt_direction;
-	int			lasthurt_part;
-
-	int			lasthurt_victim;
 	int			lasthurt_anim;		// death-animation
+	gentity_t	*tEntFireWeapon;	// Temporary entity for FireWeapon() which carry
+									// impact of current shot made by other player
 
 	// timers
 	int			respawnTime;		// can respawn when time > this, force after g_forcerespwan
@@ -440,13 +431,6 @@ struct gclient_s {
 	//check if player died in Round-modes
 	qbool	player_died;
 
-	//hit data
-	lerpFrame_t		torso;
-	vec3_t			torso_angles;
-	lerpFrame_t		legs;
-	vec3_t			legs_angles;
-
-
 	int mappart; // mappart the player is currently in
 
 	qbool		realspec;	//is this one a real spectator? (duel mode)
@@ -455,8 +439,6 @@ struct gclient_s {
 	qbool		won;		// player has won this duel
 	int				wontime;
 
-#define SOCIAL_HELP_COUNT	3
-	// social help for the player if he died SOCIAL_HELP_COUNT-times
 	int				deaths;
 
 	qbool		trio; // this player has to be spawned on a triple spawnpoint
@@ -631,7 +613,7 @@ void	G_SetMovedir ( vec3_t angles, vec3_t movedir);
 
 void	G_InitGentity( gentity_t *e );
 gentity_t	*G_Spawn (void);
-gentity_t *G_TempEntity( vec3_t origin, int event );
+gentity_t *G_TempEntity( const vec3_t origin, int event );
 void	G_Sound( gentity_t *ent, int channel, int soundIndex );
 void	G_FreeEntity( gentity_t *e );
 qbool	G_EntitiesFree( void );
@@ -652,35 +634,19 @@ qbool G_IsAnyClientWithinRadius(const vec3_t org, float radiusSquare, int ignore
 //
 // g_combat.c
 //
-void G_LookForBreakableType(gentity_t *ent);
-qbool CanDamage (gentity_t *targ, vec3_t origin);
-void G_Damage (gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, float damage, int dflags, int mod);
-qbool G_RadiusDamage (vec3_t origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, int mod);
-int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t impactpoint, vec3_t bouncedir );
-void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 void TossClientItems( gentity_t *self );
-void TossClientCubes( gentity_t *self );
-void LookAtKiller( gentity_t *self, gentity_t *attacker );
-
-// damage flags
-#define DAMAGE_RADIUS				0x00000001	// damage was indirect
-#define DAMAGE_NO_ARMOR				0x00000002	// armour does not protect from this damage
-#define DAMAGE_NO_KNOCKBACK			0x00000004	// do not affect velocity, just view angles
-#define DAMAGE_NO_PROTECTION		0x00000008  // armor, shields, invulnerability, and godmode have no effect
+void LookAtKiller( gentity_t *self, const gentity_t *attacker );
+float G_Damage(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
+			   const vec3_t dir, const vec3_t point, const float damage, const int dflags, const meansOfDeath_t mod);
+qbool G_RadiusDamage(vec3_t origin, gentity_t *attacker, const float initialDamage, const float radius,
+					 gentity_t *ignore, const meansOfDeath_t mod);
 
 //
 // g_missile.c
 //
 void G_RunMissile( gentity_t *ent );
-void G_ExplodeMissile( gentity_t *ent );
-void G_InstantExplode(vec3_t orig, gentity_t *attacker);
-gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
-gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t aimdir);
-// Smokin'Guns missiles
-gentity_t *fire_dynamite (gentity_t *self, vec3_t start, vec3_t dir, int speed);
-gentity_t *fire_molotov (gentity_t *self, vec3_t start, vec3_t dir, int speed);
-gentity_t *fire_alcohol (gentity_t *self, vec3_t start, vec3_t dir, int speed);
-gentity_t *fire_knife (gentity_t *self, vec3_t start, vec3_t dir, int speed);
+void G_InstantExplode(const vec3_t orig, gentity_t *attacker);
+gentity_t *FireThrowMissle(gentity_t *self, const vec3_t start, const vec3_t dir, const weapon_t weapon, const float speed);
 
 //
 // g_mover.c
@@ -704,9 +670,9 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
 //
 // g_weapon.c
 //
-qbool LogAccuracyHit( gentity_t *target, gentity_t *attacker );
-void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
-qbool CheckKnifeAttack( gentity_t *ent );
+qbool LogAccuracyHit(const gentity_t *target, const gentity_t *attacker);
+void CalcMuzzlePoint ( gentity_t *ent, vec3_t muzzlePoint );
+void CheckCloseCombatKnifeAttack(gentity_t *ent);
 
 //unlagged - g_unlagged.c
 void G_ResetHistory( gentity_t *ent );
@@ -754,7 +720,7 @@ qbool G_FilterPacket (char *from);
 //
 // g_weapon.c
 //
-void FireWeapon( gentity_t *ent, qbool altfire, int weapon );
+void FireWeapon( gentity_t *ent, qbool altfire, weapon_t weapon );
 
 //
 // p_hud.c
@@ -816,7 +782,7 @@ int G_AnimLength( int anim, int weapon);
 //
 // g_team.c
 //
-qbool OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
+qbool OnSameTeam(const gentity_t *ent1,const gentity_t *ent2);
 void Team_CheckDroppedItem( gentity_t *dropped );
 qbool CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 
@@ -922,13 +888,11 @@ extern	vmCvar_t	g_password;
 extern	vmCvar_t	g_needpass;
 extern	vmCvar_t	g_gravity;
 extern	vmCvar_t	g_speed;
-extern	vmCvar_t	g_knockback;
 extern	vmCvar_t	g_quadfactor;
 extern	vmCvar_t	g_forcerespawn;
 extern	vmCvar_t	g_inactivity;
 extern	vmCvar_t	g_debugMove;
 extern	vmCvar_t	g_debugAlloc;
-extern	vmCvar_t	g_debugDamage;
 extern	vmCvar_t	g_weaponRespawn;
 extern	vmCvar_t	g_weaponTeamRespawn;
 extern	vmCvar_t	g_synchronousClients;
@@ -987,18 +951,10 @@ extern	vmCvar_t	du_forcetrio;
 //Spoon Start
 extern	vmCvar_t	g_deathcam;
 
-// shows current version (make sure the game was updated correctly)
-extern	vmCvar_t	g_version;
-extern	vmCvar_t	g_url;
-
 // time elapsed for breakable item to respawn
 extern	vmCvar_t	g_breakspawndelay;
 extern	vmCvar_t	g_forcebreakrespawn;
 extern  vmCvar_t  g_tourney;
-
-//hit data
-extern	hit_data_t	hit_data;
-extern	hit_info_t	hit_info[NUM_HIT_LOCATIONS];
 
 extern	int			g_round;
 extern	int			g_maxmapparts;
@@ -1046,9 +1002,6 @@ extern	vmCvar_t	rtp_teamrole;
 
 extern	vmCvar_t	g_redteamcount;
 extern	vmCvar_t	g_blueteamcount;
-
-extern	vmCvar_t	g_redteamscore;
-extern	vmCvar_t	g_blueteamscore;
 
 extern	vmCvar_t	g_robberReward;
 
@@ -1269,11 +1222,6 @@ void G_SetItemBox (gentity_t *ent);
 void G_ThrowWeapon( int weapon, gentity_t *ent );
 void G_GatlingBuildUp( gentity_t *ent );
 gentity_t *G_dropWeapon( gentity_t *ent, gitem_t *item, float angle, int flags );
-int G_HitModelCheck(hit_data_t *data, vec3_t origin,
-				   vec3_t angles, vec3_t torso_angles, vec3_t head_angles,
-				   lerpFrame_t *torso, lerpFrame_t *legs,
-				   vec3_t start, vec3_t end);
-qbool G_LoadHitFiles( hit_data_t *hit_data);
 void G_RunLerpFrame( lerpFrame_t *lf, int newAnimation, float speedScale);
 void G_ClearLerpFrame( lerpFrame_t *lf, int animationNumber);
 void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3] );

@@ -202,8 +202,6 @@ qbool	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3
 	return qfalse;
 }
 
-void G_ExplodeMissile( gentity_t *ent );
-
 /*
 ============
 G_MoverPush
@@ -301,7 +299,7 @@ qbool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obs
 
 		// bobbing entities are instant-kill and never get blocked
 		if ( pusher->s.pos.trType == TR_SINE || pusher->s.apos.trType == TR_SINE ) {
-			G_Damage( check, pusher, pusher, NULL, NULL, 99999, 0, MOD_CRUSH );
+			G_Damage( check, pusher, pusher, NULL, NULL, 0, DAMAGE_INSTANT_KILL, MOD_CRUSH );
 			continue;
 		}
 
@@ -565,7 +563,7 @@ void Reached_BinaryMover( gentity_t *ent ) {
 Use_BinaryMover
 ================
 */
-void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
+void Use_BinaryMover(gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	int		total;
 	int		partial;
 
@@ -1164,34 +1162,82 @@ void func_breakable_die( gentity_t *self, gentity_t *inflictor, gentity_t *attac
 	temp->r.svFlags |= SVF_BROADCAST;
 
 	// set surfaceType // with the torsoAnim set to 1 it transfers a surfaceFlag
-	if(self->trio){
+	/*if(self->trio){
 		// save in float because of more memory
 		temp->s.angles2[0] = self->trio;
 		temp->s.torsoAnim = 1;
-	} else {
+	} else {*/
 		temp->s.eventParm = self->count;
 		temp->s.torsoAnim = 0;
-	}
+	/*}*/
 
 //	G_LogPrintf("breakable die\n");
+}
+
+#define SMALL 2
+void G_LookForBreakableType(gentity_t *ent){
+	vec3_t	origin, origin2;
+	vec3_t	mins, maxs;
+	int		j, shaderNum;
+	trace_t tr;
+
+	if( ent->flags & FL_BREAKABLE_INIT)
+		return;
+
+	VectorAdd (ent->r.absmin, ent->r.absmax, origin);
+	VectorScale (origin, 0.5f, origin);
+	VectorSubtract(ent->r.absmin, origin, mins);
+	VectorSubtract(ent->r.absmax, origin, maxs);
+
+	ent->r.contents |= CONTENTS_JUMPPAD;
+	trap_LinkEntity(ent);
+
+	// from the mins
+	for(j=0;j<6;j++){
+		VectorCopy(origin, origin2);
+
+		if(j < 3){
+			origin2[j] += mins[j];
+			origin2[j] += -SMALL;
+		} else {
+			origin2[j-3] += maxs[j-3];
+			origin2[j-3] += SMALL;
+		}
+
+		shaderNum = trap_Trace_New2 ( &tr, origin2, NULL, NULL, origin, -1, MASK_SHOT|CONTENTS_JUMPPAD);
+
+		if(tr.entityNum == ent->s.number)
+			break;
+
+		// test has failed
+		shaderNum  = -1;
+	}
+
+	ent->r.contents &= ~CONTENTS_JUMPPAD;
+	trap_LinkEntity(ent);
+
+	if(shaderNum != -1)
+		ent->flags |= FL_BREAKABLE_INIT;
+
+	G_BreakablePrepare(ent, shaderNum);
 }
 
 //QUAKED func_breakable (0 .5 .8) ?
 
 // spawnflags, manually set breakables types
-#define TYPE_METAL	4
+/*#define TYPE_METAL	4
 #define TYPE_WOOD	8
 #define	TYPE_CLOTH	16
 #define TYPE_DIRT	32
 #define	TYPE_GLASS	64
-#define	TYPE_STONE	128
+#define	TYPE_STONE	128*/
 void SP_func_breakable (gentity_t *ent){
 	float	size;
 	char	*s;
 	gitem_t	*item;
 
 	// look for a manually-set-type
-	if(ent->spawnflags){
+	/*if(ent->spawnflags){
 
 		if(ent->spawnflags & TYPE_METAL){
 			ent->trio = SURF_METAL;
@@ -1209,7 +1255,7 @@ void SP_func_breakable (gentity_t *ent){
 			ent->trio = 0;
 	} else {
 		ent->trio = 0;
-	}
+	}*/
 
 	trap_SetBrushModel( ent, ent->model );
 

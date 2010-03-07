@@ -1185,7 +1185,7 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type)
 		if (move.stopevent & SE_HITGROUND)
 		{
 			//check for nearby gap
-			VectorNormalize2(move.velocity, tmpdir);
+			VectorNormalizeClearOutOnZeroLength(move.velocity, tmpdir);
 			dist = BotGapDistance(move.endpos, tmpdir, ms->entitynum);
 			if (dist > 0) return qfalse;
 			//

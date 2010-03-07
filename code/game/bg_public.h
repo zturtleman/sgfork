@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
-#define	GAME_VERSION		"smokinguns-fork"
+#define	GAME_VERSION		"sgfork"
 
 //
 // config strings are a general means of communicating variable length strings
@@ -161,7 +161,6 @@ typedef struct {
 	int			tracemask;			// collide against these types of surfaces
 	int			debugLevel;			// if set, diagnostic output will be printed
 	qbool	noFootsteps;		// if the game is setup for no footsteps by the server
-	qbool	gauntletHit;		// true if a gauntlet attack would actually hit something
 
 	int			framecount;
 
@@ -240,11 +239,8 @@ typedef enum {
 	PERS_SPAWN_COUNT,				// incremented every respawn
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 	PERS_ATTACKER,					// clientnum of last damage inflicter
-	PERS_ATTACKEE_ARMOR,			// health/armor of last person we attacked
 	PERS_KILLED,					// count of the number of times you died
-	// player awards tracking
-	//bank robbery
-	PERS_ROBBER
+	PERS_ROBBER						// 1 if player is robber, 0 otherwise
 } persEnum_t;
 
 
@@ -316,18 +312,6 @@ typedef enum {
 } powerup_t;
 
 typedef enum {
-	HI_NONE,
-
-	HI_TELEPORTER,
-	HI_MEDKIT,
-	HI_KAMIKAZE,
-	HI_PORTAL,
-	HI_INVULNERABILITY,
-
-	HI_NUM_HOLDABLE
-} holdable_t;
-
-typedef enum {
 	WP_NONE,
 
 	//melee
@@ -377,7 +361,7 @@ typedef enum {
 #define PLAYEREVENT_HOLYSHIT			0x0004
 
 // entityState_t->event values
-// entity events are for effects that take place reletive
+// entity events are for effects that take place relative
 // to an existing entities origin.  Very network efficient.
 
 // two bits at the top of the entityState->event field
@@ -489,27 +473,17 @@ typedef enum {
 	EV_DUEL_INTRO,
 	EV_DUEL_WON,  // 80
 
-	EV_HIT_CHECK,
-
 	//func events
 	EV_FUNCBREAKABLE,
 
-	EV_BULLET_HIT_FLESH,
-	EV_BULLET_HIT_WALL,
-
-	EV_BULLET_HIT_BOILER,  // 85
-	EV_BOILER_HIT,
-
 	EV_WHISKEY_BURNS,
-	EV_MISSILE_ALCOHOL,
 	EV_MISSILE_FIRE,
 	EV_MISSILE_HIT,  // 90
 	EV_MISSILE_MISS,
 	EV_MISSILE_MISS_METAL,
+	EV_RAILTRAIL,
 	EV_SHOTGUN,
 	EV_BULLET,				// otherEntity is the shooter
-
-	EV_SMOKE,				// 95, make smoke puff
 
 	EV_PAIN,
 	EV_DEATH_DEFAULT,
@@ -523,7 +497,7 @@ typedef enum {
 	EV_DEATH_FALL,	// 105
 	EV_DEATH_FALL_BACK,
 	EV_OBITUARY,
-	EV_HIT_MESSAGE,
+	EV_PLAYER_HIT,
 
 	EV_POWERUP_QUAD,
 	EV_POWERUP_BATTLESUIT,	// 110
@@ -535,7 +509,6 @@ typedef enum {
 	EV_DEBUG_LINE,
 	EV_STOPLOOPINGSOUND,	// 115
 	EV_TAUNT,
-	EV_NOTHING
 } entity_event_t;
 
 
@@ -813,7 +786,6 @@ typedef enum {
 	MOD_SUICIDE,
 	MOD_TARGET_LASER,
 	MOD_TRIGGER_HURT,
-	MOD_BOILER //just to check if the boilerplate was hit
 } meansOfDeath_t;
 
 
@@ -828,8 +800,6 @@ typedef enum {
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based
 							// EFX: rotate + external ring that rotates
-	IT_HOLDABLE,			// single use, holdable item
-							// EFX: rotate + bob
 	IT_PERSISTANT_POWERUP,
 	IT_TEAM
 } itemType_t;
@@ -838,9 +808,10 @@ typedef enum {
 
 typedef struct wpinfo_s {
 	animation_t	animations[NUM_WP_ANIMATIONS];
-	float	spread;
-	float	damage;
-	int		range;
+	float	spread;		// For missiles it is speed
+	float	damage;		// For missiles it is splashDamage as well
+	float	knockback;
+	int		range;		// For missiles it is splashRadius
 	int		addTime;
 	int		count;
 	int		clipAmmo;	//ammo that fits in the weapon
@@ -902,7 +873,6 @@ gitem_t	*BG_ItemByClassname( const char *classname );
 gitem_t	*BG_ItemForWeapon( weapon_t weapon );
 gitem_t	*BG_ItemForAmmo( weapon_t ammo ) ;
 gitem_t	*BG_ItemForPowerup( powerup_t pw );
-gitem_t	*BG_ItemForHoldable( holdable_t pw );
 int	BG_PlayerWeapon( int firstweapon, int lastweapon, playerState_t	*ps);
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
@@ -966,43 +936,12 @@ void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 qbool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 int BG_AnimLength( int anim, int weapon);
-void BG_SurfaceFlags2Prefix(int surfaceFlags, char	*prefix);
 
-#define ARENAS_PER_TIER		4
 #define MAX_ARENAS			1024
 #define	MAX_ARENAS_TEXT		8192
 
 #define MAX_BOTS			1024
 #define MAX_BOTS_TEXT		8192
-
-
-// Kamikaze
-
-// 1st shockwave times
-#define KAMI_SHOCKWAVE_STARTTIME		0
-#define KAMI_SHOCKWAVEFADE_STARTTIME	1500
-#define KAMI_SHOCKWAVE_ENDTIME			2000
-// explosion/implosion times
-#define KAMI_EXPLODE_STARTTIME			250
-#define KAMI_IMPLODE_STARTTIME			2000
-#define KAMI_IMPLODE_ENDTIME			2250
-// 2nd shockwave times
-#define KAMI_SHOCKWAVE2_STARTTIME		2000
-#define KAMI_SHOCKWAVE2FADE_STARTTIME	2500
-#define KAMI_SHOCKWAVE2_ENDTIME			3000
-// radius of the models without scaling
-#define KAMI_SHOCKWAVEMODEL_RADIUS		88
-#define KAMI_BOOMSPHEREMODEL_RADIUS		72
-// maximum radius of the models during the effect
-#define KAMI_SHOCKWAVE_MAXRADIUS		1320
-#define KAMI_BOOMSPHERE_MAXRADIUS		720
-#define KAMI_SHOCKWAVE2_MAXRADIUS		704
-
-// Relative direction strike came from
-#define LOCATION_LEFT		0x00000100
-#define LOCATION_RIGHT		0x00000200
-#define LOCATION_FRONT		0x00000400
-#define LOCATION_BACK		0x00000800
 
 #define NUM_GIBS	9
 
@@ -1026,121 +965,10 @@ typedef struct {
 
 extern	prefixInfo_t	prefixInfo[NUM_PREFIXINFO];
 
-///////////////////////////////////////
-// HIT FILE STRUCTURES
-///////////////////////////////////////
-
-
-#define MAX_HITFILE		30000
-#define	MAX_HIT_FRAMES	300
-#define HIT_DEATHANIM_OFFSET 437
-
-#define PART_NONE	0
-#define	PART_HEAD	1
-#define PART_UPPER	2
-#define PART_LOWER	3
-
-#define HIT_IDENT	21
-
-// FIXME: add spherical hit-detection for head
-typedef enum {
-	TYPE_CYLINDER,
-	TYPE_SPHERE,
-	NUM_TYPES
-} hit_types;
-
-// hit locations:
-typedef enum {
-	HIT_HEAD,
-	HIT_NECK,
-	HIT_SHOULDER_R,
-	HIT_UPPER_ARM_R,
-	HIT_LOWER_ARM_R,
-	HIT_HAND_R,
-	HIT_SHOULDER_L,
-	HIT_UPPER_ARM_L,
-	HIT_LOWER_ARM_L,
-	HIT_HAND_L,
-	HIT_CHEST,
-	HIT_STOMACH,
-	HIT_UPPER_LEG_R,
-	HIT_LOWER_LEG_R,
-	HIT_FOOT_R,
-	HIT_UPPER_LEG_L,
-	HIT_LOWER_LEG_L,
-	HIT_FOOT_L,
-	HIT_PELVIS,
-
-	NUM_HIT_LOCATIONS
-} hit_locations;
-
-#define NUM_HIT_HEAD (HIT_NECK - HIT_HEAD)
-#define NUM_HIT_UPPER (HIT_UPPER_LEG_R - HIT_NECK)
-#define NUM_HIT_LOWER (NUM_HIT_LOCATIONS - HIT_UPPER_LEG_R)
-
-// create some info to make parsing the hitfiles a little easier
-typedef struct hit_info_s {
-	char	*meshname;
-	char	*forename;
-	char	*backname;
-	int		hit_location;
-	int		hit_part;
-} hit_info_t;
-
-extern	hit_info_t	hit_info[NUM_HIT_LOCATIONS];
-
-// Hit data
-typedef struct hit_header {
-	short	ident;
-	short	numFrames;
-	short	numMeshes;
-} hit_header_t;
-
-typedef struct hit_tag_s {
-	vec3_t		angles;
-	vec3_t		origin;
-} hit_tag_t;
-
-typedef struct hit_mesh_s {
-	short		normal[3];
-	short		origin[3];
-} hit_mesh_t;
-
-typedef struct mesh_header_s {
-	char		name[20];
-	short		a1;
-	short		a2;
-	short		dir1[3];
-	short		dir2[3];
-	short		length;
-} mesh_header_t;
-
-typedef struct hit_part_s {
-	mesh_header_t	header;
-	hit_mesh_t		pos[MAX_HIT_FRAMES];
-} hit_part_t;
-
-
-typedef struct hit_data_s {
-	hit_tag_t		tag_head[MAX_HIT_FRAMES];
-	hit_tag_t		tag_torso[MAX_HIT_FRAMES];
-
-	hit_part_t		meshes[NUM_HIT_LOCATIONS];
-
-	animation_t		animations[MAX_TOTALANIMATIONS];
-} hit_data_t;
-
-////////////////////////////////////////////
-// HIT FILE STRUCTURES END
-////////////////////////////////////////////
-
-
 void BG_StringRead(char *destination, char *source, int size);
 void BG_ModifyEyeAngles( vec3_t origin, vec3_t viewangles,
 						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask ),
 						vec3_t legOffset, qbool print);
-qbool BG_ShootThruWall( float *damage, vec3_t start, vec3_t muzzle, int surfaceFlags, vec3_t end,
-						void (*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask ));
 int BG_CountTypeWeapons(int type, int weapons);
 int BG_SearchTypeWeapon(int type, int weapons, int wp_ignore);
 
@@ -1149,15 +977,10 @@ void BG_DirsToEntityState(entityState_t *es, vec3_t bottledirs[ALC_COUNT]);
 void BG_EntityStateToDirs(entityState_t *es, vec3_t bottledirs[ALC_COUNT]);
 
 qbool CheckPistols(playerState_t *ps, int *weapon);
-void Com_PrintfVector(vec3_t vec);
-void Com_PrintfVectorInt(int vec[3]);
 int BG_MapPrefix(char *map, int gametype);
 
-extern vec3_t	playerMins;
-extern vec3_t	playerMaxs;
-
-extern vec3_t	playerMins_hit;
-extern vec3_t	playerMaxs_hit;
+extern const vec3_t	playerMins;
+extern const vec3_t	playerMaxs;
 
 extern vec3_t gatling_mins;
 extern vec3_t gatling_maxs;

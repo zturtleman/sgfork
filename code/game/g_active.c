@@ -86,7 +86,6 @@ void P_DamageFeedback( gentity_t *player ) {
 	//
 	client->damage_blood = 0;
 	client->damage_armor = 0;
-	client->damage_knockback = 0;
 }
 
 
@@ -142,8 +141,8 @@ void P_WorldEffects( gentity_t *ent ) {
 				// don't play a normal pain sound
 				ent->pain_debounce_time = level.time + 200;
 
-				G_Damage (ent, NULL, NULL, NULL, NULL,
-					ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
+				G_Damage(ent, NULL, NULL, NULL, NULL,
+					ent->damage, 0, MOD_WATER);
 			}
 		}
 	} else {
@@ -748,10 +747,11 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				damage = 35 + rand()%2;
 			}
 
-			ent->client->ps.powerups[DM_LEGS_1]++;
 			VectorSet (dir, 0, 0, 1);
 			ent->pain_debounce_time = level.time + 200;	// no normal pain sound
-			G_Damage (ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+			G_Damage(ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+			ent->client->ps.powerups[DM_LEGS_2] = (ent->health < HEALTH_INJURED) ? 1 : 0;
+			ent->client->ps.powerups[DM_LEGS_1] = (ent->health < HEALTH_USUAL) ? 1 : 0;
 			break;
 
 		case EV_FIRE_WEAPON_DELAY:
@@ -818,8 +818,6 @@ void ClientThink_real( gentity_t *ent ) {
 	int			oldEventSequence;
 	int			msec;
 	usercmd_t	*ucmd;
-	vec3_t legs[3], torso[3];
-	float frameLerp = 0.0f;
 
 
 	client = ent->client;
@@ -1023,12 +1021,16 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// check for the hit-scan gauntlet, don't let the action
 	// go through as an attack unless it actually hits something
-	if ( ent->client->ps.weapon == WP_KNIFE && ( ucmd->buttons & BUTTON_ATTACK )
-		&& !ent->client->ps.stats[STAT_WP_MODE] &&
-		ent->client->ps.weaponTime - (ucmd->serverTime - ent->client->ps.commandTime) <= 0) {
-
-		pm.gauntletHit = CheckKnifeAttack( ent );
-	}
+	// If reload button is pressed at the same time as the attack button,
+	// disable knife action. The same applies to any "talk action"
+	// (say, say_team, opening console and buy choosing action)
+	// No attack is made when in weapon choose mode
+	if ((ucmd->buttons & BUTTON_ATTACK) && !(ucmd->buttons & (BUTTON_RELOAD | BUTTON_TALK))
+		&& !(ent->client->ps.stats[STAT_FLAGS] & SF_WP_CHOOSE)
+		&& ent->client->ps.weapon == WP_KNIFE
+		&& !ent->client->ps.stats[STAT_WP_MODE]
+		&& ent->client->ps.weaponTime - (ucmd->serverTime - ent->client->ps.commandTime) <= 0)
+		CheckCloseCombatKnifeAttack(ent);
 
 	if ( ent->flags & FL_FORCE_GESTURE ) {
 		ent->flags &= ~FL_FORCE_GESTURE;
@@ -1134,30 +1136,6 @@ void ClientThink_real( gentity_t *ent ) {
 	// since that's the case, it makes no sense to store the extra info
 	// in the client's snapshot entity, so let's save a little bandwidth
 	BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
-
-	G_PlayerAngles(ent, legs, torso);
-
-	if(client->ps.stats[STAT_KNOCKTIME] && client->legs.animation){
-		frameLerp = client->legs.animation->frameLerp;
-		client->legs.animation->frameLerp *= 2;
-	}
-
-	//run animation on the client
-	if ( ent->client->legs.yawing && ( pm.ps->legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
-		G_RunLerpFrame(&ent->client->legs, LEGS_TURN, 1.0);
-	} else {
-		G_RunLerpFrame(&client->legs, pm.ps->legsAnim, 1.0);
-	}
-
-
-	if(client->ps.stats[STAT_KNOCKTIME] && client->legs.animation){
-		client->legs.animation->frameLerp = frameLerp;
-	}
-
-	G_RunLerpFrame(&client->torso, pm.ps->torsoAnim, 1.0);
-
-	vectoangles(legs[0], ent->client->legs_angles);
-	vectoangles(torso[0], ent->client->torso_angles);
 
 	// use the snapped origin for linking so it matches client predicted versions
 	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
@@ -1369,7 +1347,7 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 ClientEndFrame
 
 Called at the end of each server frame for each connected client
-A fast client will have multiple ClientThink for each ClientEdFrame,
+A fast client will have multiple ClientThink for each ClientEndFrame,
 while a slow client may have multiple ClientEndFrame between ClientThink.
 ==============
 */

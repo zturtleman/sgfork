@@ -264,8 +264,6 @@ void hurt_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 }
 
 void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
-	int		dflags;
-
 	if ( !other->takedamage ) {
 		return;
 	}
@@ -285,11 +283,7 @@ void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 		G_Sound( other, CHAN_AUTO, self->noise_index );
 	}
 
-	if (self->spawnflags & 8)
-		dflags = DAMAGE_NO_PROTECTION;
-	else
-		dflags = 0;
-	G_Damage (other, self, self, NULL, NULL, self->damage, dflags, MOD_TRIGGER_HURT);
+	G_Damage(other, self, self, NULL, NULL, self->damage, 0, MOD_TRIGGER_HURT);
 }
 
 void SP_trigger_hurt( gentity_t *self ) {

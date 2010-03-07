@@ -52,7 +52,7 @@ buildqvms( )
 {
   make BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1 $*
   [ $? -eq 0 ] || ExitOnError "QVMS building"
-  cd $BUILD_DIR/smokinguns/
+  cd $BUILD_DIR/sgfork/
   zip -r $VMPAKNAME vm/
   mv $VMPAKNAME "$BASE_HOME_DIR"
   cd ../../..
@@ -131,15 +131,15 @@ then
   BUILD_DIR=build/release-mingw32-${ARCH}
   [ "$BASE_HOME_DIR" = "" ] && BASE_HOME_DIR=$PWD
   [ "$BINARY_HOME_DIR" = "" ] && BINARY_HOME_DIR=$BASE_HOME_DIR
-  MAINBINARY="smokinguns.x86.exe"
-  DEDIBINARY="smokinguns_dedicated.x86.exe"
+  MAINBINARY="sgfork.x86.exe"
+  DEDIBINARY="sgfork_dedicated.x86.exe"
 elif [ "$PLATFORM" = "linux" ]
 then
   BUILD_DIR=build/release-linux-${ARCH}
-  MAINBINARY="smokinguns.${ARCH}"
-  DEDIBINARY="smokinguns_dedicated.${ARCH}"
-  [ "$BASE_HOME_DIR" = "" ] && BASE_HOME_DIR=$HOME/.smokinguns/base
-  [ "$BINARY_HOME_DIR" = "" ] && BINARY_HOME_DIR=$HOME/smokinguns
+  MAINBINARY="sgfork.${ARCH}"
+  DEDIBINARY="sgfork_dedicated.${ARCH}"
+  [ "$BASE_HOME_DIR" = "" ] && BASE_HOME_DIR=$HOME/.sgfork/base
+  [ "$BINARY_HOME_DIR" = "" ] && BINARY_HOME_DIR=$HOME/sgfork
 fi
 
 if [ `basename $PWD` = "tools" ]

@@ -99,10 +99,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CHANGE_CROSSHAIR_TEAMMATE  2
 #define CHANGE_CROSSHAIR_OPPONENT  4
 
-//Health stages
-#define HEALTH_USUAL	80
-#define HEALTH_INJURED	49
-
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -735,7 +731,6 @@ typedef struct {
 	int			headStartTime;
 
 	// view movement
-	float		v_dmg_time;
 	float		v_dmg_pitch;
 	float		v_dmg_roll;
 
@@ -995,7 +990,6 @@ typedef struct {
 	qhandle_t	machinegunBrassModel;
 	qhandle_t	shotgunBrassModel;
 
-	qhandle_t	railRingsShader;
 	qhandle_t	railCoreShader;
 
 	qhandle_t	lightningShader;
@@ -1402,7 +1396,6 @@ extern	vmCvar_t		cg_gun_y;
 extern	vmCvar_t		cg_gun_z;
 extern	vmCvar_t		cg_drawGun;
 extern	vmCvar_t		cg_viewsize;
-extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
 extern	vmCvar_t		cg_ignore;
@@ -1429,6 +1422,7 @@ extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_menu;
 extern	vmCvar_t		cg_blood;
+extern	vmCvar_t		cg_shakeOnHit;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
 extern	vmCvar_t		cg_drawFriend;
@@ -1477,11 +1471,6 @@ extern	vmCvar_t		cg_latentCmds;
 extern	vmCvar_t		cg_plOut;
 //unlagged - client options
 
-extern	vmCvar_t		cg_farclip;
-extern	vmCvar_t		cg_farclipValue;
-extern	vmCvar_t		cg_farclipZoomValue;
-
-extern	vmCvar_t		cg_mapLOD;
 extern  vmCvar_t    cg_WeaponsListChangesEnable;
 extern  vmCvar_t    cg_ItemsListChangesEnable;
 
@@ -1618,7 +1607,7 @@ int CG_DrawStrlen( const char *str );
 
 float	*CG_FadeColor( int startMsec, int totalMsec );
 float *CG_TeamColor( int team );
-void CG_GetColorForHealth( int health, vec4_t hcolor );
+void CG_GetColorForHealth(const int health, vec4_t hcolor);
 void CG_TileClear( void );
 
 void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
@@ -1749,11 +1738,11 @@ void CG_FireWeapon( centity_t *cent, qbool altfire, int weapon);
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType, int surfaceFlags, int shaderNum, qbool fire, vec3_t dirs[ALC_COUNT], int entityNum);
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 void CG_ShotgunFire( entityState_t *es );
-void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qbool flesh, int fleshEntityNum , int weapon, int surfaceFlags, int shaderNum, int entityNum);
+void CG_BulletFire(entityState_t *es);
 void CG_MakeSmokePuff(entityState_t *ent);
+void CG_Do_Bubbles(const vec3_t muzzle, const vec3_t end, const vec3_t smallStep, int weapon);
 
-void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
-void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
+void CG_RailTrail(const vec3_t start, const vec3_t end, int color );
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team );
 void CG_DrawWeaponSelect( void );
@@ -2024,10 +2013,8 @@ void CG_LightForPoint(vec3_t origin, vec3_t normal, vec4_t color);
 localEntity_t *CG_LaunchSpriteParticle( vec3_t origin, vec3_t dir, /*int sound,*/ int bouncefactor, int duration,
 						int leFlags);
 
-void BuildHitModel(hit_data_t *data, vec3_t origin,
-				   vec3_t angles, vec3_t torso_angles, vec3_t head_angles,
-				   int frame_upper, int oldframe_upper, float backlerp_upper,
-				   int frame_lower, int oldframe_lower, float backlerp_lower);
+void CG_ProjectileHitWall(int weapon, vec3_t origin, vec3_t dir, int surfaceFlags, int shaderNum, int entityNum);
+
 qbool CG_CheckPlayerVisible(vec3_t view, vec3_t player);
 void CG_PlayReloadSound(int weapon, centity_t *cent, qbool sec);
 localEntity_t *CG_AddSmokeParticle(vec3_t origin, int radius, int randomradius, int lifetime,
@@ -2086,39 +2073,4 @@ typedef struct {
 	float x;
 	float y;
 } coord_t;
-
-
-
-// Far clipping by Joe Kari //
-
-
-qbool CG_Farclip_Sphere( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cube( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Ellipse_Z( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cylinder_Z( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Box_Z( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Circle_Infinite_Z( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Square_Infinite_Z( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cone_Z( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Pyramid_Z( vec3_t , vec3_t , float , float ) ;
-
-qbool CG_Farclip_Ellipse_X( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cylinder_X( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Box_X( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Circle_Infinite_X( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Square_Infinite_X( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cone_X( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Pyramid_X( vec3_t , vec3_t , float , float ) ;
-
-qbool CG_Farclip_Ellipse_Y( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cylinder_Y( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Box_Y( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Circle_Infinite_Y( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Square_Infinite_Y( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Cone_Y( vec3_t , vec3_t , float , float ) ;
-qbool CG_Farclip_Pyramid_Y( vec3_t , vec3_t , float , float ) ;
-
-extern qbool ( * CG_Farclip_Tester[] )( vec3_t , vec3_t , float , float ) ;
-extern int CG_Farclip_Tester_Table_Size ;
-
 

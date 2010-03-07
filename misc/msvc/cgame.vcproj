@@ -452,6 +452,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\game\bg_weapon.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\cgame\cg_consolecmds.c"
 				>
 			</File>
@@ -558,6 +562,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\game\bg_public.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\game\bg_weapon.h"
 				>
 			</File>
 			<File

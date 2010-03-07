@@ -283,10 +283,4 @@ int	trap_CM_BoxTrace_New( trace_t *results, const vec3_t start, const vec3_t end
 						  clipHandle_t model, int brushmask );
 //unused q3-function
 //int CG_LightVerts( const vec3_t normal, int numVerts, polyVert_t *verts );
-
-//enables/disables hit-data-calculation on client
-//#define	HIT_DATA
-#define COINS 7
-#define	BILLS 15
-
 #endif
