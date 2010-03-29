@@ -508,7 +508,7 @@ qbool FS_CreatePath (char *OSPath) {
 		if (*ofs == PATH_SEP) {	
 			// create the directory
 			*ofs = 0;
-			if (!Sys_Mkdir (OSPath)) {
+			if (*(ofs - 1)!=':' && !Sys_Mkdir (OSPath)) {
 				Com_Error( ERR_FATAL, "FS_CreatePath: failed to create path \"%s\"\n",
 					OSPath );
 			}
