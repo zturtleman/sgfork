@@ -1813,7 +1813,7 @@ void Setup_NewRound(void){
 			continue;
 
 		if (g_entities[i].client->ps.stats[STAT_ARMOR])
-			g_entities[i].client->ps.stats[STAT_ARMOR]=BOILER_PLATE;
+			g_entities[i].client->ps.stats[STAT_ARMOR]= BG_ItemByClassname("item_boiler_plate")->quantity;
 
 		g_entities[i].takedamage = qtrue;
 		g_entities[i].teamchange = 0;
