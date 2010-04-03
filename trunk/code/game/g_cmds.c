@@ -237,7 +237,7 @@ void Cmd_Give_f (gentity_t *ent)
 
 	if (give_all || Q_stricmp(name, "armor") == 0)
 	{
-		ent->client->ps.stats[STAT_ARMOR] = BOILER_PLATE;
+		ent->client->ps.stats[STAT_ARMOR] = BG_ItemByClassname("item_boiler_plate")->quantity;
 
 		if (!give_all)
 			return;

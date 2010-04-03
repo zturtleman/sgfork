@@ -180,22 +180,10 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	return g_weaponRespawn.integer;
 }
 
-//======================================================================
-
-int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
-	if(ent->count){
-		other->client->ps.stats[STAT_ARMOR] += ent->count;
-	} else {
-		other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
-	}
-	if ( other->client->ps.stats[STAT_ARMOR] > BOILER_PLATE/*other->client->ps.stats[STAT_MAX_HEALTH] * 2*/ ) {
-		other->client->ps.stats[STAT_ARMOR] = BOILER_PLATE/*other->client->ps.stats[STAT_MAX_HEALTH] * 2*/;
-	}
-
+static int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
+	other->client->ps.stats[STAT_ARMOR] = ent->item->quantity;
 	return RESPAWN_ARMOR;
 }
-
-//======================================================================
 
 /*
 ===============

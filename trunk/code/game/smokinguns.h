@@ -178,11 +178,6 @@ Money system
 Misc
 =============================
 */
-
-#define BOILER_PLATE 60
-#define	ARMOR_PROTECTION	0.66
-
-#define	ITEM_RADIUS			15		// item sizes are needed for client side pickup detection
 #define MEDAL_TIME 3000
 #define ACTIVATE_RANGE 45
 

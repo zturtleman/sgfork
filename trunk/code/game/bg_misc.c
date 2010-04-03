@@ -282,7 +282,7 @@ qbool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerS
 		return qtrue;
 
 	case IT_ARMOR:
-		if ( ps->stats[STAT_ARMOR] >= BOILER_PLATE ) {
+		if ( ps->stats[STAT_ARMOR] >= BG_ItemByClassname("item_boiler_plate")->quantity ) {
 			return qfalse;
 		}
 		return qtrue;
